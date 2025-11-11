@@ -1,0 +1,4 @@
+/var/cache/
+/vendor/
+/node_modules/
+*.log

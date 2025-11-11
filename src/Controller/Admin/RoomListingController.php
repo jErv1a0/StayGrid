@@ -11,7 +11,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\Routing\Attribute\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 #[Route('/admin/roomlisting', name: 'app_admin_roomlisting_')]
 class RoomListingController extends AbstractController
 {
@@ -20,7 +22,6 @@ class RoomListingController extends AbstractController
     {
         $rooms = $em->getRepository(RoomListing::class)->findAll();
 
-        // Prepare room data with current booking and duration
         $roomData = [];
         foreach ($rooms as $room) {
             $bookings = $em->getRepository(Booking::class)->findBy(

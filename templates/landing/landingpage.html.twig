@@ -18,11 +18,30 @@
         }
         .nav-link { color: #4b5563; }
         .nav-link:hover { color: #FFD700; }
-        .btn-primary { background-color: #FFD700; border-color: #FFD700; }
-        .btn-primary:hover { background-color: #e6c200; } 
+        .btn-primary { background-color: #FFD700; border-color: #FFD700; color: white; }
+        .btn-primary:hover { background-color: #e6c200; color: white; }
+
+        /* Popup animation */
+        .fade-in-out {
+            animation: fadeInOut 10s forwards;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
     </style>
 </head>
 <body>
+
+<!-- Popup notification center-top -->
+{% if app.user %}
+<div id="login-popup" class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900 px-6 py-4 rounded-lg shadow-lg z-50 fade-in-out">
+    User: You are logged in as <span class="font-semibold">Regular User</span>. Limited access granted.
+</div>
+{% endif %}
 
 <nav class="bg-white shadow-sm sticky top-0 z-10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -45,21 +64,23 @@
                 {% endfor %}
             </div>
 
-          {% if app.user %}
-    <a href="{{ path('app_booking') }}" 
-       class="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-6 rounded-lg shadow-lg transition duration-200">
-        Book Now
-    </a>
-{% else %}
-       <a href="{{ path('app_login', {'redirect': 'book'}) }}"class="inline-block px-6 py-3 bg-yellow-500 text-gray-900 font-semibold rounded-lg shadow-md hover:bg-yellow-400 transition">
+            <div class="flex items-center space-x-4">
+                {% if app.user %}
+                    <a href="{{ path('app_booking') }}" 
+                       class="bg-yellow-400 hover:bg-yellow-500 font-bold py-2 px-6 rounded-lg shadow-lg transition duration-200 text-white">
                         Book Now
                     </a>
-{% endif %}
+                {% else %}
+                    <a href="{{ path('app_login', {'redirect': 'book'}) }}" class="inline-block px-6 py-3 bg-yellow-500 text-white font-semibold rounded-lg shadow-md hover:bg-yellow-400 transition">
+                        Book Now
+                    </a>
+                {% endif %}
+            </div>
         </div>
     </div>
 </nav>
 
-
+<!-- Carousel Section -->
 <section class="relative w-full overflow-hidden h-[500px]">
     <div id="carousel" class="flex transition-transform duration-700 ease-in-out">
 
@@ -103,6 +124,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    // Carousel
     const carousel = document.getElementById('carousel');
     const dots = document.querySelectorAll('section div span');
     let index = 0;
@@ -120,11 +142,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }, 5000); 
+
+    // Remove popup after 10 seconds
+    const popup = document.getElementById('login-popup');
+    if(popup) {
+        setTimeout(() => {
+            popup.remove();
+        }, 10000); // 10 seconds
+    }
 });
 </script>
 
-
-
+<!-- Header Section -->
 <header class="pt-20 pb-16 bg-white overflow-hidden">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
@@ -137,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     {{ hero_subtitle }}
                 </p>
                 <div class="flex space-x-4">
-                     <a href="{{ path('app_login', {'redirect': 'book'}) }}" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white btn-primary">
+                     <a href="{{ path('app_login', {'redirect': 'book'}) }}" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg btn-primary">
                         Book Now &rarr;
                     </a>
                     <a href="/rooms" class="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-lg" style="color:#FFD700; border: 2px solid #FFD700;">
@@ -195,6 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 </script>
 
+<!-- Features Section -->
 {% set features = [
     { title: 'Smart System', icon_path: 'M9.75 17L9 20l-1 1h8l-1-1v-3m2-4v4a2 2 0 01-2 2H9a2 2 0 01-2-2v-4m12 0a2 2 0 00-2-2H9a2 2 0 00-2 2m12 0h.01M17 10h.01' },
     { title: 'Secure Platform', icon_path: 'M13 10V3L4 14h7v7l9-11h-7z' },
@@ -222,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
 </section>
 
-
+<!-- Featured Rooms Section -->
 {% set featured_rooms = [
     { name: 'Studio Deluxe', description: 'Perfect for solo travelers or couples.', image_url: asset('images/studiodeluxefh.png'), alt: 'Studio Suites View' },
     { name: 'Executive Suite', description: 'Spacious stay with a full kitchen.', image_url: asset('images/executiveFC.png'), alt: 'Executive Suite View' },
@@ -241,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="p-6">
                         <h3 class="text-xl font-bold text-gray-900 mb-2">{{ room.name }}</h3>
                         <p class="text-gray-600 mb-4">{{ room.description }}</p>
-                         <a href="{{ path('app_login', {'redirect': 'book'}) }}" class="inline-flex items-center text-sm font-medium transition duration-150 ease-in-out" style="color: #FFD700;">
+                        <a href="{{ path('app_login', {'redirect': 'book'}) }}" class="inline-flex items-center text-sm font-medium transition duration-150 ease-in-out" style="color: #FFD700;">
                             Book This Stay &rarr;
                         </a>
                     </div>
@@ -256,5 +286,6 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     </div>
 </section>
+
 </body>
 </html>
