@@ -61,9 +61,10 @@ DB_READY=0
 
 while [ "$COUNT" -lt "$MAX_RETRIES" ]; do
   php -r '
-    $url = getenv("DATABASE_URL");
-    if (!$url) { exit(1); }
+    $url = getenv("DATABASE_URL") ?: getenv("MYSQL_URL") ?: getenv("MYSQL_DSN");
+    if (!$url || str_starts_with($url, "${{")) { exit(1); }
     $p = parse_url($url);
+    if ($p === false || empty($p["host"])) { exit(1); }
     $host = $p["host"] ?? getenv("MYSQL_HOST");
     $port = $p["port"] ?? (getenv("MYSQL_PORT") ?: 3306);
     $db = isset($p["path"]) ? ltrim($p["path"], "/") : getenv("MYSQL_DATABASE");
@@ -83,13 +84,8 @@ while [ "$COUNT" -lt "$MAX_RETRIES" ]; do
 done
 
 if [ "$DB_READY" -ne 1 ]; then
-  echo "ERROR: Database not reachable after $((MAX_RETRIES * 3)) seconds. Exiting."
-  exit 1
+  echo "WARNING: Database not reachable after $((MAX_RETRIES * 3)) seconds. Continuing startup so the web process can boot while migrations keep retrying in the background."
 fi
-
-# Start PHP-FPM
-echo "Starting PHP-FPM..."
-php-fpm -D
 
 # Warm Symfony cache
 echo "Clearing and warming Symfony cache..."
@@ -102,33 +98,39 @@ php bin/console cache:warmup \
   --env=$APP_ENV \
   --no-debug || true
 
-# Prepare DB and run migrations after DB is reachable
-echo "Preparing database and running Doctrine migrations..."
+# Start PHP-FPM and nginx immediately so Railway can receive traffic while migrations run.
+echo "Starting PHP-FPM..."
+php-fpm -D
 
-# Run migrations with retries; allow no migration to succeed
-COUNT=0
-MIGRATED=0
-while [ "$COUNT" -lt "$MAX_RETRIES" ]; do
-  if php bin/console doctrine:migrations:sync-metadata-storage --no-interaction >/dev/null 2>&1; then
-    :
-  fi
-
-  if php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration; then
-    MIGRATED=1
-    echo "Migrations completed."
-    break
-  fi
-
-  COUNT=$((COUNT+1))
-  echo "Migration attempt failed ($COUNT/$MAX_RETRIES), retrying..."
-  sleep 2
-done
-
-if [ "$MIGRATED" -ne 1 ]; then
-  echo "ERROR: Could not apply migrations after $MAX_RETRIES retries. Exiting to avoid serving broken app."
-  exit 1
-fi
-
-# Start nginx
 echo "Starting Nginx..."
-exec nginx -g 'daemon off;'
+nginx -g 'daemon off;' &
+
+NGINX_PID=$!
+
+(
+  echo "Preparing database and running Doctrine migrations..."
+
+  COUNT=0
+  MIGRATED=0
+  while [ "$COUNT" -lt "$MAX_RETRIES" ]; do
+    if php bin/console doctrine:migrations:sync-metadata-storage --no-interaction >/dev/null 2>&1; then
+      :
+    fi
+
+    if php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration; then
+      MIGRATED=1
+      echo "Migrations completed."
+      break
+    fi
+
+    COUNT=$((COUNT+1))
+    echo "Migration attempt failed ($COUNT/$MAX_RETRIES), retrying..."
+    sleep 2
+  done
+
+  if [ "$MIGRATED" -ne 1 ]; then
+    echo "ERROR: Could not apply migrations after $MAX_RETRIES retries. The web server stays up, but the app may not be fully functional."
+  fi
+) &
+
+wait "$NGINX_PID"

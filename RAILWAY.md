@@ -42,6 +42,12 @@ Use the Railway MySQL variable directly in the service Environment section. For 
 DATABASE_URL=${{MySQL.DATABASE_URL}}
 ```
 
+Do not wrap that value in quotes. If your logs show the literal text `${{MySQL.DATABASE_URL}}`, Railway did not resolve the variable and the app will keep waiting for a real MySQL DSN.
+
+The runtime entrypoint also checks `MYSQL_URL` and `MYSQL_DSN` as fallbacks, but the preferred setup is still `DATABASE_URL=${{MySQL.DATABASE_URL}}`.
+
+The container now starts PHP-FPM and nginx immediately, then applies migrations in the background. That prevents Railway from timing out while MySQL is still coming up or while env resolution is still being fixed.
+
 The `Dockerfile` no longer sets a default `DATABASE_URL`. You MUST set `DATABASE_URL` in Railway service Environment (for example `mysql://user:pass@host:3306/dbname`) or migrations will attempt to run against SQLite defaults and fail.
 
 ## Deploy checklist

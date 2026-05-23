@@ -25,8 +25,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
         new Delete(),
     ]
 )]
-#[ORM\Table(name: 'roomlisting', indexes: [new Index(name: 'room_category_idx', columns: ['category']), new Index(name: 'room_is_available_idx', columns: ['isAvailable'])])]
+#[ORM\Table(name: 'roomlisting')]
 #[ORM\UniqueConstraint(name: 'uniq_room_number', fields: ['number'])]
+#[Index(name: 'room_category_idx', columns: ['category'])]
+#[Index(name: 'room_is_available_idx', columns: ['isAvailable'])]
 #[ORM\Entity(repositoryClass: RoomListingRepository::class)]
 class RoomListing
 {
