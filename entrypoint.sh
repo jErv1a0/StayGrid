@@ -88,28 +88,38 @@ if [ -n "$DATABASE_URL" ]; then
   DB_NAME=$(echo "$DATABASE_URL" | sed -E 's#.*//[^@]+@[^/]+/([^?]+).*#\1#' 2>/dev/null || true)
 fi
 
-DB_HOST=${DB_HOST:-${MYSQL_HOST:-mysql}}
-DB_PORT=${DB_PORT:-${MYSQL_PORT:-3306}}
-DB_USER=${DB_USER:-${MYSQL_USER:-root}}
-DB_PASS=${DB_PASS:-${MYSQL_ROOT_PASSWORD:-}}
-DB_NAME=${DB_NAME:-${MYSQL_DATABASE:-staygrid}}
 
-MAX_RETRIES=60
+# Prefer DATABASE_URL when set; robustly parse and test connectivity using PHP
+MAX_RETRIES=80
 COUNT=0
 DB_READY=0
 
-echo "Waiting for database at $DB_HOST:$DB_PORT (user: $DB_USER)"
+echo "Waiting for database (checking DATABASE_URL or MYSQL_* env vars)"
 while [ "$COUNT" -lt "$MAX_RETRIES" ]; do
-  php -r "try { new PDO('mysql:host=' . getenv('DB_HOST') . ';port=' . getenv('DB_PORT') . ';dbname=' . getenv('DB_NAME'), getenv('DB_USER'), getenv('DB_PASS'), [PDO::ATTR_TIMEOUT => 2]); echo '1'; } catch (Exception \$e) { exit(1); }" \
-    DB_HOST="$DB_HOST" DB_PORT="$DB_PORT" DB_USER="$DB_USER" DB_PASS="$DB_PASS" DB_NAME="$DB_NAME" >/dev/null 2>&1 && DB_READY=1 && break || true
+  php -r '
+    $url = getenv("DATABASE_URL");
+    if (!$url) { exit(1); }
+    $p = parse_url($url);
+    $host = $p["host"] ?? getenv("MYSQL_HOST");
+    $port = $p["port"] ?? (getenv("MYSQL_PORT") ?: 3306);
+    $db = isset($p["path"]) ? ltrim($p["path"], "/") : getenv("MYSQL_DATABASE");
+    $user = $p["user"] ?? getenv("MYSQL_USER");
+    $pass = $p["pass"] ?? getenv("MYSQL_PASSWORD");
+    try {
+      new PDO("mysql:host={$host};port={$port};dbname={$db}", $user, $pass, [PDO::ATTR_TIMEOUT => 2]);
+      echo "1";
+    } catch (Exception $e) {
+      exit(1);
+    }
+  ' >/dev/null 2>&1 && DB_READY=1 && break || true
 
   COUNT=$((COUNT+1))
   echo "Database not ready yet ($COUNT/$MAX_RETRIES)..."
-  sleep 2
+  sleep 3
 done
 
 if [ "$DB_READY" -ne 1 ]; then
-  echo "ERROR: Database at $DB_HOST:$DB_PORT not reachable after $MAX_RETRIES seconds. Exiting."
+  echo "ERROR: Database not reachable after $((MAX_RETRIES * 3)) seconds. Exiting."
   exit 1
 fi
 
