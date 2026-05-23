@@ -5,7 +5,8 @@ namespace App\Security;
 use App\Entity\LogInUsers;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\Transport\Transport;
 use Symfony\Component\Mime\Email;
 use SymfonyCasts\Bundle\VerifyEmail\VerifyEmailHelperInterface;
 
@@ -13,7 +14,6 @@ class EmailVerifier
 {
     public function __construct(
         private VerifyEmailHelperInterface $verifyEmailHelper,
-        private MailerInterface $mailer,
         private EntityManagerInterface $entityManager
     ) {}
 
@@ -40,7 +40,18 @@ class EmailVerifier
                 "Thank you!"
             );
 
-        $this->mailer->send($email);
+        $mailerDsn = trim((string) ($_ENV['MAILER_DSN'] ?? getenv('MAILER_DSN') ?: ''));
+        if ($mailerDsn === '' || !str_contains($mailerDsn, '://')) {
+            return;
+        }
+
+        try {
+            $transport = Transport::fromDsn($mailerDsn);
+            $mailer = new Mailer($transport);
+            $mailer->send($email);
+        } catch (\Throwable) {
+            return;
+        }
     }
 
     public function handleEmailConfirmation(Request $request, LogInUsers $user): void

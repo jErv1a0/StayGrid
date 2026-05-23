@@ -5,6 +5,7 @@ parameters:
     # Define the parameter name and its absolute path value
     profile_pictures_directory: '%kernel.project_dir%/public/uploads/profile_pictures'
     app_secret_fallback: 'staygrid-default-secret'
+    mailer_fallback_dsn: 'null://null'
 
 services:
 
@@ -33,6 +34,9 @@ services:
     App\Twig\SafeUrlExtension:
         tags: ['twig.extension']
         public: false
+
+    App\Security\EmailVerifier:
+        public: true
 
     # Configure a dedicated Guzzle client for KnpU OAuth2 in local dev (non-prod only).
     knpu.oauth2.guzzle:
