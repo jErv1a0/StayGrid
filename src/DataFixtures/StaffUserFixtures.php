@@ -43,3 +43,4 @@ class StaffUserFixtures extends Fixture
         $manager->flush();
     }
 }
+
