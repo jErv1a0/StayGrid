@@ -25,7 +25,7 @@ WORKDIR /var/www/staygrid
 
 COPY composer.json composer.lock ./
 COPY . .
-RUN composer install --no-dev --no-interaction --no-progress --prefer-dist --optimize-autoloader
+RUN composer install --no-dev --no-interaction --no-progress --prefer-dist --optimize-autoloader --no-scripts
 
 COPY entrypoint.sh /entrypoint.sh
 
