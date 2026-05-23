@@ -51,3 +51,4 @@ php bin/console doctrine:migrations:migrate --no-interaction
 - The existing [docker-compose.yaml](docker-compose.yaml) remains the local development stack.
 - The same [Dockerfile](Dockerfile) now serves both Railway and local compose.
 - If you ever change the Dockerfile path, update [railway.json](railway.json) too.
+- For local compose, `WEB_PORT` controls the host port and defaults to `8081` so it does not collide with another service already listening on `8080`.
