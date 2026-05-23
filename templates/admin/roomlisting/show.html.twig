@@ -1,86 +1,174 @@
+{# templates/admin/roomlisting/show.html.twig #}
 {% extends 'admin/base.html.twig' %}
 
-{% block title %}Room {{ room_listing.number }}{% endblock %}
+{% block title %}StayGrid // Room {{ room_listing.number }}{% endblock %}
 
-{% block content %}
-<div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8 pt-24">
-    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-        <div class="px-4 py-5 sm:px-6">
-            <h3 class="text-2xl leading-6 font-medium text-gray-900">
-                Room Listing Details
-            </h3>
-            <p class="mt-1 max-w-2xl text-sm text-gray-500">
-                Detailed information for Room Number: **{{ room_listing.number }}**
-            </p>
+{% block body %}
+<div class="min-h-screen bg-[#f6f4ef] py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    {% set roomImagePath = room_listing.image ? (room_listing.image matches '/^uploads\\//' ? room_listing.image : 'uploads/rooms/' ~ room_listing.image) : null %}
+    {% set roomCategoryKey = room_listing.category|default('')|lower %}
+    {% set roomImageFallback = 'images/default_room.png' %}
+    {% if 'family' in roomCategoryKey %}
+        {% set roomImageFallback = 'images/familyapartmentFH.png' %}
+    {% elseif 'executive' in roomCategoryKey or 'suite' in roomCategoryKey %}
+        {% set roomImageFallback = 'images/executivefc.png' %}
+    {% elseif 'studio' in roomCategoryKey %}
+        {% set roomImageFallback = 'images/studiodeluxefh.png' %}
+    {% endif %}
+    {% set roomImageSrc = roomImagePath ? asset(roomImagePath) : asset(roomImageFallback) %}
+
+        <div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-12 border-b border-black/10 pb-8">
+            <div>
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="px-2 py-0.5 bg-gray-950 text-yellow-400 text-[9px] font-black uppercase tracking-[0.3em]">Room Inspector</span>
+                    <span class="text-[9px] font-mono text-gray-400 uppercase tracking-widest">Status: {{ room_listing.isAvailable ? 'Live' : 'Blocked' }}</span>
+                </div>
+                <h1 class="text-5xl font-black text-gray-950 uppercase tracking-tighter leading-none">
+                    Room {{ room_listing.number }}
+                </h1>
+            </div>
+
+            <div class="flex gap-4">
+                <a href="{{ path('app_admin_roomlisting_index') }}"
+                   class="group inline-flex items-center gap-2 bg-white border border-black px-6 py-3 hover:bg-yellow-400 transition-colors">
+                    <i data-feather="arrow-left" class="w-4 h-4"></i>
+                    <span class="text-xs font-black uppercase tracking-widest">Back to Listings</span>
+                </a>
+                <a href="{{ path('app_admin_roomlisting_edit', {'id': room_listing.id}) }}"
+                   class="group inline-flex items-center gap-2 bg-yellow-400 border border-black px-6 py-3 hover:bg-black hover:text-white transition-colors">
+                    <i data-feather="edit-3" class="w-4 h-4 text-gray-950"></i>
+                    <span class="text-xs font-black uppercase tracking-widest text-gray-950">Edit Room</span>
+                </a>
+            </div>
         </div>
-        <div class="border-t border-gray-200">
-            <dl>
-                {# ID #}
-                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">ID</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ room_listing.id }}</dd>
-                </div>
-                
-                {# NEW: Room Category #}
-                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">Category</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ room_listing.category|default('N/A') }}</dd>
-                </div>
-                
-                {# Room Number/Code #}
-                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">Room Number/Code</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ room_listing.number }}</dd>
-                </div>
-                
-                {# Price Per Night #}
-                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">Price Per Night</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        ${{ room_listing.pricePerNight|number_format(2, '.', ',') }}
-                    </dd>
-                </div>
-                
-                {# Max Capacity #}
-                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">Max Capacity</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ room_listing.capacity }} Guests</dd>
-                </div>
-                
-                {# Availability Status #}
-                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">Availability Status</dt>
-                    <dd class="mt-1 text-sm sm:mt-0 sm:col-span-2">
-                        {% if room_listing.isAvailable %}
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Available</span>
-                        {% else %}
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Not Available</span>
-                        {% endif %}
-                    </dd>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+
+            <div class="lg:col-span-2 space-y-8">
+
+                <div class="relative bg-gray-200 border border-black/10 overflow-hidden group">
+                    {% if room_listing.image %}
+                        <img class="w-full h-[400px] object-cover hover:scale-[1.02] transition-all duration-500"
+                             src="{{ roomImageSrc }}"
+                             onerror="this.onerror=null;this.src='{{ asset(roomImageFallback) }}';"
+                             alt="Room {{ room_listing.number }}">
+                    {% else %}
+                        <div class="w-full h-[400px] flex flex-col items-center justify-center bg-gray-100">
+                            <i data-feather="image" class="w-16 h-16 text-gray-300 mb-4 stroke-[1]"></i>
+                            <span class="text-[10px] font-mono text-gray-400 uppercase tracking-[0.3em]">No image uploaded</span>
+                        </div>
+                    {% endif %}
+                    <div class="absolute bottom-4 left-4 bg-gray-950 text-white text-[10px] font-mono px-3 py-1 uppercase tracking-widest opacity-80">
+                        Room Feed {{ room_listing.number }}
+                    </div>
                 </div>
 
-                {# Description #}
-                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">Description</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 whitespace-pre-wrap">{{ room_listing.description|default('No description provided.') }}</dd>
+                <div class="bg-white border border-black/10">
+                    <div class="bg-[#111827] px-6 py-4 border-b border-black/10">
+                        <h2 class="text-[11px] font-black text-white uppercase tracking-[0.3em]">Room Details</h2>
+                    </div>
+
+                    <div class="p-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Listing ID</label>
+                                    <div class="text-2xl font-mono font-black text-gray-950 italic">#{{ room_listing.id }}</div>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Location</label>
+                                    <div class="text-xl font-black text-gray-950 uppercase">{{ room_listing.location|default('Unknown')|replace({'_': ' '}) }}</div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Classification</label>
+                                    <span class="inline-block bg-gray-950 text-white px-4 py-1 text-xs font-black uppercase tracking-tighter">
+                                        {{ room_listing.category|default('Standard')|replace({'_': ' '}) }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Capacity</label>
+                                    <div class="flex items-baseline gap-2">
+                                        <span class="text-3xl font-mono font-black text-gray-950">{{ room_listing.capacity }}</span>
+                                        <span class="text-[10px] font-black text-gray-400 uppercase">guests</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-10 pt-10 border-t-4 border-double border-gray-100">
+                            <div class="bg-yellow-50 border border-yellow-400 p-6 flex justify-between items-center">
+                                <div>
+                                    <h3 class="text-[10px] font-black text-yellow-700 uppercase tracking-widest mb-1">Nightly Rate</h3>
+                                    <div class="text-4xl font-mono font-black text-gray-950">₱{{ room_listing.pricePerNight|number_format(2) }}<span class="text-sm font-normal text-gray-400 italic"> / night</span></div>
+                                </div>
+                                <i data-feather="trending-up" class="w-10 h-10 text-yellow-200"></i>
+                            </div>
+                        </div>
+
+                        <div class="mt-10">
+                            <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Description</h3>
+                            <div class="p-6 bg-gray-50 border-l-4 border-gray-950">
+                                <p class="text-gray-700 font-medium leading-relaxed italic">
+                                    "{{ room_listing.description|default('No technical notes provided for this unit deployment.') }}"
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                
-            </dl>
+            </div>
+
+            <div class="space-y-8">
+
+                <div class="bg-white border border-black/10">
+                    <div class="bg-gray-950 px-6 py-4 flex items-center gap-3">
+                        <div class="w-2 h-2 rounded-full {{ room_listing.isAvailable ? 'bg-green-500 animate-pulse' : 'bg-red-500' }}"></div>
+                        <h3 class="text-[11px] font-black text-white uppercase tracking-[0.3em]">Listing Status</h3>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div class="inline-flex items-center gap-2 px-3 py-2 text-[10px] font-black uppercase tracking-wider border {{ room_listing.isAvailable ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200' }}">
+                            <span class="w-1.5 h-1.5 rounded-full {{ room_listing.isAvailable ? 'bg-green-600' : 'bg-red-600' }}"></span>
+                            {{ room_listing.isAvailable ? 'Available for booking' : 'Not available for booking' }}
+                        </div>
+
+                        <div class="pt-2 border-t border-gray-100">
+                            {{ include('admin/roomlisting/_delete_form.html.twig') }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-black/10">
+                    <div class="bg-gray-100 px-6 py-4">
+                        <h3 class="text-[10px] font-black text-gray-950 uppercase tracking-[0.3em]">Quick Facts</h3>
+                    </div>
+                    <div class="p-6 space-y-4 font-mono">
+                        <div class="flex justify-between text-[11px] border-b border-gray-100 pb-2">
+                            <span class="text-gray-400 uppercase font-bold tracking-tighter">Availability:</span>
+                            <span class="font-black {{ room_listing.isAvailable ? 'text-green-600' : 'text-red-600' }}">
+                                {{ room_listing.isAvailable ? 'ONLINE' : 'BLOCKED' }}
+                            </span>
+                        </div>
+                        <div class="flex justify-between text-[11px] border-b border-gray-100 pb-2">
+                            <span class="text-gray-400 uppercase font-bold tracking-tighter">Capacity:</span>
+                            <span class="font-black text-gray-950">{{ room_listing.capacity }} guests</span>
+                        </div>
+                        <div class="flex justify-between text-[11px]">
+                            <span class="text-gray-400 uppercase font-bold tracking-tighter">Category:</span>
+                            <span class="font-black text-gray-950 italic">{{ room_listing.category|default('STD')|replace({'_': ' '})|upper }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <p class="text-[9px] font-mono text-gray-300 uppercase tracking-[0.35em] italic">
+                        Admin access only
+                    </p>
+                </div>
+            </div>
         </div>
-    </div>
-
-    <div class="mt-6 flex space-x-4">
-        <a href="{{ path('app_admin_roomlisting_edit', {'id': room_listing.id}) }}" 
-           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition">
-            Edit
-        </a>
-        
-        {{ include('admin/roomlisting/_delete_form.html.twig') }}
-
-        <a href="{{ path('app_admin_roomlisting_index') }}" 
-           class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition">
-            Back to list
-        </a>
     </div>
 </div>
 {% endblock %}

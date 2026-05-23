@@ -1,78 +1,242 @@
+{% set page_title = "StayGrid" %}
+{% set hero_headline = "Smart Stays, Staygrid" %}
+{% set hero_subtitle = "Discover the best rooms and accommodations with an easy booking experience." %}
+
 <!DOCTYPE html>
-
-<html lang="en">
+<html lang="en" x-data="{ showModal: false }" x-init="
+    {% if app.user %}
+        showModal = true;
+        setTimeout(() => showModal = false, 5000);
+    {% endif %}
+">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>{% block title %}{{ page_title|default("StayGrid") }}{% endblock %}</title>
-
+    {% include 'partials/_global_radius.html.twig' %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }}</title>
 
     <link rel="icon" type="image/png" href="{{ asset('icons/staygrid16x16.png') }}"/>
-
-
-<script src="https://cdn.tailwindcss.com"></script>
-
-<style>
-    body {
-        font-family: 'Inter', sans-serif;
-        background-color: #f7f9fc;
-    }
-    .nav-link { color: #4b5563; }
-    .nav-link:hover { color: #FFD700; }
-    .btn-primary { background-color: #FFD700; border-color: #FFD700; }
-    .btn-primary:hover { background-color: #e6c200; } 
-    .feature-icon-bg { background-color: #FFF4B0; color: #FFD700; }
-
-    {% block styles %}{% endblock %} 
-
-</style>
-
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #f7f9fc;
+        }
+        .nav-link { color: #4b5563; }
+        .nav-link:hover { color: #FFD700; }
+        .btn-primary { background-color: #FFD700; border-color: #FFD700; }
+        .btn-primary:hover { background-color: #e6c200; } 
+    </style>
 </head>
 <body>
 
-
-<nav class="bg-white shadow-sm sticky top-0 z-10">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-<div class="flex justify-between items-center h-16">
-
-<a href="/" class="flex items-center space-x-2 text-xl font-bold text-gray-800">
-StayGrid
-</a>
-
-        <div class="hidden md:flex space-x-6 items-center">
-            {% set nav_items = [
-                { name: 'Home', url: '/' },
-                { name: 'Rooms', url: '/rooms' },
-                { name: 'About', url: '/about' },
-                { name: 'Contact', url: '/contact' }
-            ] %}
-            {% for item in nav_items %}
-                <a href="{{ item.url }}" class="nav-link text-sm font-medium flex items-center">
-                    {{ item.name }}
-                </a>
-            {% endfor %}
-        </div>
-
-     {% else %}
-    <a href="{{ path('app_login', {'redirect': 'book'}) }}" 
-       class="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-6 rounded-lg shadow-lg transition duration-200">
-        Book Now
-    </a>
+<!-- Authentication Modal -->
+<div x-show="showModal" 
+     x-transition.opacity
+     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl p-6 w-96 text-center">
+        <h2 class="text-lg font-bold text-gray-900 mb-2">Authentication Status</h2>
+        {% if is_granted('ROLE_ADMIN') %}
+            <p class="text-green-600">You are logged in as Admin. You have full access.</p>
+        {% else %}
+            <p class="text-yellow-600">You are logged in as Regular User. Limited access granted.</p>
+        {% endif %}
     </div>
 </div>
 
-</nav>
+{% include 'partials/_public_nav.html.twig' %}
 
-<!--
-2. MAIN CONTENT BLOCK
-All page-specific content (Hero, Forms, etc.) will go inside this block.
--->
+<section class="relative w-full overflow-hidden h-[500px]">
+    <div id="carousel" class="flex transition-transform duration-700 ease-in-out">
+        <div class="min-w-full h-[500px] relative">
+            <img src="{{ asset('images/smarthouse1.png') }}" alt="Modern Suite" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                <div class="text-center text-white">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-4">Welcome to StayGrid</h1>
+                    <p class="text-lg md:text-xl">Experience comfort and innovation in every stay.</p>
+                </div>
+            </div>
+        </div>
 
-<main>
-{% block content %}{% endblock %}
-</main>
+        <div class="min-w-full h-[500px] relative">
+            <img src="{{ asset('images/smarthouse2.png') }}" alt="Luxury Room" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                <div class="text-center text-white">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-4">Book Your Perfect Stay</h1>
+                    <p class="text-lg md:text-xl">Smart. Secure. Seamless.</p>
+                </div>
+            </div>
+        </div>
 
+        <div class="min-w-full h-[500px] relative">
+            <img src="{{ asset('images/smarthouse3.jpg') }}" alt="Hotel View" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                <div class="text-center text-white">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-4">Discover the Difference</h1>
+                    <p class="text-lg md:text-xl">Where technology meets hospitality.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <div class="absolute bottom-5 left-1/2 transform -translate-x-1/2 flex space-x-3">
+        <span class="w-3 h-3 bg-yellow-500 rounded-full opacity-80"></span>
+        <span class="w-3 h-3 bg-gray-300 rounded-full opacity-80"></span>
+        <span class="w-3 h-3 bg-gray-300 rounded-full opacity-80"></span>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const carousel = document.getElementById('carousel');
+    const dots = document.querySelectorAll('section div span');
+    let index = 0;
+
+    setInterval(() => {
+        index = (index + 1) % 3;
+        carousel.style.transform = `translateX(-${index * 100}%)`;
+
+        dots.forEach((dot, i) => {
+            dot.classList.remove('bg-yellow-500');
+            dot.classList.add('bg-gray-300');
+            if (i === index) {
+                dot.classList.add('bg-yellow-500');
+                dot.classList.remove('bg-gray-300');
+            }
+        });
+    }, 5000); 
+});
+</script>
+
+<header class="pt-20 pb-16 bg-white overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div class="text-left">
+                <h1 class="text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-6 leading-tight">
+                    {{ hero_headline }}
+                </h1>
+                <p class="mt-3 text-xl text-gray-500 mb-8 max-w-lg">
+                    {{ hero_subtitle }}
+                </p>
+                <div class="flex space-x-4">
+                     <a href="{{ path('app_login', {'redirect': 'book'}) }}" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white btn-primary">
+                        Book Now &rarr;
+                    </a>
+                    <a href="/rooms" class="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-lg" style="color:#FFD700; border: 2px solid #FFD700;">
+                        View Rooms
+                    </a>
+                </div>
+            </div>
+
+            <div class="hidden md:block relative w-full h-80 rounded-xl shadow-2xl overflow-hidden">
+                <div id="hero-slider" class="absolute inset-0">
+                    <img class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000" 
+                        src="{{ asset('images/smart_familysuite.png') }}" 
+                        alt="Smart Family Suite View">
+
+                    <img class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 hidden" 
+                        src="{{ asset('images/smart_bed.png') }}" 
+                        alt="Smart Bed View">
+
+                    <img class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 hidden" 
+                        src="{{ asset('images/smart_kitchen.png') }}" 
+                        alt="Smart Kitchen View">
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const slider = document.getElementById('hero-slider');
+        if (!slider) return;
+
+        const slides = slider.querySelectorAll('img');
+        let currentSlide = 0;
+
+        const showSlide = (index) => {
+            slides.forEach((slide, i) => {
+                if (i === index) {
+                    slide.classList.remove('hidden');
+                } else {
+                    slide.classList.add('hidden');
+                }
+            });
+        };
+
+        const nextSlide = () => {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        };
+
+        showSlide(currentSlide);
+        setInterval(nextSlide, 3000); 
+    });
+</script>
+
+{% set features = [
+    { title: 'Smart System', icon_path: 'M9.75 17L9 20l-1 1h8l-1-1v-3m2-4v4a2 2 0 01-2 2H9a2 2 0 01-2-2v-4m12 0a2 2 0 00-2-2H9a2 2 0 00-2 2m12 0h.01M17 10h.01' },
+    { title: 'Secure Platform', icon_path: 'M13 10V3L4 14h7v7l9-11h-7z' },
+    { title: '24/7 Support', icon_path: 'M12 6V4m0 16v-2m8-6h2M4 12H2m15.364 6.364l1.414 1.414M6.343 6.343L4.929 4.929M17.657 6.343l1.414-1.414M6.343 17.657l-1.414 1.414' }
+] %}
+
+<section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-extrabold text-gray-900 text-center mb-12">Why Choose StayGrid?</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
+            {% for feature in features %}
+                <div class="flex flex-col items-center">
+                    <div class="w-16 h-16 flex items-center justify-center rounded-full mb-4 shadow-xl feature-icon-bg">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ feature.icon_path }}"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">{{ feature.title }}</h3>
+                    <p class="text-gray-500 text-center">
+                        Fast, reliable, and modern platform features to make your booking journey seamless.
+                    </p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% set featured_rooms = [
+    { name: 'Studio Deluxe', description: 'Perfect for solo travelers or couples.', image_url: asset('images/studiodeluxefh.png'), alt: 'Studio Suites View' },
+    { name: 'Executive Suite', description: 'Spacious stay with a full kitchen.', image_url: asset('images/executiveFC.png'), alt: 'Executive Suite View' },
+    { name: 'Family Apartment', description: 'Multiple rooms ideal for groups.', image_url: asset('images/familyapartmentFH.png'), alt: 'Family Apartment View' }
+] %}
+
+<section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-extrabold text-gray-900 text-center mb-4">Our Featured Stays</h2>
+        <p class="text-xl text-gray-500 text-center mb-12">Explore accommodations that match your style and needs.</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {% for room in featured_rooms %}
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transition transform hover:scale-[1.02] duration-300">
+                    <img class="w-full h-48 object-cover" src="{{ room.image_url }}" alt="{{ room.name }}">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">{{ room.name }}</h3>
+                        <p class="text-gray-600 mb-4">{{ room.description }}</p>
+                         <a href="{{ path('app_login', {'redirect': 'book'}) }}" class="inline-flex items-center text-sm font-medium transition duration-150 ease-in-out" style="color: #FFD700;">
+                            Book This Stay &rarr;
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-12">
+             <a href="/rooms" class="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-lg" style="color:#FFD700; border: 2px solid #FFD700;">
+                View All Rooms
+            </a>
+        </div>
+    </div>
+</section>
 </body>
 </html>
+

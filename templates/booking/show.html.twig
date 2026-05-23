@@ -1,0 +1,99 @@
+{# templates/booking/show.html.twig #}
+{% extends 'user/base.html.twig' %}
+
+{% block title %}StayGrid // DETAILS {{ booking.id }}{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-[#FBFBFB] font-sans antialiased pb-24">
+
+    {# --- HEADER SECTION --- #}
+    <div class="max-w-4xl mx-auto px-8 pt-16 mb-12">
+        <div class="flex items-center gap-3 mb-4">
+            <span class="w-10 h-px bg-yellow-500"></span>
+            <span class="text-[10px] font-black uppercase tracking-[0.4em] text-gray-400 italic">Authorization Confirmed</span>
+        </div>
+        <div class="flex flex-col md:flex-row justify-between items-end gap-6">
+            <h1 class="text-5xl font-black tracking-tighter uppercase leading-none">
+                Booking Details <span class="text-gray-200">.</span>
+            </h1>
+            <div class="text-right">
+                <p class="text-[10px] font-black text-gray-300 uppercase tracking-widest italic">Reference_Hash</p>
+                <p class="text-sm font-mono font-bold uppercase tracking-tighter">#{{ booking.id }}-{{ "now"|date("U")|slice(-4) }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto px-8">
+        {# --- MAIN MANIFEST CARD --- #}
+        <div class="bg-white border border-gray-100 shadow-2xl overflow-hidden relative">
+            
+            {# Decorative Scanner Line #}
+            <div class="absolute top-0 left-0 w-full h-1 bg-yellow-400"></div>
+
+            <div class="p-10">
+                {# Top Row: Node & Identity #}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12 border-b border-gray-50 pb-12">
+                    <div>
+                        <p class="text-[9px] font-black uppercase tracking-[0.5em] text-gray-400 mb-4 italic">Assigned Node</p>
+                        <h2 class="text-3xl font-black tracking-tighter uppercase mb-2">{{ booking.room.category|default('STANDARD_NODE') }}</h2>
+                        <p class="text-sm font-bold text-yellow-600 tracking-widest uppercase italic">Node_{{ booking.room.number }}</p>
+                        <p class="text-[10px] font-medium text-gray-400 uppercase mt-2 tracking-tighter">{{ booking.room.location|default('LOC_NOT_DEFINED') }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[9px] font-black uppercase tracking-[0.5em] text-gray-400 mb-4 italic">Occupant Identity</p>
+                        <h2 class="text-3xl font-black tracking-tighter uppercase mb-2">{{ booking.user ? booking.user.email|split('@')[0] : 'GUEST_USER' }}</h2>
+                        <p class="text-xs font-mono text-gray-400 uppercase tracking-widest">{{ booking.user ? booking.user.email : 'AUTH_PENDING' }}</p>
+                    </div>
+                </div>
+
+                {# Middle Row: Temporal Sync (Dates) #}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
+                    <div class="bg-gray-50 p-6 border-l-4 border-black">
+                        <p class="text-[9px] font-black uppercase tracking-[0.5em] text-gray-400 mb-2 italic">Sync Start</p>
+                        <p class="text-2xl font-black tracking-tight">{{ booking.startDate ? booking.startDate|date('D, d M Y') : 'XX.XX.XXXX' }}</p>
+                        <p class="text-[10px] font-mono text-gray-400 uppercase mt-1">Check_In // 14:00 HRS</p>
+                    </div>
+                    <div class="bg-gray-50 p-6 border-l-4 border-gray-200">
+                        <p class="text-[9px] font-black uppercase tracking-[0.5em] text-gray-400 mb-2 italic">SyncTerminate</p>
+                        <p class="text-2xl font-black tracking-tight text-gray-400">{{ booking.endDate ? booking.endDate|date('D, d M Y') : 'XX.XX.XXXX' }}</p>
+                        <p class="text-[10px] font-mono text-gray-300 uppercase mt-1">Check_Out // 11:00 HRS</p>
+                    </div>
+                </div>
+
+                {# Bottom Row: Status & Security #}
+                <div class="flex flex-col md:flex-row justify-between items-center gap-8 pt-8 border-t border-dashed border-gray-200">
+                    <div class="flex items-center gap-4">
+                        <div class="h-12 w-12 bg-black flex items-center justify-center text-yellow-400 font-black italic">
+                            {{ booking.status|slice(0, 1)|upper }}
+                        </div>
+                        <div>
+                            <p class="text-[9px] font-black uppercase tracking-[0.5em] text-gray-300 italic">Current_Status</p>
+                            <p class="text-sm font-black uppercase tracking-widest">{{ booking.status|default('PENDING') }}</p>
+                        </div>
+                    </div>
+
+                    {# QR Placeholder / Visual Detail #}
+                    <div class="flex items-center gap-3 opacity-20 group-hover:opacity-100 transition-opacity">
+                        <div class="w-16 h-16 border-2 border-black p-1">
+                            <div class="w-full h-full bg-black"></div>
+                        </div>
+                        <p class="text-[7px] font-mono leading-tight uppercase">Security_Token_Encrypted<br/>StayGrid System Auth</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# --- ACTION BUTTONS --- #}
+        <div class="mt-12 flex flex-col sm:flex-row gap-4">
+            <a href="{{ path('app_user_rooms_rooms') }}" 
+               class="flex-1 bg-black text-white text-center py-5 text-[11px] font-black uppercase tracking-[0.3em] hover:bg-yellow-400 hover:text-black transition-all">
+                View Stay
+            </a>
+            <a href="{{ path('app_client_booking_index') }}" 
+               class="flex-1 bg-white border border-gray-200 text-center py-5 text-[11px] font-black uppercase tracking-[0.3em] text-gray-400 hover:text-black hover:border-black transition-all">
+                Back To Room Listing
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

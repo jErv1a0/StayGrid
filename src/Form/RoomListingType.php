@@ -14,6 +14,8 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Length;
 
 class RoomListingType extends AbstractType
 {
@@ -35,8 +37,16 @@ class RoomListingType extends AbstractType
                 'label' => 'Room Number/Code',
                 'attr' => ['placeholder' => 'e.g. 343223'],
             ])
+            ->add('location', TextType::class, [
+                'label' => 'Location (City / Neighborhood)',
+                'required' => false,
+                'attr' => ['placeholder' => 'e.g. Makati, Manila'],
+                'constraints' => [
+                    new Length(['max' => 255, 'maxMessage' => 'Location cannot be longer than {{ limit }} characters']),
+                ],
+            ])
             ->add('pricePerNight', NumberType::class, [
-                'label' => 'Price Per Night ($)',
+                'label' => 'Price Per Night (₱)',
                 'html5' => true,
             ])
             ->add('capacity', NumberType::class, [

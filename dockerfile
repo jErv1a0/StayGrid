@@ -1,21 +1,22 @@
-# Use official PHP image with Apache
-FROM php:8.2-apache
+FROM php:8.2-fpm
 
-# Install OS dependencies for Symfony and PHP extensions
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     unzip \
-    libpq-dev \
+    libicu-dev \
     libzip-dev \
-    # Add other necessary OS packages (e.g., libpng-dev for GD)
-    && docker-php-ext-install pdo pdo_mysql zip opcache \
-    # Install Composer
-    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    libpng-dev \
+    libxml2-dev \
+    && docker-php-ext-install pdo_mysql intl zip opcache \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/staygrid
 
-# Copy your project files (optional for development, as volumes are often used)
-# COPY . /var/www/staygrid
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-interaction --no-progress --prefer-dist --optimize-autoloader
 
-# Install Symfony dependencies
-RUN composer install --no-dev --optimize-autoloader
+COPY . .
+
+RUN mkdir -p var/cache var/log public/uploads && chown -R www-data:www-data var public/uploads

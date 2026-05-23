@@ -17,6 +17,13 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 #[Route('/admin/roomlisting', name: 'app_admin_roomlisting_')]
 class RoomListingController extends AbstractController
 {
+    private \App\Service\ActivityLogger $activityLogger;
+
+    public function __construct(\App\Service\ActivityLogger $activityLogger)
+    {
+        $this->activityLogger = $activityLogger;
+    }
+
     #[Route('/', name: 'index', methods: ['GET'])]
     public function index(EntityManagerInterface $em): Response
     {
@@ -85,6 +92,9 @@ class RoomListingController extends AbstractController
             $entityManager->persist($roomListing);
             $entityManager->flush();
 
+            // Log activity
+            $this->activityLogger->log('room.created', $this->getUser(), $roomListing, ['number' => $roomListing->getNumber()]);
+
             $this->addFlash('success', 'Room listing created successfully!');
             return $this->redirectToRoute('app_admin_roomlisting_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -92,6 +102,14 @@ class RoomListingController extends AbstractController
         return $this->render('admin/roomlisting/new.html.twig', [
             'room_listing' => $roomListing,
             'form' => $form,
+        ]);
+    }
+
+    #[Route('/{id}', name: 'show', methods: ['GET'])]
+    public function show(RoomListing $roomListing): Response
+    {
+        return $this->render('admin/roomlisting/show.html.twig', [
+            'room_listing' => $roomListing,
         ]);
     }
 
@@ -118,6 +136,9 @@ class RoomListingController extends AbstractController
 
             $entityManager->flush();
 
+            // Log activity
+            $this->activityLogger->log('room.updated', $this->getUser(), $roomListing, ['number' => $roomListing->getNumber()]);
+
             $this->addFlash('success', 'Room listing updated successfully!');
             return $this->redirectToRoute('app_admin_roomlisting_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -132,11 +153,13 @@ class RoomListingController extends AbstractController
     public function delete(Request $request, RoomListing $roomListing, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete' . $roomListing->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($roomListing);
-            $entityManager->flush();
-            $this->addFlash('success', 'Room listing deleted successfully!');
-        }
+                // Log activity BEFORE removal (we still have the entity)
+                $this->activityLogger->log('room.deleted', $this->getUser(), $roomListing, ['number' => $roomListing->getNumber()]);
 
+                $entityManager->remove($roomListing);
+                $entityManager->flush();
+                $this->addFlash('success', 'Room listing deleted successfully!');
+            }
         return $this->redirectToRoute('app_admin_roomlisting_index', [], Response::HTTP_SEE_OTHER);
     }
 }

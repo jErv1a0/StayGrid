@@ -1,57 +1,87 @@
 <?php
-// src/Entity/RoomListing.php
 
 namespace App\Entity;
 
 use App\Repository\RoomListingRepository;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Index;
+use Symfony\Component\Serializer\Attribute\Groups;
 
-#[ORM\Table(name: 'roomlisting')]
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection(),
+        new Post(),
+        new Put(),
+        new Delete(),
+    ]
+)]
+#[ORM\Table(name: 'roomlisting', indexes: [new Index(name: 'room_category_idx', columns: ['category']), new Index(name: 'room_is_available_idx', columns: ['isAvailable'])])]
+#[ORM\UniqueConstraint(name: 'uniq_room_number', fields: ['number'])]
 #[ORM\Entity(repositoryClass: RoomListingRepository::class)]
 class RoomListing
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['room:read', 'room:write'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['room:read', 'room:write'])]
     private ?string $number = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['room:read', 'room:write'])]
     private ?string $category = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['room:read', 'room:write'])]
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['room:read', 'room:write'])]
     private ?int $capacity = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, name: 'price')]
+    #[Groups(['room:read', 'room:write'])]
     private ?string $pricePerNight = null;
 
-    #[ORM\Column]
-    private ?bool $isAvailable = false;
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, name: 'price_per_hour', nullable: true)]
+    #[Groups(['room:read', 'room:write'])]
+    private ?string $pricePerHour = null;
+
+    #[ORM\Column(type: 'boolean', nullable: true, options: ['default' => true])]
+    #[Groups(['room:read', 'room:write'])]
+    private ?bool $isAvailable = true;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['room:read', 'room:write'])]
     private ?string $image = null;
 
-    // Rental Duration Fields
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $startDate = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['room:read', 'room:write'])]
+    private ?string $location = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $endDate = null;
+    // Rental dates are stored on Booking entities now (normalized)
 
     // Admin-blocked room flag
     #[ORM\Column(type: 'boolean')]
+    #[Groups(['room:read', 'room:write'])]
     private bool $isBlocked = false;
 
     // One Room can have many Bookings
     #[ORM\OneToMany(mappedBy: 'room', targetEntity: Booking::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
+    #[Groups(['room:read'])]
     private Collection $bookings;
 
     public function __construct()
@@ -59,7 +89,6 @@ class RoomListing
         $this->bookings = new ArrayCollection();
     }
 
-    // ─── BASIC FIELDS ───────────────────────────────────────────────
     public function getId(): ?int
     {
         return $this->id;
@@ -120,9 +149,21 @@ class RoomListing
         return $this;
     }
 
-    public function isAvailable(): ?bool
+    public function getPricePerHour(): ?float
     {
-        return $this->isAvailable;
+        return $this->pricePerHour !== null ? (float)$this->pricePerHour : null;
+    }
+
+    public function setPricePerHour(?float $price): static
+    {
+        $this->pricePerHour = $price !== null ? number_format($price, 2, '.', '') : null;
+        return $this;
+    }
+
+    public function isAvailable(): bool
+    {
+
+        return $this->isAvailable ?? true;
     }
 
     public function setIsAvailable(bool $isAvailable): static
@@ -136,34 +177,47 @@ class RoomListing
         return $this->image;
     }
 
+    /**
+     * Return a human-friendly title for the room.
+     * Falls back to category and number when appropriate.
+     */
+    public function getTitle(): string
+    {
+        $parts = [];
+
+        if ($this->category) {
+            $parts[] = $this->category;
+        }
+
+        if ($this->number) {
+            $parts[] = 'Room ' . $this->number;
+        }
+
+        if (count($parts) > 0) {
+            return implode(' — ', $parts);
+        }
+
+        return 'Room';
+    }
+
     public function setImage(?string $image): static
     {
         $this->image = $image;
         return $this;
     }
 
-    // ─── RENTAL DURATION ───────────────────────────────────────────
-    public function getStartDate(): ?\DateTimeInterface
+    public function getLocation(): ?string
     {
-        return $this->startDate;
+        return $this->location;
     }
 
-    public function setStartDate(?\DateTimeInterface $startDate): static
+    public function setLocation(?string $location): static
     {
-        $this->startDate = $startDate;
+        $this->location = $location;
         return $this;
     }
 
-    public function getEndDate(): ?\DateTimeInterface
-    {
-        return $this->endDate;
-    }
-
-    public function setEndDate(?\DateTimeInterface $endDate): static
-    {
-        $this->endDate = $endDate;
-        return $this;
-    }
+    // Rental dates moved to Booking; keep room entity focused on static attributes
 
     // ─── ADMIN-BLOCKED ROOM ────────────────────────────────────────
     public function isBlocked(): bool
@@ -180,8 +234,11 @@ class RoomListing
     // ─── HELPER FUNCTIONS ──────────────────────────────────────────
     public function getDurationDays(): ?int
     {
-        if ($this->startDate && $this->endDate) {
-            return $this->startDate->diff($this->endDate)->days;
+        // Deprecated: Room-level duration removed; compute from first booking if needed
+        foreach ($this->bookings as $booking) {
+            if ($booking->getStartDate() && $booking->getEndDate()) {
+                return $booking->getStartDate()->diff($booking->getEndDate())->days;
+            }
         }
         return null;
     }
@@ -200,7 +257,6 @@ class RoomListing
         return false;
     }
 
-    // Get room status for dashboard: Blocked / Occupied / Available
     public function getStatus(): string
     {
         if ($this->isBlocked) {

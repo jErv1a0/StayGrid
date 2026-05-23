@@ -1,0 +1,30 @@
+{% extends 'staff/base.html.twig' %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block body %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 bg-white border border-black/10 p-6">
+        <div class="mb-6">
+            <a href="{{ path('app_staff_roomlisting_index') }}" class="text-sm text-gray-500 hover:underline">← Back to listings</a>
+            <h1 class="text-3xl font-black mt-2 uppercase tracking-tight">Add Room</h1>
+            <p class="text-sm text-gray-500 mt-1">Create a new room listing with location, photos and details.</p>
+        </div>
+        {{ include('admin/roomlisting/_form.html.twig', { 'cancel_path': 'app_staff_roomlisting_index', 'button_label': 'Create Room' }) }}
+    </div>
+
+    <aside class="bg-white border border-black/10 p-6">
+        <h3 class="text-sm font-black uppercase tracking-[0.3em] text-gray-500 mb-4">Room Preview</h3>
+        <div class="border border-gray-100 p-4 text-center">
+            <div class="h-40 bg-gray-50 flex items-center justify-center text-gray-300 mb-4">Image</div>
+            <p class="font-black text-gray-950">{% if room_listing is defined and room_listing.number is defined %}{{ room_listing.number }}{% else %}Room Preview{% endif %}</p>
+            <p class="text-sm text-gray-500 mt-1">{% if room_listing is defined and room_listing.category is defined %}{{ room_listing.category }}{% else %}Category{% endif %}</p>
+            <p class="text-sm text-gray-400 mt-2">Location: {% if room_listing is defined and room_listing.location is defined %}{{ room_listing.location }}{% else %}Not specified{% endif %}</p>
+        </div>
+        <div class="mt-6 text-sm text-gray-500 leading-7">
+            <p><strong>Tips:</strong> Use a clear location (city/neighborhood) to improve discoverability.</p>
+            <p class="mt-2">Keep images square (4:3) and under 1MB for best performance.</p>
+        </div>
+    </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,222 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'partials/_global_radius.html.twig' %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Family Apartment - StayGrid Luxury Rooms</title>
+  <link rel="icon" type="image/png" href="{{ asset('icons/staygrid16x16.png') }}"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/feather-icons"></script>
+  <style>
+    body {
+        font-family: 'Manrope', sans-serif;
+        background-color: #f7f9fc;
+    }
+    .nav-link { color: #4b5563; }
+    .nav-link:hover { color: #FFD700; }
+    .btn-primary { background-color: #FFD700; border-color: #FFD700; }
+    .btn-primary:hover { background-color: #e6c200; }
+    .feature-icon-bg { background-color: #FFF4B0; color: #FFD700; }
+
+    .card-hover { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+    .card-hover:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+    .gradient-overlay { background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(0,0,0,0.4) 100%); }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
+
+<!-- Navigation -->
+<header class="sticky top-0 z-20 backdrop-blur border-b border-black/10 bg-[#f6f4ef]/85">
+    <div class="max-w-7xl mx-auto px-5 md:px-8 h-16 flex items-center justify-between">
+        <a href="{{ path('app_home') }}" class="text-xl font-bold tracking-tight text-black">StayGrid</a>
+
+        <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-black/70">
+            <a href="{{ path('app_home') }}" class="hover:text-black transition-colors">Home</a>
+            <a href="{{ path('app_rooms') }}" class="hover:text-black transition-colors">Rooms</a>
+            <a href="{{ path('app_about') }}" class="hover:text-black transition-colors">About</a>
+            <a href="{{ path('app_contact') }}" class="hover:text-black transition-colors">Contact</a>
+        </nav>
+
+        {% if app.user %}
+            <a href="{{ path('app_booking') }}" class="inline-flex items-center px-5 py-2.5 bg-black text-white text-xs font-bold tracking-[0.2em] uppercase hover:bg-yellow-400 hover:text-black transition-colors">Book Now</a>
+        {% else %}
+            <a href="{{ path('app_login', {'redirect': 'book'}) }}" class="inline-flex items-center px-5 py-2.5 bg-black text-white text-xs font-bold tracking-[0.2em] uppercase hover:bg-yellow-400 hover:text-black transition-colors">Book Now</a>
+        {% endif %}
+    </div>
+</header>
+
+<main>
+
+<section class="relative pt-32 pb-24 bg-white border-b border-gray-900 overflow-hidden">
+    <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 40px 40px;"></div>
+
+    <div class="max-w-7xl mx-auto px-6 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            <div class="lg:col-span-7 relative group">
+                <div class="border border-gray-900 p-2 bg-white">
+                    <img src="{{ asset('images/familyapartmentFH.png') }}" alt="Family Apartment" class="w-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700">
+                </div>
+                <div class="absolute -bottom-6 -right-6 bg-yellow-400 border border-gray-900 px-6 py-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-gray-900">Multi-Occupancy</p>
+                    <p class="text-2xl font-black text-gray-900">FAM_UNIT_02</p>
+                </div>
+            </div>
+
+            <div class="lg:col-span-5">
+                <span class="text-[10px] font-black uppercase tracking-[0.5em] text-yellow-500 mb-6 block">Target: Group_Stays</span>
+                <h1 class="text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter leading-none mb-8 uppercase">
+                    Family <br/>
+                    <span class="text-transparent" style="-webkit-text-stroke: 1.5px #111827;">Apartment.</span>
+                </h1>
+                
+                <p class="text-gray-500 text-lg font-medium leading-tight mb-10">
+                   Designed for collective living. Expanded floor plans featuring multi-room configurations and full culinary infrastructure for shared group dynamics.
+                </p>
+
+                <div class="grid grid-cols-1 gap-4 mb-12">
+                    {% set specs = [
+                        {'label': 'Sleeper', 'val': '3 Spacious Queen Bedrooms'},
+                        {'label': 'Sanitary', 'val': '2 Modern Full-System Baths'},
+                        {'label': 'Culinary', 'val': 'Integrated Kitchen & Dining'},
+                        {'label': 'Network', 'val': 'High-Bandwidth WiFi + Smart TV'},
+                        {'label': 'Access', 'val': 'Rooftop & Pool Permissions'}
+                    ] %}
+                    {% for spec in specs %}
+                    <div class="flex items-center gap-4 border-b border-gray-100 pb-3">
+                        <span class="text-[9px] font-mono text-gray-400 uppercase w-20">{{ spec.label }}</span>
+                        <span class="text-sm font-bold text-gray-900 uppercase tracking-tight">{{ spec.val }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <a href="{{ path('app_login', {'redirect': 'book'}) }}" class="inline-flex items-center justify-between w-full px-8 py-6 bg-gray-900 text-yellow-400 hover:bg-yellow-400 hover:text-gray-900 transition-all duration-500 group shadow-[10px_10px_0px_0px_#facc15] hover:shadow-none">
+                    <span class="font-black uppercase tracking-[0.3em] text-sm">Book this Stay</span>
+                    <i data-feather="arrow-right" class="group-hover:translate-x-2 transition-transform"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-24 bg-gray-50 border-b border-gray-900">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="flex items-center gap-6 mb-16">
+            <h2 class="text-2xl font-black uppercase tracking-tighter">Space Breakdown</h2>
+            <div class="h-px flex-grow bg-gray-900 opacity-10"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-1 bg-gray-900 border border-gray-900">
+            {% set gallery = [
+                {'img': 'familyapartmentX.png', 'label': 'Primary Bedroom View'},
+                {'img': 'familyapartmentla.png', 'label': 'Collective Living Area'},
+                {'img': 'familyapartmentkitchen.png', 'label': 'Culinary Station'}
+            ] %}
+            {% for item in gallery %}
+            <div class="group relative aspect-square overflow-hidden bg-white">
+                <img src="{{ asset('images/' ~ item.img) }}" alt="{{ item.label }}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000">
+                <div class="absolute bottom-0 left-0 right-0 p-6 bg-gray-900/95 translate-y-full group-hover:translate-y-0 transition-transform">
+                    <p class="text-yellow-400 text-[10px] font-black uppercase tracking-widest">{{ item.label }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="py-24 bg-white">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
+            <div class="text-left">
+                <span class="text-[10px] font-black uppercase tracking-[0.5em] text-yellow-500 mb-4 block">Inventory_List</span>
+                <h2 class="text-5xl lg:text-6xl font-black text-gray-900 tracking-tighter uppercase">Apartment Variants</h2>
+            </div>
+            <div class="text-right">
+                <p class="text-[10px] font-mono text-gray-400 uppercase tracking-widest">Rate_Metric: PHP (â‚±) / Night</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border-t border-l border-gray-900">
+            {% set variants = [
+                {'img': 'fac.png', 'name': 'Classic Family Unit', 'price': '1,800', 'desc': 'High-value two-bedroom configuration with lounge.'},
+                {'img': 'fab.png', 'name': 'Balcony Vista Unit', 'price': '2,150', 'desc': 'Exterior access point with panoramic neighborhood views.'},
+                {'img': 'fad.png', 'name': 'Deluxe Group Suite', 'price': '2,600', 'desc': 'Expanded 3-bedroom layout with private dining.'},
+                {'img': 'fam.png', 'name': 'Modern Tech Unit', 'price': '2,300', 'desc': 'Open-concept design with integrated smart controls.'},
+                {'img': 'fagraden.png', 'name': 'Garden Access Unit', 'price': '1,950', 'desc': 'Ground-level entry with direct terrace connectivity.'},
+                {'img': 'falux.png', 'name': 'Premium Family Suite', 'price': '2,800', 'desc': 'Maximized square footage with upgraded furnishings.'}
+            ] %}
+
+            {% for variant in variants %}
+            <div class="group border-r border-b border-gray-900 flex flex-col">
+                <div class="aspect-video overflow-hidden border-b border-gray-900">
+                    <img src="{{ asset('images/' ~ variant.img) }}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" alt="{{ variant.name }}">
+                </div>
+                <div class="p-8 flex flex-col flex-grow bg-white group-hover:bg-gray-50 transition-colors">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-black uppercase tracking-tighter leading-none group-hover:text-gray-900">{{ variant.name }}</h3>
+                        <span class="text-[9px] font-mono text-gray-400">FA_{{ loop.index }}</span>
+                    </div>
+                    <p class="text-gray-500 text-sm mb-8 leading-tight h-10">{{ variant.desc }}</p>
+                    
+                    <div class="flex items-center justify-between mt-auto">
+                        <div class="flex flex-col">
+                            <span class="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1">Per Night</span>
+                            <p class="text-2xl font-black text-gray-900 group-hover:text-yellow-600 transition-colors">₱{{ variant.price }}</p>
+                        </div>
+                        <a href="{{ path('app_login', {'redirect': 'book'}) }}" class="w-14 h-14 border border-gray-900 flex items-center justify-center group-hover:bg-yellow-400 group-hover:border-yellow-400 transition-all">
+                            <i data-feather="plus" class="w-5 h-5"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+
+    <footer class="bg-gray-900 text-white py-12">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+      <div>
+        <h3 class="text-xl font-bold mb-4">StayGrid</h3>
+        <p class="text-gray-400">Your trusted accommodation partner for unforgettable stays.</p>
+      </div>
+      <div>
+        <h4 class="font-bold text-yellow-400 mb-4">Navigation</h4>
+        <ul class="space-y-2 text-gray-400">
+          <li><a href="/" class="hover:text-yellow-400 transition">Home</a></li>
+          <li><a href="/rooms" class="hover:text-yellow-400 transition">Rooms</a></li>
+          <li><a href="/about" class="hover:text-yellow-400 transition">About Us</a></li>
+          <li><a href="/contact" class="hover:text-yellow-400 transition">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-bold text-yellow-400 mb-4">Support</h4>
+        <ul class="space-y-2 text-gray-400">
+          <li><a href="#" class="hover:text-yellow-400 transition">FAQ</a></li>
+          <li><a href="#" class="hover:text-yellow-400 transition">Booking Help</a></li>
+          <li><a href="#" class="hover:text-yellow-400 transition">Cancellation Policy</a></li>
+          <li><a href="#" class="hover:text-yellow-400 transition">Privacy</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-bold text-yellow-400 mb-4">Contact</h4>
+        <p class="text-gray-400 mb-2">Email: <a href="mailto:info@staygrid.com" class="hover:text-yellow-400 transition">info@staygrid.com</a></p>
+        <p class="text-gray-400">Phone: <a href="tel:+15551234567" class="hover:text-yellow-400 transition">+1 (555) 123-4567</a></p>
+      </div>
+    </div>
+    <div class="border-t border-gray-700 pt-8 text-center text-gray-500">
+      <p>&copy; 2026 StayGrid. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+</main>
+</body>
+</html>
+

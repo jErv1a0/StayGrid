@@ -1,0 +1,121 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}StayGrid // Booking_Registry{% endblock %}
+
+{% block body %}
+<div class="space-y-8">
+    <section class="relative overflow-hidden border border-black/10 bg-[#0b0c10] text-white p-7 md:p-9">
+        <div class="absolute inset-0 pointer-events-none" style="background:
+            radial-gradient(circle at 15% 24%, rgba(250,204,21,0.16), transparent 36%),
+            radial-gradient(circle at 82% 70%, rgba(255,255,255,0.08), transparent 32%);"></div>
+        <div class="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+                <div class="flex items-center gap-2 mb-2">
+                    <i data-feather="book-open" class="w-4 h-4 text-yellow-400"></i>
+                    <span class="text-[10px] font-black uppercase tracking-[0.35em] text-yellow-400">Node Occupancy Registry</span>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-black uppercase tracking-tight">All Bookings.</h1>
+                <p class="text-xs text-white/70 mt-3 uppercase tracking-wide">Central database for guest reservations and unit allocations.</p>
+            </div>
+            <a href="{{ path('app_admin_bookings_new') }}" class="inline-flex items-center gap-3 bg-yellow-400 text-black border border-yellow-400 px-6 py-3 text-[11px] font-black uppercase tracking-[0.22em] hover:bg-white hover:border-white transition-colors">
+                <span>Initialize New Booking</span>
+                <i data-feather="plus" class="w-4 h-4"></i>
+            </a>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <article class="border border-black/10 bg-white px-5 py-5">
+            <p class="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 mb-2">Total Records</p>
+            <p class="text-4xl font-black tracking-tight">{{ bookings|length }}</p>
+        </article>
+        <article class="border border-black/10 bg-white px-5 py-5">
+            <p class="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 mb-2">Confirmed</p>
+            <p class="text-4xl font-black tracking-tight">{{ bookings|filter(b => (b.status|default('')) == 'confirmed')|length }}</p>
+        </article>
+        <article class="border border-black/10 bg-white px-5 py-5">
+            <p class="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 mb-2">Pending</p>
+            <p class="text-4xl font-black tracking-tight">{{ bookings|filter(b => (b.status|default('')) == 'pending')|length }}</p>
+        </article>
+    </section>
+
+    <div class="border border-black/10 bg-white overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full border-collapse">
+                <thead>
+                    <tr class="bg-[#111827] text-white">
+                        <th class="px-6 py-4 text-left text-[9px] font-black uppercase tracking-[0.2em]">Registry_ID</th>
+                        <th class="px-6 py-4 text-left text-[9px] font-black uppercase tracking-[0.2em]">Unit_Allocation</th>
+                        <th class="px-6 py-4 text-left text-[9px] font-black uppercase tracking-[0.2em]">Guest_Node</th>
+                        <th class="px-6 py-4 text-left text-[9px] font-black uppercase tracking-[0.2em]">Timeframe (Start > End)</th>
+                        <th class="px-6 py-4 text-left text-[9px] font-black uppercase tracking-[0.2em]">System_Status</th>
+                        <th class="px-6 py-4 text-right text-[9px] font-black uppercase tracking-[0.2em]">Directives</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-black/10">
+                    {% for booking in bookings %}
+                        <tr class="hover:bg-yellow-50/30 transition-colors group">
+                            <td class="px-6 py-5 font-mono text-[11px] font-bold text-gray-400 group-hover:text-gray-950 transition-colors">
+                                #{{ booking.id|slice(0, 8) }}
+                            </td>
+
+                            <td class="px-6 py-5">
+                                <div class="text-[11px] font-black uppercase tracking-tight text-gray-950">
+                                    {{ booking.room ? booking.room.getTitle() : 'UNALLOCATED' }}
+                                </div>
+                                <div class="text-[9px] font-mono text-gray-400 uppercase tracking-tighter">
+                                    Class: {{ booking.room.category|default('Standard') }}
+                                </div>
+                            </td>
+
+                            <td class="px-6 py-5">
+                                <div class="text-[11px] font-bold text-gray-800">
+                                    {{ booking.user ? booking.user.getEmail() : 'ANONYMOUS' }}
+                                </div>
+                            </td>
+
+                            <td class="px-6 py-5 whitespace-nowrap">
+                                <div class="flex items-center gap-2 font-mono text-[10px] font-black">
+                                    <span class="text-gray-950 bg-gray-100 px-2 py-0.5 border border-gray-200">{{ booking.startDate|date('Y.m.d') }}</span>
+                                    <i data-feather="arrow-right" class="w-3 h-3 text-yellow-500"></i>
+                                    <span class="text-gray-950 bg-gray-100 px-2 py-0.5 border border-gray-200">{{ booking.endDate|date('Y.m.d') }}</span>
+                                </div>
+                            </td>
+
+                            <td class="px-6 py-5">
+                                {% set s = booking.status|default('unknown') %}
+                                <span class="inline-flex items-center border border-gray-950 px-2 py-1 text-[9px] font-black uppercase tracking-tighter shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] 
+                                    {% if s == 'confirmed' %} bg-green-400 text-black 
+                                    {% elseif s == 'pending' %} bg-yellow-400 text-black 
+                                    {% else %} bg-gray-200 text-gray-700 
+                                    {% endif %}">
+                                    {{ s }}
+                                </span>
+                            </td>
+
+                            <td class="px-6 py-5 text-right">
+                                <div class="flex items-center justify-end gap-4">
+                                    <a href="{{ path('app_admin_bookings_show', {id: booking.id}) }}" class="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-950 transition-colors">View</a>
+                                    <a href="{{ path('app_admin_bookings_edit', {id: booking.id}) }}" class="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-yellow-600 transition-colors">Edit</a>
+                                    
+                                    <form method="post" action="{{ path('app_admin_bookings_delete', {id: booking.id}) }}" class="inline" onsubmit="return confirm('WARNING: DELETING REGISTRY NODE. PROCEED?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete-booking-' ~ booking.id) }}">
+                                        <button type="submit" class="text-[10px] font-black uppercase tracking-widest text-red-300 hover:text-red-600 transition-colors italic">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="px-6 py-20 text-center">
+                                <i data-feather="slash" class="w-10 h-10 text-gray-200 mx-auto mb-4"></i>
+                                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">Registry_Buffer_Empty</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

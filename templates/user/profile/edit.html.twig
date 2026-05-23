@@ -1,0 +1,197 @@
+{# templates/user/profile_settings.html.twig #}
+{% extends 'user/base.html.twig' %}
+
+{% block title %}StayGrid User Profile{% endblock %}
+
+{% block body %}
+<section class="min-h-screen bg-[#f6f4ef] flex flex-col font-sans antialiased">
+    
+    {{ form_start(profileForm, {
+        'attr': {
+            'class': 'flex-1 flex flex-col', 
+            'id': 'admin-profile-form',
+            'enctype': 'multipart/form-data' 
+        }
+    }) }}
+
+    {# --- TOP HUD (Sticky Header) --- #}
+    <div class="px-8 py-6 flex justify-between items-center border-b border-black/10 bg-[#f6f4ef]/90 backdrop-blur-md sticky top-0 z-50">
+        <div class="flex items-center gap-6">
+            <span class="text-[10px] font-black uppercase tracking-[0.5em] text-yellow-500">Your Profile</span>
+            <div class="h-4 w-px bg-gray-100"></div>
+            <span class="text-[10px] font-mono text-gray-300 uppercase tracking-widest italic">ID: {{ app.user.id|default('000') }}</span>
+        </div>
+        
+        <button type="submit" 
+                class="group flex items-center gap-3 bg-gray-950 text-white px-8 py-3 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-yellow-400 hover:text-gray-950 transition-all shadow-xl shadow-black/10">
+            Commit Changes
+            <i data-feather="save" class="w-3 h-3"></i>
+        </button>
+    </div>
+
+    <div class="flex-1 max-w-7xl mx-auto w-full grid lg:grid-cols-12 gap-0">
+        
+        {# --- LEFT: IDENTITY CONSOLE --- #}
+        <div class="lg:col-span-4 p-8 lg:p-16 border-r border-black/10 bg-white flex flex-col gap-12">
+            
+            {# Profile Image Manifest #}
+            <div class="space-y-6">
+                <p class="text-[9px] font-black uppercase tracking-[0.4em] text-gray-400 italic">Your Profile Picture</p>
+                <div class="relative group w-48 h-48 mx-auto lg:mx-0">
+                    {% set profileImageUrl = profileForm.vars.value.profilePicture 
+                        ? asset('uploads/profile_pictures/' ~ profileForm.vars.value.profilePicture) 
+                        : asset('images/default-admin-avatar.jpg') 
+                    %}
+                    <img class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500 border border-black/10 shadow-2xl" 
+                         src="{{ profileImageUrl }}" 
+                         alt="Current Profile">
+                    
+                    {# Camera Trigger #}
+                    <div class="absolute inset-0 bg-gray-950/80 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center cursor-pointer"
+                         onclick="document.getElementById('{{ profileForm.profilePictureFile.vars.id }}').click()">
+                        <i data-feather="camera" class="text-white w-6 h-6 mb-2"></i>
+                        <span class="text-[8px] font-black uppercase tracking-widest text-white">Update Asset</span>
+                    </div>
+                    {{ form_widget(profileForm.profilePictureFile, {'attr': {'class': 'hidden'}}) }}
+                </div>
+            </div>
+
+            {# Role Manifest #}
+            <div class="space-y-2">
+                <p class="text-[9px] font-black uppercase tracking-[0.4em] text-gray-400 italic"></p>
+                <div class="flex flex-wrap gap-2 pt-2">
+                    {% for role in app.user.roles %}
+                        <span class="text-[10px] font-mono bg-gray-50 text-gray-400 px-3 py-1 border border-gray-100">
+                            {{ role|replace({'ROLE_': ''}) }}
+                        </span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {# System Metadata #}
+            <div class="mt-auto p-6 border-2 border-dashed border-black/10 opacity-60 bg-[#f8f8f6]">
+                <p class="text-[8px] font-mono text-gray-400 uppercase leading-loose">
+                    Node Type: USER CLIENT<br/>
+                    Auth Chain: LOCAL GRID STAY<br/>
+                    Last Sync: {{ "now"|date("d.m.Y H:i") }}
+                </p>
+            </div>
+        </div>
+
+        {# --- RIGHT: DATA CALIBRATION --- #}
+        <div class="lg:col-span-8 bg-[#f6f4ef] p-8 lg:p-20">
+            
+            <div class="max-w-2xl space-y-20">
+                
+                {# SECTION 1: Personal #}
+                <div class="space-y-10">
+                    <h3 class="text-[11px] font-black uppercase tracking-[0.5em] text-yellow-600">Personal Details</h3>
+                    
+                    <div class="group border-b border-gray-200 focus-within:border-gray-950 transition-all pb-4">
+                        {{ form_label(profileForm.fullName, 'Full Name', {'label_attr': {'class': 'label-style'}}) }}
+                        {{ form_widget(profileForm.fullName, {'attr': {'class': 'input-reset', 'placeholder': 'Input Name'}}) }}
+                        {{ form_errors(profileForm.fullName) }}
+                    </div>
+
+                    <div class="group border-b border-gray-200 focus-within:border-gray-950 transition-all pb-4">
+                        {{ form_label(profileForm.address, 'City / Location', {'label_attr': {'class': 'label-style'}}) }}
+                        {{ form_widget(profileForm.address, {'attr': {'class': 'input-reset', 'placeholder': 'e.g. Manila'}}) }}
+                        {{ form_errors(profileForm.address) }}
+                    </div>
+                </div>
+
+                {# SECTION 2: Account #}
+                <div class="space-y-10">
+                    <h3 class="text-[11px] font-black uppercase tracking-[0.5em] text-yellow-600">Credentials</h3>
+                    
+                    <div class="group border-b border-gray-200 focus-within:border-gray-950 transition-all pb-4">
+                        {{ form_label(profileForm.email, 'Email', {'label_attr': {'class': 'label-style'}}) }}
+                        {{ form_widget(profileForm.email, {'attr': {'class': 'input-reset'}}) }}
+                        {{ form_errors(profileForm.email) }}
+                    </div>
+                </div>
+
+                {# SECTION 3: Password #}
+                <div class="space-y-10">
+                    <h3 class="text-[11px] font-black uppercase tracking-[0.5em] text-yellow-600">Security</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                        <div class="group border-b border-gray-200 focus-within:border-gray-950 transition-all pb-4">
+                            {{ form_label(profileForm.plainPassword.first, 'New Password', {'label_attr': {'class': 'label-style'}}) }}
+                            {{ form_widget(profileForm.plainPassword.first, {'attr': {'class': 'input-reset', 'placeholder': '••••••••'}}) }}
+                        </div>
+                        <div class="group border-b border-gray-200 focus-within:border-gray-950 transition-all pb-4">
+                            {{ form_label(profileForm.plainPassword.second, 'Confirm Key', {'label_attr': {'class': 'label-style'}}) }}
+                            {{ form_widget(profileForm.plainPassword.second, {'attr': {'class': 'input-reset', 'placeholder': '••••••••'}}) }}
+                        </div>
+                    </div>
+                    {{ form_errors(profileForm.plainPassword.first) }}
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    {{ form_rest(profileForm) }}
+    {{ form_end(profileForm) }}
+</section>
+
+<style>
+    .label-style {
+        display: block;
+        font-size: 9px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.24em;
+        color: #9ca3af;
+        margin-bottom: 0.5rem;
+        transition: color 0.2s ease;
+    }
+
+    .group:focus-within .label-style {
+        color: #111827;
+    }
+
+    .input-reset {
+        width: 100%;
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        padding: 0;
+        font-size: 1.5rem;
+        line-height: 1.2;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: #111827;
+        outline: none;
+        box-shadow: none;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+
+    .input-reset::placeholder {
+        color: #d1d5db;
+    }
+
+    ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    li {
+        color: #ef4444;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-top: 0.5rem;
+        letter-spacing: 0.08em;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof feather !== 'undefined') { feather.replace(); }
+    });
+</script>
+{% endblock %}

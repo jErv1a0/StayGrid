@@ -1,0 +1,86 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}StayGrid // Initialize_New_Booking{% endblock %}
+
+{% block body %}
+<div class="max-w-3xl mx-auto py-10">
+
+    <div class="mb-6">
+        <a href="{{ path('app_admin_bookings_index') }}" class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 hover:text-yellow-600 transition-all">
+            <i data-feather="arrow-left" class="w-3 h-3"></i> Back_to_Registry
+        </a>
+    </div>
+
+    <div class="bg-white border border-black/10 overflow-hidden">
+        
+        <div class="bg-[#111827] p-8 border-b border-black/10 flex items-center justify-between">
+            <div>
+                <p class="text-[9px] font-mono font-black text-yellow-400 uppercase tracking-[0.4em] mb-1">Status: Ready_For_Input</p>
+                <h3 class="text-2xl font-black text-white uppercase tracking-tighter">
+                    Initialize_Booking<span class="text-yellow-400">_Node</span>
+                </h3>
+            </div>
+            <i data-feather="plus-square" class="w-8 h-8 text-white opacity-20"></i>
+        </div>
+
+        <div class="p-8 lg:p-12">
+            {{ form_start(bookingForm, {attr: {class: 'space-y-10'}}) }}
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    
+                    <div class="space-y-3">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-gray-950 flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 bg-yellow-400"></span> {{ form_label(bookingForm.startDate) }}
+                        </label>
+                        <div class="relative">
+                            {{ form_widget(bookingForm.startDate, {attr: {
+                                class: 'w-full bg-gray-50 border border-black/20 p-4 text-sm font-mono font-bold focus:outline-none focus:bg-white focus:ring-0 focus:border-black transition-all'
+                            }}) }}
+                        </div>
+                        <div class="text-[9px] font-mono text-red-600 font-bold uppercase italic">
+                            {{ form_errors(bookingForm.startDate) }}
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-gray-950 flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 bg-gray-950"></span> {{ form_label(bookingForm.endDate) }}
+                        </label>
+                        <div class="relative">
+                            {{ form_widget(bookingForm.endDate, {attr: {
+                                class: 'w-full bg-gray-50 border border-black/20 p-4 text-sm font-mono font-bold focus:outline-none focus:bg-white focus:ring-0 focus:border-black transition-all'
+                            }}) }}
+                        </div>
+                        <div class="text-[9px] font-mono text-red-600 font-bold uppercase italic">
+                            {{ form_errors(bookingForm.endDate) }}
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="bg-gray-50 border-l-4 border-gray-950 p-4 flex gap-4 items-start">
+                    <i data-feather="info" class="w-4 h-4 mt-0.5 text-gray-400"></i>
+                    <p class="text-[10px] leading-relaxed text-gray-500 font-mono uppercase">
+                        Ensure check-in/out protocols align with unit availability. Double-entry validation is active for all new <span class="text-gray-950 font-bold">Node_Registry</span> creations.
+                    </p>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center justify-between pt-6 border-t border-gray-100 gap-6">
+                    <a href="{{ path('app_admin_bookings_index') }}" class="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-red-600 transition-colors">
+                        Abort_Sequence
+                    </a>
+
+                    <button type="submit" class="w-full sm:w-auto bg-yellow-400 text-black border border-black px-10 py-4 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors">
+                        Create_Registry_Entry
+                    </button>
+                </div>
+
+            {{ form_end(bookingForm) }}
+        </div>
+    </div>
+
+    <div class="mt-8 text-center">
+        <span class="text-[10px] font-mono text-gray-300 uppercase tracking-[1em]">StayGrid System Core v3.0</span>
+    </div>
+</div>
+{% endblock %}

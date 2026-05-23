@@ -1,39 +1,103 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Admin Login{% endblock %}
+{% block title %}StayGrid Admin // Auth_Gate{% endblock %}
 
 {% block content %}
-<div class="min-h-screen flex items-center justify-center bg-gray-100">
-    <div class="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
-        <h2 class="text-center text-2xl font-bold mb-6 text-gray-800">Admin Login</h2>
+<div class="relative min-h-screen overflow-hidden bg-[#081018] text-white">
+    <div class="pointer-events-none absolute inset-0" style="background:
+        radial-gradient(circle at 15% 18%, rgba(34,211,238,0.22), transparent 34%),
+        radial-gradient(circle at 85% 78%, rgba(250,204,21,0.20), transparent 36%),
+        linear-gradient(160deg, #060c13 0%, #0b1722 45%, #111827 100%);"></div>
+    <div class="pointer-events-none absolute inset-0 opacity-[0.08]" style="background-image: linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px); background-size: 32px 32px;"></div>
 
-        {% if error %}
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                <strong class="font-bold">Error:</strong>
-                <span class="block">{{ error.messageKey|trans(error.messageData, 'security') }}</span>
+    <div class="relative z-10 mx-auto grid min-h-screen w-full max-w-6xl grid-cols-1 items-center gap-10 px-4 py-12 md:px-8 lg:grid-cols-2 lg:gap-16">
+
+        <section class="order-2 lg:order-1">
+            <div class="inline-flex items-center gap-3 border border-cyan-300/40 bg-cyan-400/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.28em] text-cyan-200">
+                <span class="h-2 w-2 animate-pulse rounded-full bg-cyan-300"></span>
+                Security Command Portal
             </div>
-        {% endif %}
-
-        <form method="post" action="{{ path('app_admin_login') }}" class="space-y-4">
-            <div>
-                <label for="username" class="block text-sm font-medium text-gray-700">Email</label>
-                <input type="email" name="_username" id="username" required
-                       class="w-full p-3 border border-gray-300 rounded mt-1" value="{{ last_username }}">
+            <h1 class="mt-5 text-4xl font-black uppercase tracking-tight text-white md:text-5xl">
+                StayGrid
+                <span class="text-yellow-300">Admin Access</span>
+            </h1>
+            <p class="mt-5 max-w-md text-sm leading-relaxed text-slate-200/85">
+                Restricted entry for authorized administrators. All attempts are logged and monitored for platform security.
+            </p>
+            <div class="mt-8 grid max-w-lg grid-cols-1 gap-3 sm:grid-cols-3">
+                <div class="border border-white/15 bg-black/20 px-3 py-3">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Region</p>
+                    <p class="mt-1 text-sm font-black text-white">PH-SOUTH</p>
+                </div>
+                <div class="border border-white/15 bg-black/20 px-3 py-3">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Node</p>
+                    <p class="mt-1 text-sm font-black text-white">SEC-01</p>
+                </div>
+                <div class="border border-white/15 bg-black/20 px-3 py-3">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Status</p>
+                    <p class="mt-1 text-sm font-black text-lime-300">Online</p>
+                </div>
             </div>
+        </section>
 
-            <div>
-                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                <input type="password" name="_password" id="password" required
-                       class="w-full p-3 border border-gray-300 rounded mt-1">
+        <section class="order-1 lg:order-2">
+            <div class="relative overflow-hidden border border-white/20 bg-slate-950/80 p-8 shadow-[0_24px_70px_rgba(0,0,0,0.45)] backdrop-blur md:p-10">
+                <div class="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-cyan-300 via-white/70 to-yellow-300"></div>
+
+                {% if error %}
+                    <div class="mb-6 border border-red-400/60 bg-red-500/15 p-3 text-[11px] font-bold uppercase tracking-wide text-red-200">
+                        ACCESS DENIED: {{ error.messageKey|trans(error.messageData, 'security') }}
+                    </div>
+                {% endif %}
+
+                <form method="post" action="{{ path('app_admin_login') }}" class="space-y-6">
+                    <div class="space-y-2">
+                        <label for="_username" class="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.22em] text-slate-300">
+                            <span>Admin Email</span>
+                            <span class="text-slate-500">Required</span>
+                        </label>
+                        <input
+                            type="email"
+                            id="_username"
+                            name="_username"
+                            value="{{ last_username }}"
+                            required
+                            class="w-full border border-slate-600 bg-slate-900 px-4 py-3 text-sm font-semibold text-white placeholder:text-slate-500 focus:border-cyan-300 focus:outline-none"
+                            placeholder="admin@staygrid.com"
+                        >
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="_password" class="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.22em] text-slate-300">
+                            <span>Password</span>
+                            <span class="text-slate-500">Encrypted</span>
+                        </label>
+                        <input
+                            type="password"
+                            id="_password"
+                            name="_password"
+                            required
+                            class="w-full border border-slate-600 bg-slate-900 px-4 py-3 text-sm font-semibold text-white placeholder:text-slate-500 focus:border-cyan-300 focus:outline-none"
+                            placeholder="Enter your password"
+                        >
+                    </div>
+
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('admin_authenticate') }}">
+
+                    <button
+                        type="submit"
+                        class="w-full bg-yellow-300 px-4 py-4 text-xs font-black uppercase tracking-[0.3em] text-black transition hover:bg-white"
+                    >
+                        Sign In to Admin
+                    </button>
+                </form>
+
+                <div class="mt-6 flex items-center justify-between border-t border-white/10 pt-4 text-[10px] font-mono uppercase tracking-[0.2em] text-slate-400">
+                    <span>Audit Logging Enabled</span>
+                    <span>v6.2 Secure Gate</span>
+                </div>
             </div>
-
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token('admin_authenticate') }}">
-
-            <button type="submit"
-                    class="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded">
-                Sign In
-            </button>
-        </form>
+        </section>
     </div>
 </div>
 {% endblock %}

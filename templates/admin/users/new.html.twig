@@ -1,0 +1,122 @@
+{# templates/admin/user/new.html.twig #}
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}StayGrid // CREATE_NEW_IDENTITY{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-[#f6f4ef] py-10">
+    <div class="max-w-3xl mx-auto px-4 space-y-8">
+
+        {# --- HEADER SECTION --- #}
+        <div class="flex flex-col md:flex-row justify-between items-end gap-6 border-b border-black/10 pb-8">
+            <div>
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="px-2 py-0.5 bg-gray-950 text-yellow-400 text-[9px] font-black uppercase tracking-[0.3em]">Identity_Provision_v1.0</span>
+                    <span class="text-[9px] font-mono text-gray-400 uppercase tracking-widest italic underline decoration-yellow-400 underline-offset-4">Action: New_Node_Deployment</span>
+                </div>
+                <h1 class="text-5xl font-black text-gray-950 uppercase tracking-tight leading-none">
+                    New_User
+                </h1>
+            </div>
+            
+            <a href="{{ path('app_admin_user_index') }}"
+               class="group inline-flex items-center gap-2 bg-white border border-black px-6 py-3 hover:bg-yellow-400 transition-colors">
+                <i data-feather="arrow-left" class="w-4 h-4 text-gray-950"></i>
+                <span class="text-xs font-black uppercase tracking-widest text-gray-950">Abort_Process</span>
+            </a>
+        </div>
+
+        {# --- MAIN FORM TERMINAL --- #}
+        <div class="bg-white border border-black/10 overflow-hidden">
+            <div class="bg-[#111827] px-6 py-4 border-b border-black/10 flex justify-between items-center">
+                <h2 class="text-[11px] font-black text-white uppercase tracking-[0.4em]">Credential_Input_Buffer</h2>
+                <div class="flex gap-1">
+                    <div class="h-2 w-2 rounded-full bg-red-500"></div>
+                    <div class="h-2 w-2 rounded-full bg-yellow-500"></div>
+                    <div class="h-2 w-2 rounded-full bg-green-500"></div>
+                </div>
+            </div>
+
+            <div class="p-8">
+                {# Define Brutalist Styles #}
+                {% set input_class = 'w-full bg-gray-50 border border-black/20 p-4 font-mono text-sm focus:bg-white focus:border-black focus:outline-none transition-colors placeholder-gray-300' %}
+                {% set label_class = 'block text-[10px] font-black text-gray-950 uppercase tracking-[0.2em] mb-2' %}
+                {% set error_class = 'text-red-600 text-[10px] font-bold uppercase mt-2 italic bg-red-50 p-2 border-l-4 border-red-600' %}
+
+                {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'space-y-8'}}) }}
+
+                    {# Email Field #}
+                    <div>
+                        {{ form_label(form.email, 'Primary_Access_Email', {'label_attr': {'class': label_class}}) }}
+                        {{ form_widget(form.email, {'attr': {'class': input_class, 'placeholder': 'USER_ID@STAYGRID.NETWORK'}}) }}
+                        {{ form_errors(form.email, {'attr': {'class': error_class}}) }}
+                    </div>
+
+                    {# Password Field #}
+                    <div class="p-6 bg-gray-100 border border-black/20">
+                        <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 border-b border-gray-300 pb-2">Security_Token_Definition</h3>
+                        <div>
+                            {{ form_label(form.password, 'Initial_Password', {'label_attr': {'class': label_class}}) }}
+                            {{ form_widget(form.password, {'attr': {'class': input_class, 'placeholder': '••••••••••••'}}) }}
+                            {{ form_errors(form.password, {'attr': {'class': error_class}}) }}
+                        </div>
+                        <p class="text-[9px] font-mono text-gray-400 mt-4 uppercase italic">Encryption: Argon2id Standard_Applied</p>
+                    </div>
+
+                    {# Roles Panel #}
+                    <div>
+                        <label class="{{ label_class }}">Grant_Access_Privileges</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {% for role in form.roles %}
+                                <label class="group relative flex items-center p-4 border border-black/20 bg-white cursor-pointer hover:bg-yellow-50 has-[:checked]:bg-yellow-400 transition-all">
+                                    <div class="flex items-center h-5">
+                                            {{ form_widget(role, {'attr': {'class': 'w-5 h-5 border border-black text-gray-950 focus:ring-0 rounded-none'}}) }}
+                                    </div>
+                                    <div class="ml-3">
+                                        <span class="text-xs font-black uppercase tracking-tighter text-gray-950">
+                                            {{ role.vars.label|replace({'ROLE_': ''}) }}
+                                        </div>
+                                </label>
+                            {% endfor %}
+                        </div>
+                        {{ form_errors(form.roles, {'attr': {'class': error_class}}) }}
+                    </div>
+
+                    {# Verification Status #}
+                    <div class="pt-4 border-t-2 border-gray-100">
+                        <label class="inline-flex items-center group cursor-pointer">
+                            <div class="relative">
+                                {{ form_widget(form.isVerified, {'attr': {'class': 'peer sr-only'}}) }}
+                                <div class="w-12 h-7 bg-gray-200 border-2 border-gray-950 peer-checked:bg-green-500 transition-colors"></div>
+                                <div class="absolute left-1 top-1 w-5 h-5 bg-gray-950 peer-checked:translate-x-5 transition-transform"></div>
+                            </div>
+                            <div class="ml-4">
+                                <span class="block text-[10px] font-black text-gray-950 uppercase tracking-widest">Bypass_Verification</span>
+                                <span class="block text-[9px] font-mono text-gray-400 uppercase italic leading-none mt-1">Activate account immediately upon creation</span>
+                            </div>
+                        </label>
+                        {{ form_errors(form.isVerified, {'attr': {'class': error_class}}) }}
+                    </div>
+
+                    {# Submit Button #}
+                    <div class="pt-10 border-t-4 border-double border-gray-100">
+                        {{ form_rest(form) }}
+                        <button type="submit"
+                            class="w-full flex items-center justify-center gap-3 bg-yellow-400 border border-black py-5 hover:bg-black hover:text-white transition-colors group">
+                            <i data-feather="user-check" class="w-5 h-5 group-active:text-white"></i>
+                            <span class="text-sm font-black uppercase tracking-[0.3em]">Initialize_User_Node</span>
+                        </button>
+                    </div>
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+
+        <div class="mt-8 text-center">
+             <p class="text-[9px] font-mono text-gray-300 uppercase tracking-[0.5em] italic">
+                StayGrid_Core_Identity_v1.0.4
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

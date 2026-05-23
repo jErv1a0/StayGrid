@@ -6,6 +6,7 @@
     <title>{{ page_title }}</title>
     <link rel="icon" type="image/png" href="{{ asset('icons/staygrid16x16.png') }}"/>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -22,11 +23,14 @@
         }
     </script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Manrope', sans-serif; }
         .icon { width: 1.25rem; height: 1.25rem; display: inline-block; vertical-align: middle; margin-right: 0.5rem; }
     </style>
 </head>
 <body class="bg-white text-gray-800 flex min-h-screen">
+
+    {# Safely determine current route (prevent errors when app.request is null) #}
+    {% set current_route = app.request ? (app.request.attributes.get('_route') ?: '') : '' %}
 
     <aside class="w-64 bg-dark-bg text-dark-text shadow-xl z-20 transition-all duration-300 fixed min-h-screen">
         <div class="p-6">
@@ -34,14 +38,14 @@
         </div>
 
         <nav class="flex flex-col px-4 pb-6 space-y-2">
-            <a href="{{ path('app_admin_home') }}" class="flex items-center px-4 py-3 rounded-lg text-sm font-medium transition duration-150 ease-in-out hover:bg-slate-700/50 hover:text-white {% if app.request.attributes.get('_route') == 'app_admin_home' %}bg-primary-accent text-secondary-dark font-bold shadow-lg{% endif %}">
+            <a href="{{ path('app_admin_home') }}" class="flex items-center px-4 py-3 rounded-lg text-sm font-medium transition duration-150 ease-in-out hover:bg-slate-700/50 hover:text-white {% if current_route == 'app_admin_home' %}bg-primary-accent text-secondary-dark font-bold shadow-lg{% endif %}">
                 <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.144-.439 1.583 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125h2.25a1.125 1.125 0 001.125-1.125V13.5a1.125 1.125 0 011.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v6.375c0 .621.504 1.125 1.125 1.125h2.25c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21H12M15.75 21H19.5" />
                 </svg>
                 Dashboard
             </a>
 
-            <a href="{{ path('app_admin_roomlisting_index') }}" class="flex items-center px-4 py-3 rounded-lg text-sm font-medium transition duration-150 ease-in-out hover:bg-slate-700/50 hover:text-white {% if 'roomlisting' in app.request.attributes.get('_route') %}bg-primary-accent text-secondary-dark font-bold shadow-lg{% endif %}">
+            <a href="{{ path('app_admin_roomlisting_index') }}" class="flex items-center px-4 py-3 rounded-lg text-sm font-medium transition duration-150 ease-in-out hover:bg-slate-700/50 hover:text-white {% if 'roomlisting' in current_route %}bg-primary-accent text-secondary-dark font-bold shadow-lg{% endif %}">
                 <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 14.25h18" />
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 7.5a4.5 4.5 0 00-9 0v1.5a4.5 4.5 0 009 0V7.5z" />
@@ -49,14 +53,14 @@
                 Room Listings
             </a>
 
-            <a href="{{ path('app_admin_users_index') }}" class="flex items-center px-4 py-3 rounded-lg text-sm font-medium transition duration-150 ease-in-out hover:bg-slate-700/50 hover:text-white {% if 'users' in app.request.attributes.get('_route') %}bg-primary-accent text-secondary-dark font-bold shadow-lg{% endif %}">
+            <a href="{{ path('app_admin_users_index') }}" class="flex items-center px-4 py-3 rounded-lg text-sm font-medium transition duration-150 ease-in-out hover:bg-slate-700/50 hover:text-white {% if 'users' in current_route %}bg-primary-accent text-secondary-dark font-bold shadow-lg{% endif %}">
                 <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM12 17.25a7.5 7.5 0 00-7.5 7.5h15a7.5 7.5 0 00-7.5-7.5z" />
                 </svg>
                 Users
             </a>
 
-            <a href="{{ path('app_admin_profile_edit') }}" class="flex items-center px-4 py-3 rounded-lg text-sm font-medium transition duration-150 ease-in-out hover:bg-slate-700/50 hover:text-white {% if 'profile' in app.request.attributes.get('_route') %}bg-primary-accent text-secondary-dark font-bold shadow-lg{% endif %}">
+            <a href="{{ path('app_admin_profile_edit') }}" class="flex items-center px-4 py-3 rounded-lg text-sm font-medium transition duration-150 ease-in-out hover:bg-slate-700/50 hover:text-white {% if 'profile' in current_route %}bg-primary-accent text-secondary-dark font-bold shadow-lg{% endif %}">
                 <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
                 </svg>
@@ -118,13 +122,13 @@
             </div>
             <div class="bg-white shadow-lg rounded-xl p-6 border-l-8 border-yellow-400 hover:shadow-2xl transition-all">
                 <h3 class="text-gray-500 font-medium mb-2">Total Revenue</h3>
-                <p class="text-3xl font-bold text-gray-800">${{ total_revenue }}</p>
+                <p class="text-3xl font-bold text-gray-800">{{ '₱' ~ total_revenue }}</p>
             </div>
         </div>
 
         <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
             <h2 class="text-gray-700 font-semibold mb-4">Bookings per Room Category</h2>
-            <canvas id="roomBookingChart" class="w-full h-64 rounded-lg"></canvas>
+            <canvas id="roomBookingChart" class="w-full h-64 rounded-lg" data-labels="{{ bookingsStats|keys|json_encode|raw }}" data-data="{{ bookingsStats|json_encode|raw }}"></canvas>
         </div>
 
         <div class="bg-white rounded-xl shadow-lg p-6 overflow-x-auto">
@@ -150,7 +154,7 @@
                             <td class="px-4 py-2">
                                 <span class="inline-block px-3 py-1 rounded-full text-sm font-medium {{ badgeColor }}">{{ status }}</span>
                             </td>
-                            <td class="px-4 py-2 text-gray-700">${{ room.pricePerNight }}</td>
+                            <td class="px-4 py-2 text-gray-700">{{ '₱' ~ room.pricePerNight }}</td>
                         </tr>
                     {% else %}
                         <tr>
@@ -163,36 +167,7 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        const ctx = document.getElementById('roomBookingChart').getContext('2d');
-        const roomBookingChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: {{ bookingsStats|keys|json_encode|raw }},
-                datasets: [{
-                    label: 'Number of Bookings',
-                    data: {{ bookingsStats|json_encode|raw }},
-                    backgroundColor: ['#facc15', '#34d399', '#3b82f6', '#f87171', '#a855f7', '#f43f5e'],
-                    borderRadius: 6,
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.dataset.label + ': ' + context.raw;
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
-                }
-            }
-        });
-    </script>
+    <script src="{{ asset('js/admin-home.js') }}"></script>
 </body>
 </html>
+

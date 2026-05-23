@@ -1,0 +1,17 @@
+knpu_oauth2_client:
+    # Local development fallback for environments missing system CA certificates.
+    # Do not disable certificate verification in production.
+    http_client_options:
+        timeout: 30
+        verify: false
+
+    clients:
+        # the key "google" can be anything, but should match what you use in your controller
+        google:
+            # must be "google" - it's backed by League\OAuth2\Client\Provider\Google
+            type: google
+            client_id: '%env(GOOGLE_CLIENT_ID)%'
+            client_secret: '%env(GOOGLE_CLIENT_SECRET)%'
+            # Use the Symfony route name for the OAuth callback.
+            redirect_route: connect_google_check
+            redirect_params: {}

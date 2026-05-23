@@ -1,0 +1,164 @@
+openapi: 3.0.3
+info:
+  title: StayGrid Customer API
+  version: 1.0.0
+  description: Minimal OpenAPI skeleton for core customer endpoints (for project documentation).
+servers:
+  - url: https://{host}
+    variables:
+      host:
+        default: localhost:8000
+paths:
+  /api/rooms:
+    get:
+      summary: List rooms
+      responses:
+        '200':
+          description: A list of rooms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Room'
+      tags: [Rooms]
+  /api/rooms/{id}:
+    get:
+      summary: Get a single room
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Room object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+        '404':
+          description: Not Found
+      tags: [Rooms]
+  /api/bookings:
+    post:
+      summary: Create a booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewBooking'
+      responses:
+        '201':
+          description: Booking created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+      security:
+        - cookieAuth: []
+      tags: [Bookings]
+  /api/user/profile:
+    get:
+      summary: Get authenticated user profile
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /api/auth/login:
+    post:
+      summary: Login (session)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Authenticated (sets session cookie)
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: PHPSESSID
+  schemas:
+    Room:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        number:
+          type: string
+        category:
+          type: string
+        pricePerNight:
+          type: number
+        image:
+          type: string
+    NewBooking:
+      type: object
+      required: [roomId, startDate, endDate]
+      properties:
+        roomId:
+          type: integer
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        guests:
+          type: integer
+    Booking:
+      type: object
+      properties:
+        id:
+          type: integer
+        roomId:
+          type: integer
+        userId:
+          type: integer
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        name:
+          type: string
+        isVerified:
+          type: boolean
+
+# Example request snippets
+x-samples:
+  listRooms:
+    summary: curl list rooms
+    request: |
+      curl -X GET "http://localhost:8000/api/rooms" -H "Accept: application/json"
+  createBooking:
+    summary: curl create booking
+    request: |
+      curl -X POST "http://localhost:8000/api/bookings" -H "Content-Type: application/json" -d '{"roomId":1,"startDate":"2026-06-01","endDate":"2026-06-05","guests":2}' -c cookiejar.txt

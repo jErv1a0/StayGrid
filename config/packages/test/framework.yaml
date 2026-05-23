@@ -1,0 +1,7 @@
+framework:
+    test: true
+    session:
+        # Use the mock file session storage in test environment
+        storage_factory_id: 'session.storage.factory.mock_file'
+    php_errors:
+        log: true

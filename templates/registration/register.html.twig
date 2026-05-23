@@ -1,86 +1,165 @@
-{% extends 'base.html.twig' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'partials/_global_radius.html.twig' %}
+    <meta charset="UTF-8">
+    <title>StayGrid Create Account</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #111111;
+            --paper: #f6f4ef;
+            --gold: #facc15;
+            --mist: #e8e5dc;
+        }
 
-{% block title %}Sign Up with StayGrid{% endblock %}
+        body {
+            font-family: 'Manrope', sans-serif;
+            background: var(--paper);
+            color: var(--ink);
+        }
 
-{% block content %}
-<!-- 🌄 Background Section -->
-<section class="min-h-screen flex flex-col items-center justify-start pt-20 bg-cover bg-center bg-no-repeat relative"
-         style="background-image: url('{{ asset('images/bgsign.png') }}');">
+        .display-font {
+            font-family: 'Space Grotesk', sans-serif;
+        }
 
-    <!-- Dark Overlay -->
-    <div class="absolute inset-0 bg-black/40"></div>
-    <br><br><br><br>
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+        }
+    </style>
+</head>
 
-    <!-- Header -->
-    <div class="relative text-center text-white mb-6 z-10">
-        <h2 class="text-4xl font-extrabold mb-1">
-            Sign up with <span class="text-yellow-400">StayGrid</span>
-        </h2>
-        <p class="text-gray-200 text-sm md:text-base">
-            Join thousands of guests experiencing comfort, innovation, and simplicity.
-        </p>
-    </div>
+<body>
+<div class="min-h-screen bg-[radial-gradient(circle_at_10%_15%,rgba(250,204,21,0.24),transparent_32%),radial-gradient(circle_at_90%_85%,rgba(17,17,17,0.12),transparent_34%),linear-gradient(145deg,#f8f6f2_0%,#f0ece5_45%,#f6f4ef_100%)]">
 
-    <!-- Sign-Up Form -->
-    <div class="relative bg-white/10 backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full max-w-sm border border-white/30 z-10">
+    {% include 'partials/_public_nav.html.twig' %}
 
-        <h3 class="text-xl font-bold text-white mb-3 text-center">Sign Up</h3>
-        <p class="text-gray-200 text-center mb-5 text-sm">
-            Start your StayGrid journey today.
-        </p>
+    <main class="max-w-7xl mx-auto px-5 md:px-8 py-8 md:py-14">
+        <section class="grid lg:grid-cols-[1.05fr_0.95fr] gap-6 lg:gap-8 min-h-[calc(100vh-9rem)]">
 
-        {{ form_start(registrationForm, {'attr': {'class': 'space-y-4'}}) }}
+            <aside class="relative overflow-hidden bg-black text-white p-8 md:p-12 lg:p-14 border border-black/80">
+                <div class="absolute inset-0 opacity-25" style="background-image: linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px); background-size: 46px 46px;"></div>
+                <div class="absolute -top-20 -right-12 w-72 h-72 rounded-full bg-yellow-400/35 blur-3xl"></div>
 
-            <!-- Email -->
-            <div>
-                {{ form_label(registrationForm.email, 'Email Address', {'label_attr': {'class': 'text-gray-200 text-xs font-medium'}}) }}
-                {{ form_widget(registrationForm.email, {
-                    'attr': {
-                        'placeholder': 'you@example.com',
-                        'class': 'mt-1 w-full px-3 py-2 rounded-md bg-white/80 text-gray-900 placeholder-gray-500 border border-gray-300 focus:ring-2 focus:ring-yellow-400 outline-none text-sm transition'
-                    }
-                }) }}
-            </div>
+                <div class="relative z-10 h-full flex flex-col justify-between">
+                    <div>
+                        <p class="text-[11px] uppercase tracking-[0.35em] font-bold text-yellow-300 mb-8">Registration Protocol</p>
+                        <h1 class="display-font text-[clamp(2.6rem,6.2vw,5.1rem)] leading-[0.9] font-bold tracking-[-0.03em]">
+                            Build Your<br>
+                            StayGrid Identity
+                        </h1>
+                        <p class="mt-6 text-white/70 max-w-md leading-relaxed">
+                            Create your account to unlock smart booking, real-time availability, and seamless check-in across curated premium spaces.
+                        </p>
+                    </div>
 
-            <!-- Password -->
-            <div>
-                {{ form_label(registrationForm.plainPassword, 'Password', {'label_attr': {'class': 'text-gray-200 text-xs font-medium'}}) }}
-                {{ form_widget(registrationForm.plainPassword, {
-                    'attr': {
-                        'placeholder': 'Enter your password',
-                        'class': 'mt-1 w-full px-3 py-2 rounded-md bg-white/80 text-gray-900 placeholder-gray-500 border border-gray-300 focus:ring-2 focus:ring-yellow-400 outline-none text-sm transition'
-                    }
-                }) }}
-            </div>
+                    <div class="mt-10 grid grid-cols-3 gap-px bg-white/15 border border-white/20">
+                        <div class="bg-black/65 p-4">
+                            <p class="text-[10px] uppercase tracking-[0.2em] text-white/50 font-bold">Security</p>
+                            <p class="mt-1 text-sm font-bold">Encrypted</p>
+                        </div>
+                        <div class="bg-black/65 p-4">
+                            <p class="text-[10px] uppercase tracking-[0.2em] text-white/50 font-bold">Access</p>
+                            <p class="mt-1 text-sm font-bold">Instant</p>
+                        </div>
+                        <div class="bg-black/65 p-4">
+                            <p class="text-[10px] uppercase tracking-[0.2em] text-white/50 font-bold">Support</p>
+                            <p class="mt-1 text-sm font-bold">24/7</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
 
-            <!-- Agree Terms -->
-            <div class="flex items-center justify-center text-xs text-gray-200">
-                {{ form_widget(registrationForm.agreeTerms, {
-                    'attr': {
-                        'class': 'mr-2 h-4 w-4 text-yellow-500 focus:ring-yellow-400 border-gray-300 rounded'
-                    }
-                }) }}
-                <label for="{{ field_name(registrationForm.agreeTerms) }}">Agree to Terms</label>
-            </div>
+            <section class="bg-white border border-black/15 p-7 md:p-10 lg:p-12 flex items-center">
+                <div class="w-full max-w-xl mx-auto">
 
-            <!-- Submit Button -->
-            <button type="submit"
-                    class="w-full py-2.5 mt-3 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold rounded-md shadow-lg transition active:scale-95 text-sm">
-                Create Account
-            </button>
+                    {% for flash_error in app.flashes('verify_email_error') %}
+                        <div class="mb-4 p-4 border-l-4 border-red-600 bg-red-50 text-red-700 text-sm font-semibold">
+                            {{ flash_error }}
+                        </div>
+                    {% endfor %}
 
-        {{ form_end(registrationForm) }}
+                    {% for flash_success in app.flashes('success') %}
+                        <div class="mb-4 p-4 border-l-4 border-green-600 bg-green-50 text-green-700 text-sm font-semibold">
+                            {{ flash_success }}
+                        </div>
+                    {% endfor %}
 
-        <!-- Login Link -->
-        <p class="text-center text-gray-200 text-xs mt-4">
-            Already have an account?
-            <a href="{{ path('app_login') }}" class="text-yellow-400 hover:underline">Sign in here</a>
-        </p>
-    </div>
+                    <div class="mb-8">
+                        <p class="text-[11px] uppercase tracking-[0.28em] text-black/55 font-bold">Create Account</p>
+                        <h2 class="display-font mt-2 text-4xl md:text-5xl leading-[0.95] font-bold tracking-tight">Welcome to StayGrid</h2>
+                    </div>
 
-    <!-- Footer Note -->
-    <p class="text-gray-300 italic text-xs mt-6 z-10">
-        “Your StayGrid experience starts with one click — let comfort meet innovation.”
-    </p>
-</section>
-{% endblock %}
+                    {{ form_start(registrationForm, {'attr': {'class': 'space-y-6'}}) }}
+
+                    <div>
+                        {{ form_label(registrationForm.email, 'Email Address', {'label_attr': {'class': 'block text-sm font-bold mb-2'}}) }}
+                        {{ form_widget(registrationForm.email, {
+                            'attr': {
+                                'class': 'w-full px-4 py-4 border border-black/20 bg-white text-base font-semibold focus:outline-none focus:border-black focus:ring-0 transition-colors',
+                                'placeholder': 'name@domain.com'
+                            }
+                        }) }}
+                        <div class="mt-1 text-sm text-red-600">{{ form_errors(registrationForm.email) }}</div>
+                    </div>
+
+                    <div>
+                        {{ form_label(registrationForm.plainPassword, 'Password', {'label_attr': {'class': 'block text-sm font-bold mb-2'}}) }}
+                        {{ form_widget(registrationForm.plainPassword, {
+                            'attr': {
+                                'class': 'w-full px-4 py-4 border border-black/20 bg-white text-base font-semibold focus:outline-none focus:border-black focus:ring-0 transition-colors',
+                                'placeholder': 'Choose a secure password'
+                            }
+                        }) }}
+                        <div class="mt-1 text-sm text-red-600">{{ form_errors(registrationForm.plainPassword) }}</div>
+                    </div>
+
+                    <div class="flex items-start gap-3 border border-black/15 bg-[var(--mist)]/35 px-4 py-4">
+                        {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'mt-0.5 h-4 w-4 border-black/40 text-black focus:ring-0'}}) }}
+                        <div>
+                            {{ form_label(registrationForm.agreeTerms, 'I agree to the Terms and Privacy Policy', {'label_attr': {'class': 'text-sm font-semibold text-black/85'}}) }}
+                            <div class="text-sm text-red-600">{{ form_errors(registrationForm.agreeTerms) }}</div>
+                        </div>
+                    </div>
+
+                    {% if not registrationForm.vars.valid %}
+                        <div class="p-3 border border-red-300 bg-red-50 text-red-700 text-sm font-semibold">
+                            {{ form_errors(registrationForm) }}
+                        </div>
+                    {% endif %}
+
+                    <button type="submit" class="w-full py-4 bg-black text-white text-xs font-bold tracking-[0.24em] uppercase hover:bg-yellow-400 hover:text-black transition-colors">
+                        Register Account
+                    </button>
+
+                    <div class="relative flex items-center py-2">
+                        <div class="w-full border-t border-black/15"></div>
+                        <span class="px-3 bg-white text-[11px] uppercase tracking-[0.2em] text-black/40 font-bold">or</span>
+                        <div class="w-full border-t border-black/15"></div>
+                    </div>
+
+                    <a href="{{ path('connect_google_start') }}" class="w-full inline-flex items-center justify-center gap-3 py-3.5 border border-black/20 text-black font-bold text-xs tracking-[0.14em] uppercase hover:bg-black hover:text-white transition-colors">
+                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google logo">
+                        Continue with Google
+                    </a>
+
+                    <p class="mt-6 text-sm text-center text-black/70">
+                        Already have an account?
+                        <a href="{{ path('app_login') }}" class="font-bold underline underline-offset-4 text-black hover:text-yellow-600">Sign in</a>
+                    </p>
+
+                    {{ form_end(registrationForm) }}
+                </div>
+            </section>
+
+        </section>
+    </main>
+</div>
+</body>
+</html>

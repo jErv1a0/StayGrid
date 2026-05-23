@@ -1,0 +1,506 @@
+{% set page_title = "StayGrid - Smart stays, StayGrid" %}
+{% set hero_headline = "Rooms Crafted for Your Comfort" %}
+{% set hero_subtitle = "" %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'partials/_global_radius.html.twig' %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }}</title>
+
+    <link rel="icon" type="image/png" href="{{ asset('icons/staygrid16x16.png') }}"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #f7f9fc;
+        }
+        .nav-link { color: #4b5563; }
+        .nav-link:hover { color: #FFD700; transition: color 0.3s ease; }
+        .btn-primary { background-color: #FFD700; border-color: #FFD700; }
+        .btn-primary:hover { background-color: #e6c200; }
+
+        /* Reusable design system animations */
+        .card-hover { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-hover:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(255,215,0,0.15); }
+        
+        .slide-up { animation: slideUp 0.6s ease-out; }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse-glow { animation: pulseGlow 2s ease-in-out infinite; }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255,215,0,0.7); }
+            50% { box-shadow: 0 0 0 10px rgba(255,215,0,0); }
+        }
+
+        .gradient-text { background: linear-gradient(135deg, #FFD700 0%, #FFC700 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+        /* Popup animation */
+        .fade-in-out {
+            animation: fadeInOut 10s forwards;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+
+        .hero-slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            animation: heroSlideFade 20s infinite;
+        }
+
+        .hero-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.02);
+        }
+
+        @keyframes heroSlideFade {
+            0% { opacity: 0; transform: scale(1.01); }
+            4% { opacity: 1; transform: scale(1.03); }
+            20% { opacity: 1; transform: scale(1.05); }
+            25% { opacity: 0; transform: scale(1.06); }
+            100% { opacity: 0; transform: scale(1.06); }
+        }
+    </style>
+</head>
+<body class="bg-white">
+
+<!-- Popup notification -->
+{% if app.user %}
+<div id="login-popup" class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900 px-6 py-4 rounded-lg shadow-lg z-50 fade-in-out font-semibold">
+    Welcome back! You are logged in as <span class="font-bold">Regular User</span>.
+</div>
+{% endif %}
+
+<!-- Navigation -->
+{% include 'partials/_public_nav.html.twig' %}
+
+<section class="relative min-h-screen bg-[#0A0A0A] text-white overflow-hidden selection:bg-yellow-400 selection:text-black font-sans">
+    <div class="absolute inset-0 pointer-events-none" style="background:
+        radial-gradient(circle at 18% 30%, rgba(250,204,21,0.14), transparent 44%),
+        radial-gradient(circle at 82% 72%, rgba(255,255,255,0.08), transparent 38%),
+        linear-gradient(130deg, rgba(255,255,255,0.04), transparent 40%);"></div>
+    <div class="absolute inset-0 opacity-[0.08] pointer-events-none" style="background-image: linear-gradient(rgba(255,255,255,0.7) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.7) 1px, transparent 1px); background-size: 72px 72px;"></div>
+    <div class="absolute top-0 left-0 w-full h-full pointer-events-none">
+        <div class="absolute top-[18%] left-[8%] w-3 h-3 border border-yellow-400/60 rotate-45"></div>
+        <div class="absolute top-[62%] left-[52%] w-2 h-2 bg-white/40"></div>
+        <div class="absolute top-[12%] right-[10%] w-28 h-px bg-white/20"></div>
+    </div>
+
+    <div class="relative z-10 max-w-[1600px] mx-auto px-6 md:px-10 lg:px-16 pt-14 lg:pt-12 pb-14 lg:pb-16">
+        <div class="grid lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-16 items-start">
+
+            <div class="order-2 lg:order-1 lg:-mt-6">
+                <br>
+                <br>
+                <br>
+                 <br>
+                <br>
+                 <br>
+                <div class="inline-flex items-center gap-4 border border-white/15 bg-white/[0.02] px-4 py-2 mb-10">
+                    <span class="text-[10px] font-black trsacking-[0.35em] uppercase text-yellow-400">StayGrid Protocol</span>
+                    <span class="w-8 h-px bg-white/25"></span>
+                    <span class="text-[10px] font-black tracking-[0.35em] uppercase text-white/45">Release 2.6</span>
+                </div>
+
+                <h1 class="text-[clamp(3.3rem,10vw,8.4rem)] font-black leading-[0.78] tracking-[-0.045em] uppercase">
+                    Smart <br/>
+                    <span class="text-transparent" style="-webkit-text-stroke: 1.6px #ffffff;">Stays, Stay Grid</span><span class="text-yellow-400">.</span>
+                </h1>
+
+                <div class="mt-10 max-w-2xl grid sm:grid-cols-[1fr_auto] gap-8 sm:gap-12 items-end">
+                    <p class="text-base md:text-lg text-white/60 leading-relaxed max-w-xl">
+                        {{ hero_subtitle|default('') }}
+                    </p>
+                    <p class="text-[10px] sm:text-xs font-bold tracking-[0.28em] uppercase text-white/40 text-left sm:text-right"></p>
+                </div>
+
+                <div class="mt-12 flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-8">
+                
+                </div>
+            </div>
+
+            <div class="order-1 lg:order-2">
+                <div class="relative max-w-xl ml-auto">
+                    <div class="absolute -inset-6 border border-white/10 pointer-events-none"></div>
+                    <div class="absolute -bottom-6 -left-6 w-40 h-40 bg-yellow-400/10 blur-3xl rounded-full pointer-events-none"></div>
+
+                    <div class="relative overflow-hidden border border-white/20 bg-black/30">
+                        <div class="absolute z-20 top-4 left-4 right-4 flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em]">
+                            <span class="bg-black/65 backdrop-blur px-3 py-2 border border-white/20">Executive Capsule</span>
+                            <span class="bg-yellow-400 text-black px-3 py-2">Unit 026</span>
+                        </div>
+
+                        <div class="relative w-full aspect-[4/5] overflow-hidden bg-black">
+                            {% set house_slides = [
+                                'images/smarthouse1.png',
+                                'images/smarthouse2.png',
+                                'images/smarthouse3.jpg',
+                                'images/familyapartmentFH.png',
+                                'images/studioMP.png'
+                            ] %}
+
+                            {% for slide in house_slides %}
+                                <div class="hero-slide" style="animation-delay: {{ loop.index0 * 4 }}s;">
+                                    <img src="{{ asset(slide) }}" alt="StayGrid house {{ loop.index }}">
+                                </div>
+                            {% endfor %}
+
+                            <div class="absolute inset-0 bg-gradient-to-b from-black/45 via-transparent to-black/65"></div>
+                            <div class="absolute top-16 left-8 right-8 flex items-center justify-between text-[10px] uppercase font-black tracking-[0.24em] text-white/80">
+                                <span>Live Showcase</span>
+                                <span>House Series</span>
+                            </div>
+
+                            <div class="absolute left-6 right-6 bottom-7 grid grid-cols-2 gap-3">
+                                <div class="border border-white/25 bg-black/45 backdrop-blur px-4 py-3">
+                                    <p class="text-[9px] uppercase tracking-[0.2em] font-black text-white/60">Experience</p>
+                                    <p class="mt-1 text-sm font-black uppercase">Captivating</p>
+                                </div>
+                                <div class="border border-white/25 bg-black/45 backdrop-blur px-4 py-3">
+                                    <p class="text-[9px] uppercase tracking-[0.2em] font-black text-white/60">Response</p>
+                                    <p class="mt-1 text-sm font-black uppercase">Seamless</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 grid grid-cols-3 gap-px bg-white/10 border border-white/10">
+                        <div class="bg-black/65 px-4 py-4">
+                            <p class="text-[9px] font-black uppercase tracking-[0.2em] text-white/45">Access</p>
+                            <p class="mt-1 text-sm font-black">Instant</p>
+                        </div>
+                        <div class="bg-black/65 px-4 py-4">
+                            <p class="text-[9px] font-black uppercase tracking-[0.2em] text-white/45">Comfort</p>
+                            <p class="mt-1 text-sm font-black">Premier</p>
+                        </div>
+                        <div class="bg-black/65 px-4 py-4">
+                            <p class="text-[9px] font-black uppercase tracking-[0.2em] text-white/45">Security</p>
+                            <p class="mt-1 text-sm font-black">Encrypted</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="absolute bottom-[-6%] left-0 w-full pointer-events-none opacity-[0.06]">
+        <h2 class="text-[22vw] leading-none font-black uppercase tracking-[-0.06em] text-center">STAYGRID</h2>
+    </div>
+</section>
+
+<section class="py-32 bg-white border-b border-gray-900">
+    <div class="max-w-7xl mx-auto px-6">
+        
+        <div class="flex flex-col lg:flex-row justify-between items-baseline mb-24 gap-6">
+            <div class="max-w-2xl">
+                <span class="text-[10px] font-black uppercase tracking-[0.5em] text-yellow-500 mb-4 block">Core_Principles // 02</span>
+                <h2 class="text-6xl lg:text-8xl font-black text-gray-900 tracking-tighter leading-[0.85]">
+                    The Grid <br/>
+                    <span class="text-transparent" style="-webkit-text-stroke: 1.5px #111827;">Experience.</span>
+                </h2>
+            </div>
+            <div class="w-full lg:w-1/3">
+                <p class="text-gray-500 text-lg font-medium leading-tight mb-8">
+                    We've redefined hospitality. No keys, no queues—just seamless, high-performance luxury.
+                </p>
+                <a href="#" class="group flex items-center gap-4 text-gray-900 font-black uppercase tracking-widest text-xs">
+                    View All Features
+                    <div class="w-8 h-px bg-gray-900 group-hover:w-12 transition-all"></div>
+                </a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 border-t border-l border-gray-900">
+            
+            <div class="p-12 lg:p-16 border-r border-b border-gray-900 hover:bg-yellow-400 group transition-all duration-500">
+                <div class="flex justify-between items-start mb-20">
+                    <div class="w-12 h-12 border border-gray-900 flex items-center justify-center group-hover:bg-gray-900 transition-colors">
+                        <i data-feather="zap" class="text-gray-900 group-hover:text-yellow-400 w-5 h-5"></i>
+                    </div>
+                    <span class="text-[10px] font-mono text-gray-300 group-hover:text-gray-900 tracking-widest uppercase">SYS_ACC_01</span>
+                </div>
+                <h3 class="text-3xl font-black text-gray-900 mb-6 uppercase tracking-tighter leading-none">Instant <br/>Access</h3>
+                <p class="text-gray-500 group-hover:text-gray-900 leading-relaxed font-medium">Check-in via your smartphone and head straight to your room. No waiting, no stress.</p>
+            </div>
+
+            <div class="p-12 lg:p-16 border-r border-b border-gray-900 hover:bg-gray-900 group transition-all duration-500">
+                <div class="flex justify-between items-start mb-20">
+                    <div class="w-12 h-12 border border-gray-900 flex items-center justify-center group-hover:border-white transition-colors">
+                        <i data-feather="shield" class="text-gray-900 group-hover:text-white w-5 h-5"></i>
+                    </div>
+                    <span class="text-[10px] font-mono text-gray-300 group-hover:text-gray-500 tracking-widest uppercase">SEC_ENC_02</span>
+                </div>
+                <h3 class="text-3xl font-black text-gray-900 group-hover:text-white mb-6 uppercase tracking-tighter leading-none">Secured <br/>Grid</h3>
+                <p class="text-gray-500 group-hover:text-gray-400 leading-relaxed font-medium">Every room is equipped with enterprise-grade security and smart-lock technology.</p>
+            </div>
+
+            <div class="p-12 lg:p-16 border-r border-b border-gray-900 hover:bg-yellow-400 group transition-all duration-500">
+                <div class="flex justify-between items-start mb-20">
+                    <div class="w-12 h-12 border border-gray-900 flex items-center justify-center group-hover:bg-gray-900 transition-colors">
+                        <i data-feather="heart" class="text-gray-900 group-hover:text-yellow-400 w-5 h-5"></i>
+                    </div>
+                    <span class="text-[10px] font-mono text-gray-300 group-hover:text-gray-900 tracking-widest uppercase">ENV_CRT_03</span>
+                </div>
+                <h3 class="text-3xl font-black text-gray-900 mb-6 uppercase tracking-tighter leading-none">Curated <br/>Comfort</h3>
+                <p class="text-gray-500 group-hover:text-gray-900 leading-relaxed font-medium">From 800-thread count linens to bespoke espresso blends, we curate every detail.</p>
+            </div>
+
+        </div>
+
+        <div class="mt-12 flex justify-between">
+            <div class="flex gap-2">
+                <div class="w-2 h-2 bg-yellow-400"></div>
+                <div class="w-2 h-2 bg-gray-200"></div>
+                <div class="w-2 h-2 bg-gray-200"></div>
+            </div>
+            <p class="text-[9px] font-mono text-gray-300 tracking-[0.5em] uppercase">Architecture_Verified_2026</p>
+        </div>
+    </div>
+</section>
+
+<section class="py-28 bg-white border-t border-gray-900">
+    <div class="max-w-7xl mx-auto px-6">
+
+        <div class="grid lg:grid-cols-[1.15fr_0.85fr] gap-8 lg:gap-12 items-end mb-14">
+            <div>
+                <span class="text-[10px] font-black uppercase tracking-[0.5em] text-yellow-500 block mb-4">Inventory // Units</span>
+                <h2 class="text-5xl md:text-7xl lg:text-8xl font-black text-gray-900 tracking-tighter leading-[0.86]">
+                    Designed for the
+                    <span class="block text-transparent" style="-webkit-text-stroke: 1.5px #111827;">Modern Traveler.</span>
+                </h2>
+            </div>
+            <div class="lg:text-right">
+                <p class="text-gray-400 text-xs font-mono uppercase tracking-widest">Global_Standard_v2.0</p>
+            </div>
+        </div>
+
+        <div class="border border-gray-900 bg-white">
+            <div class="group grid lg:grid-cols-[1.1fr_0.9fr] border-b border-gray-900">
+                <div class="relative min-h-[360px] lg:min-h-[520px] overflow-hidden border-r border-gray-900">
+                    <img src="{{ asset('images/executiveMP.png') }}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000">
+                    <div class="absolute top-5 left-5 bg-gray-900 text-yellow-400 px-4 py-2 text-[10px] font-black uppercase tracking-widest">
+                        Flagship Unit
+                    </div>
+                </div>
+
+                <div class="p-8 lg:p-12 flex flex-col justify-between bg-[linear-gradient(145deg,#ffffff_0%,#f7f7f7_100%)]">
+                    <div>
+                        <div class="flex justify-between items-start gap-4 mb-6">
+                            <h3 class="text-3xl lg:text-4xl font-black text-gray-900 uppercase tracking-tighter">Executive Suite</h3>
+                            <span class="text-[10px] font-mono text-gray-400 uppercase">REF // 001</span>
+                        </div>
+                        <p class="text-gray-600 leading-relaxed font-medium mb-8">The pinnacle of StayGrid luxury. Featuring panoramic views and a dedicated workspace for the traveling professional.</p>
+
+                        <div class="grid grid-cols-3 gap-px bg-gray-200 border border-gray-200 mb-8">
+                            <div class="bg-white px-4 py-4">
+                                <p class="text-[10px] text-gray-400 uppercase font-black">Space</p>
+                                <p class="text-sm font-black text-gray-900 mt-1">85 sqm</p>
+                            </div>
+                            <div class="bg-white px-4 py-4">
+                                <p class="text-[10px] text-gray-400 uppercase font-black">Capacity</p>
+                                <p class="text-sm font-black text-gray-900 mt-1">2-3 PPL</p>
+                            </div>
+                            <div class="bg-white px-4 py-4">
+                                <p class="text-[10px] text-gray-400 uppercase font-black">Network</p>
+                                <p class="text-sm font-black text-gray-900 mt-1">GIGABIT</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="{{ path('app_room_executive_suite') }}" class="inline-flex items-center justify-center py-5 bg-gray-900 text-white font-black uppercase tracking-[0.2em] text-xs hover:bg-yellow-400 hover:text-gray-900 transition-colors">
+                        Explore Experience
+                    </a>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2">
+                <div class="group p-8 lg:p-10 border-r border-gray-900 hover:bg-gray-50 transition-colors">
+                    <div class="aspect-video overflow-hidden border border-gray-900 mb-8 relative">
+                        <img src="{{ asset('images/studioMP.png') }}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700">
+                        <div class="absolute bottom-0 right-0 bg-yellow-400 px-4 py-2 text-[10px] font-black text-gray-900 uppercase">Available</div>
+                    </div>
+
+                    <p class="text-[10px] font-mono text-gray-400 mb-2">TYPE_02</p>
+                    <h4 class="text-3xl font-black text-gray-900 uppercase tracking-tighter">Studio Deluxe</h4>
+                    <p class="text-gray-500 mt-2 text-sm font-medium">Minimalist aesthetics for efficiency.</p>
+
+                    <div class="mt-7 flex justify-between items-end border-t border-gray-200 pt-6">
+                        <div>
+                            <p class="text-[10px] font-black text-gray-400 uppercase">Per Night</p>
+                            <p class="text-2xl font-black text-gray-900">₱2,400</p>
+                        </div>
+                        <a href="{{ path('app_room_studio_deluxe') }}" class="text-xs font-black uppercase tracking-widest text-gray-900 group-hover:text-yellow-500 transition-colors italic">Book This Stay -&gt;</a>
+                    </div>
+                </div>
+
+                <div class="group p-8 lg:p-10 hover:bg-gray-50 transition-colors border-t md:border-t-0 border-gray-900 md:border-l-0">
+                    <div class="aspect-video overflow-hidden border border-gray-900 mb-8 relative">
+                        <img src="{{ asset('images/faMP.png') }}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700">
+                    </div>
+
+                    <p class="text-[10px] font-mono text-gray-400 mb-2">TYPE_03</p>
+                    <h4 class="text-3xl font-black text-gray-900 uppercase tracking-tighter">Family Loft</h4>
+                    <p class="text-gray-500 mt-2 text-sm font-medium">Connecting hearts and spaces.</p>
+
+                    <div class="mt-7 flex justify-between items-end border-t border-gray-200 pt-6">
+                        <div>
+                            <p class="text-[10px] font-black text-gray-400 uppercase">Per Night</p>
+                            <p class="text-2xl font-black text-gray-900">₱3,200</p>
+                        </div>
+                        <a href="{{ path('app_room_family_apartment') }}" class="text-xs font-black uppercase tracking-widest text-gray-900 group-hover:text-yellow-500 transition-colors italic">Book This Stay -&gt;</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="relative py-32 bg-white overflow-hidden">
+    <div class="max-w-7xl mx-auto px-6">
+        
+        <div class="relative bg-gray-900 grid lg:grid-cols-12 items-stretch overflow-visible border border-gray-900">
+            
+            <div class="lg:col-span-7 p-10 lg:p-20 relative z-10">
+                <div class="flex items-center gap-4 mb-10">
+                    <div class="w-12 h-[2px] bg-yellow-400"></div>
+                    <span class="text-[10px] font-black uppercase tracking-[0.5em] text-yellow-400">Phase // Final Integration</span>
+                </div>
+
+                <h2 class="text-6xl lg:text-8xl font-black text-white mb-10 leading-[0.85] tracking-tighter">
+                    Unlock the <br/>
+                    <span class="text-transparent" style="-webkit-text-stroke: 1.5px #facc15;">Grid Edge.</span>
+                </h2>
+
+                <p class="text-gray-400 text-lg max-w-md mb-12 leading-tight">
+                    Join a high-performance community. Instant check-in, exclusive hardware access, and member-only pricing on every floor.
+                </p>
+
+                <a href="#" class="inline-flex group items-center gap-6 bg-yellow-400 px-10 py-6 hover:bg-white transition-all duration-500">
+                    <span class="text-xs font-black uppercase tracking-[0.3em] text-gray-900">Authorize Membership</span>
+                    <i data-feather="arrow-right" class="text-gray-900 group-hover:translate-x-2 transition-transform"></i>
+                </a>
+            </div>
+
+            <div class="lg:col-span-5 relative bg-yellow-400 flex items-center justify-center p-12 lg:p-0 overflow-hidden">
+                <div class="absolute inset-0 opacity-30 pointer-events-none" style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 30px 30px;"></div>
+                
+                <div class="relative z-10 transform -rotate-2 hover:rotate-0 transition-all duration-700 cursor-crosshair">
+                    <div class="w-80 h-48 bg-gray-950 border border-white/10 p-8 shadow-[20px_20px_0px_0px_rgba(0,0,0,1)] flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <div class="text-[10px] font-mono text-yellow-400 uppercase tracking-widest leading-none">
+                                Grid_ID // 2026<br/>
+                                <span class="text-white opacity-40">Status: Active</span>
+                            </div>
+                            <div class="w-8 h-8 bg-yellow-400"></div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <div class="h-1 w-12 bg-yellow-400"></div>
+                            <p class="text-white font-black text-xl tracking-tighter uppercase italic">StayGrid Member</p>
+                            <p class="text-[9px] font-mono text-gray-500 tracking-[0.2em] uppercase">Valid at all Global Grid Nodes</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="absolute -bottom-10 right-10 lg:right-20 bg-white border border-gray-900 p-8 flex gap-12 z-20 shadow-[10px_10px_0px_0px_#facc15]">
+                <div class="border-r border-gray-100 pr-12 last:border-0 last:pr-0">
+                    <p class="text-4xl font-black text-gray-900 tracking-tighter">2.4K</p>
+                    <p class="text-[9px] uppercase font-bold text-gray-400 tracking-[0.2em]">Verified_Members</p>
+                </div>
+                <div>
+                    <p class="text-4xl font-black text-gray-900 tracking-tighter">15+</p>
+                    <p class="text-[9px] uppercase font-bold text-gray-400 tracking-[0.2em]">Live_Cities</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-white py-12">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+      <div>
+        <h3 class="text-xl font-bold mb-4">StayGrid</h3>
+        <p class="text-gray-400">Your trusted accommodation partner for unforgettable stays.</p>
+      </div>
+      <div>
+        <h4 class="font-bold text-yellow-400 mb-4">Navigation</h4>
+        <ul class="space-y-2 text-gray-400">
+          <li><a href="/" class="hover:text-yellow-400 transition">Home</a></li>
+          <li><a href="/rooms" class="hover:text-yellow-400 transition">Rooms</a></li>
+          <li><a href="/about" class="hover:text-yellow-400 transition">About Us</a></li>
+          <li><a href="/contact" class="hover:text-yellow-400 transition">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-bold text-yellow-400 mb-4">Support</h4>
+        <ul class="space-y-2 text-gray-400">
+          <li><a href="#" class="hover:text-yellow-400 transition">FAQ</a></li>
+          <li><a href="#" class="hover:text-yellow-400 transition">Booking Help</a></li>
+          <li><a href="#" class="hover:text-yellow-400 transition">Cancellation Policy</a></li>
+          <li><a href="#" class="hover:text-yellow-400 transition">Privacy</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-bold text-yellow-400 mb-4">Contact</h4>
+        <p class="text-gray-400 mb-2">Email: <a href="mailto:info@staygrid.com" class="hover:text-yellow-400 transition">info@staygrid.com</a></p>
+        <p class="text-gray-400">Phone: <a href="tel:+15551234567" class="hover:text-yellow-400 transition">+1 (555) 123-4567</a></p>
+      </div>
+    </div>
+    <div class="border-t border-gray-700 pt-8 text-center text-gray-500">
+      <p>&copy; 2026 StayGrid. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Add blob animation keyframes dynamically
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes blob {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -50px) scale(1.1); }
+      66% { transform: translate(-20px, 20px) scale(0.9); }
+    }
+    .animate-blob {
+      animation: blob 7s infinite;
+    }
+    .animation-delay-2000 {
+      animation-delay: 2s;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Remove popup after 10 seconds
+  document.addEventListener('DOMContentLoaded', () => {
+    const popup = document.getElementById('login-popup');
+    if(popup) {
+      setTimeout(() => {
+        popup.remove();
+      }, 10000);
+    }
+  });
+</script>
+
+</body>
+</html>
+

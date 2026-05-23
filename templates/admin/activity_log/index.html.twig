@@ -1,0 +1,162 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}StayGrid // Security_Audit{% endblock %}
+
+{% block body %}
+<div class="space-y-8">
+    <section class="relative overflow-hidden border border-black/10 bg-[#0b0c10] text-white p-7 md:p-9">
+        <div class="absolute inset-0 pointer-events-none" style="background:
+            radial-gradient(circle at 12% 25%, rgba(250,204,21,0.16), transparent 36%),
+            radial-gradient(circle at 85% 70%, rgba(255,255,255,0.08), transparent 34%);"></div>
+
+        <div class="relative z-10 flex flex-col xl:flex-row xl:items-end xl:justify-between gap-6">
+            <div>
+                <div class="flex items-center gap-3 mb-3">
+                    <i data-feather="shield" class="w-4 h-4 text-yellow-400"></i>
+                    <span class="text-[10px] font-black uppercase tracking-[0.35em] text-yellow-400">System Event Stream</span>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-black uppercase tracking-tight leading-none">Activity Log.</h1>
+                <p class="text-xs text-white/70 mt-3 uppercase tracking-wide">Monitoring authenticated nodes and internal state transitions.</p>
+            </div>
+
+            <form method="get" class="relative group w-full xl:w-auto">
+                <input name="q" type="search"
+                       placeholder="FILTER_BY_QUERY..."
+                       class="w-full xl:w-80 bg-black/45 border border-white/25 px-4 py-3 pl-11 text-[10px] font-mono font-bold focus:outline-none focus:border-yellow-400 focus:bg-black/65 transition-all uppercase tracking-widest"
+                       value="{{ app.request.query.get('q') }}">
+                <i data-feather="terminal" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50 group-focus-within:text-yellow-400"></i>
+            </form>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <article class="border border-black/10 bg-white px-5 py-5">
+            <p class="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 mb-2">Records Loaded</p>
+            <p class="text-4xl font-black tracking-tight">{{ logs|length }}</p>
+        </article>
+        <article class="border border-black/10 bg-white px-5 py-5">
+            <p class="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 mb-2">Action Types</p>
+            <p class="text-4xl font-black tracking-tight">{{ logs|map(log => log.getAction())|reduce((carry, action) => action in carry ? carry : carry|merge([action]), [])|length }}</p>
+        </article>
+        <article class="border border-black/10 bg-white px-5 py-5">
+            <p class="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 mb-2">Latest Event</p>
+            <p class="text-sm font-black uppercase tracking-wide">{{ logs|first ? logs|first.getCreatedAt()|date('Y-m-d H:i:s') : 'N/A' }}</p>
+        </article>
+    </section>
+
+    <section class="border border-black/10 bg-white overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full border-collapse">
+                <thead>
+                    <tr class="bg-[#111827] text-white">
+                        <th class="px-5 py-4 text-left text-[9px] font-black uppercase tracking-[0.26em]">Timestamp</th>
+                        <th class="px-5 py-4 text-left text-[9px] font-black uppercase tracking-[0.26em]">Actor</th>
+                        <th class="px-5 py-4 text-left text-[9px] font-black uppercase tracking-[0.26em]">Action</th>
+                        <th class="px-5 py-4 text-left text-[9px] font-black uppercase tracking-[0.26em]">Target</th>
+                        <th class="px-5 py-4 text-left text-[9px] font-black uppercase tracking-[0.26em]">Payload</th>
+                        <th class="px-5 py-4"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-black/10">
+                    {% for log in logs %}
+                        <tr class="hover:bg-[#fcfbf7] transition-colors group">
+                            <td class="px-5 py-4 text-[10px] font-mono font-bold text-gray-600 whitespace-nowrap">
+                                {{ log.getCreatedAt()|date('Y.m.d') }}<br>
+                                <span class="text-black">{{ log.getCreatedAt()|date('H:i:s') }}</span>
+                            </td>
+
+                            <td class="px-5 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-[#f5f5f4] border border-black/10 flex items-center justify-center font-black text-[10px] text-gray-500 group-hover:text-black group-hover:border-black transition-all">
+                                        {{ (log.getActorEmail() ?: 'SYS')|slice(0, 2)|upper }}
+                                    </div>
+                                    <div>
+                                        <div class="text-[10px] font-black uppercase tracking-tight text-black">
+                                            {{ log.getActorEmail() ?: (log.getActorType()|split('\\')|last) }}
+                                        </div>
+                                        <div class="text-[9px] font-mono text-gray-400 uppercase tracking-tight">
+                                            {{ log.getActorType() ? (log.getActorType()|split('\\')|last) : 'daemon' }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td class="px-5 py-4">
+                                <span class="inline-flex border border-black px-2 py-1 text-[9px] font-black uppercase tracking-tight bg-white group-hover:bg-yellow-400 transition-colors">
+                                    {{ log.getAction() }}
+                                </span>
+                            </td>
+
+                            <td class="px-5 py-4 text-[10px] font-mono">
+                                <span class="text-gray-500 font-black uppercase">{{ log.getTargetType() ? (log.getTargetType()|split('\\')|last) : 'ROOT' }}</span>
+                                {% if log.getTargetId() %}
+                                    <span class="ml-1 px-1 bg-gray-100 text-gray-700 font-bold">#{{ log.getTargetId() }}</span>
+                                {% endif %}
+                            </td>
+
+                            <td class="px-5 py-4 max-w-xs">
+                                {% if log.getDetails() %}
+                                    <div class="truncate font-mono text-[10px] text-gray-500 bg-gray-50 p-2 border border-dashed border-gray-300">
+                                        {{ log.getDetails()|json_encode }}
+                                    </div>
+                                {% else %}
+                                    <span class="text-gray-300 font-mono text-[10px]">NULL_VAL</span>
+                                {% endif %}
+                            </td>
+
+                            <td class="px-5 py-4 text-right">
+                                {% if log.getDetails() %}
+                                    <button type="button"
+                                            data-target="details-{{ loop.index }}"
+                                            class="toggle-details text-[10px] font-black uppercase tracking-[0.2em] border-b-2 border-black hover:text-yellow-700 hover:border-yellow-700 transition-all">
+                                        Inspect
+                                    </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                        {% if log.getDetails() %}
+                            <tr class="hidden details-row bg-[#111827]" id="details-{{ loop.index }}">
+                                <td colspan="6" class="p-6 border-t border-white/10">
+                                    <div class="text-green-300 p-4 font-mono text-[11px] leading-relaxed relative overflow-hidden border border-white/10 bg-black/35">
+                                        <div class="absolute top-2 right-3 text-[9px] font-black text-white/35 uppercase">Raw Data Output</div>
+                                        <pre class="whitespace-pre-wrap">{{ log.getDetails()|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="px-6 py-20 text-center">
+                                <i data-feather="inbox" class="w-8 h-8 text-gray-200 mx-auto mb-4"></i>
+                                <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">No Logs Found In Buffer</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        document.querySelectorAll('.toggle-details').forEach(function(btn){
+            btn.addEventListener('click', function(){
+                const targetId = this.getAttribute('data-target');
+                const row = document.getElementById(targetId);
+                
+                if (row.classList.contains('hidden')) {
+                    row.classList.remove('hidden');
+                    this.textContent = 'Collapse';
+                    this.classList.add('text-red-500', 'border-red-500');
+                } else {
+                    row.classList.add('hidden');
+                    this.textContent = 'Inspect';
+                    this.classList.remove('text-red-500', 'border-red-500');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

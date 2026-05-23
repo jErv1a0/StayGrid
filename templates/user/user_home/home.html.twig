@@ -1,0 +1,256 @@
+{# templates/user/dashboard.html.twig #}
+{% extends 'user/base.html.twig' %}
+
+{% block title %}StayGrid User Dashboard{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-[#f7f4ed] pb-24">
+    <section class="relative overflow-hidden border-b border-black/10">
+        <div class="absolute inset-0 pointer-events-none" style="background:
+            radial-gradient(circle at 18% 15%, rgba(251, 191, 36, 0.22), transparent 34%),
+            radial-gradient(circle at 82% 64%, rgba(15, 23, 42, 0.08), transparent 36%),
+            linear-gradient(180deg, rgba(255,255,255,0.78) 0%, rgba(247,244,237,0.95) 100%);"></div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-8 pt-16 pb-10">
+            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="w-12 h-px bg-black"></span>
+                        <span class="text-[10px] font-black uppercase tracking-[0.38em] text-gray-500">Client Dashboard</span>
+                    </div>
+                    <h1 class="text-5xl md:text-7xl font-black uppercase tracking-[-0.04em] leading-[0.86]">
+                        Welcome Back,
+                        <span class="block text-transparent" style="-webkit-text-stroke: 1.1px #111827;">Ready to Stay?</span>
+                    </h1>
+                    <p class="mt-4 text-sm font-mono uppercase tracking-[0.2em] text-gray-500">
+                        {{ current_user ? current_user.userIdentifier : 'Anonymous User' }}
+                    </p>
+                </div>
+
+                <div class="flex flex-wrap gap-3">
+                    <a href="{{ path('app_user_rooms_rooms') }}" class="px-6 py-3 bg-black text-white text-[10px] font-black uppercase tracking-[0.24em] hover:bg-yellow-400 hover:text-black transition-colors">
+                        Browse Rooms
+                    </a>
+                    <a href="{{ path('app_user_profile_edit') }}" class="px-6 py-3 border border-black text-[10px] font-black uppercase tracking-[0.24em] hover:bg-black hover:text-white transition-colors">
+                        Edit Profile
+                    </a>
+                </div>
+            </div>
+
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white border border-black/10 p-5">
+                    <p class="text-[8px] uppercase tracking-[0.25em] text-gray-400 mb-2">Total Bookings</p>
+                    <p class="text-4xl font-black leading-none">{{ total_bookings|default(0) }}</p>
+                </div>
+                <div class="bg-white border border-black/10 p-5">
+                    <p class="text-[8px] uppercase tracking-[0.25em] text-gray-400 mb-2">Total Spent</p>
+                    <p class="text-4xl font-black leading-none">₱{{ total_spent|number_format(0) }}</p>
+                </div>
+                <div class="bg-white border border-black/10 p-5">
+                    <p class="text-[8px] uppercase tracking-[0.25em] text-gray-400 mb-2">Current City</p>
+                    <p class="text-xl font-black uppercase leading-tight">{{ user_location ?: 'Not Set' }}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="max-w-7xl mx-auto px-8 pt-10 space-y-10">
+        <section class="border border-black/10 bg-white overflow-hidden">
+            <div class="px-6 py-4 border-b border-black/10 flex items-center justify-between">
+                <h2 class="text-[11px] font-black uppercase tracking-[0.35em]">Room Gallery</h2>
+                <span class="text-[9px] uppercase tracking-[0.2em] text-gray-400">All listed photos</span>
+            </div>
+
+            <div class="relative h-[290px] md:h-[440px] bg-black" id="room-gallery-slideshow">
+                <div class="h-full w-full overflow-hidden" id="room-gallery-track">
+                    {% for room in all_rooms %}
+                        {% set imagePath = room.image ? (room.image matches '/^uploads\\//' ? room.image : 'uploads/rooms/' ~ room.image) : 'images/default_room.png' %}
+                        <article class="room-slide absolute inset-0 opacity-0 transition-opacity duration-700" data-slide-index="{{ loop.index0 }}">
+                            <img src="{{ asset(imagePath) }}" alt="{{ room.title|default('Room') }}" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                            <div class="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-white">
+                                <p class="text-[9px] uppercase tracking-[0.2em] text-yellow-300">{{ room.location ?: 'Location not specified' }}</p>
+                                <h3 class="text-2xl md:text-4xl font-black uppercase tracking-tight mt-1">{{ room.title|default(room.category)|default('Room Listing')|replace({'_': ' '}) }}</h3>
+                                <p class="text-sm mt-2 text-white/80">₱{{ room.pricePerNight|number_format(0) }} per night</p>
+                            </div>
+                        </article>
+                    {% else %}
+                        <div class="absolute inset-0 flex items-center justify-center text-white/70 uppercase text-[10px] tracking-[0.2em]">
+                            No room photos available
+                        </div>
+                    {% endfor %}
+                </div>
+
+                {% if all_rooms|length > 1 %}
+                    <button type="button" id="room-slide-prev" class="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 text-white px-3 py-2 text-[10px] font-black uppercase tracking-[0.14em] border border-white/20 hover:bg-yellow-400 hover:text-black transition-colors">
+                        Prev
+                    </button>
+                    <button type="button" id="room-slide-next" class="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white px-3 py-2 text-[10px] font-black uppercase tracking-[0.14em] border border-white/20 hover:bg-yellow-400 hover:text-black transition-colors">
+                        Next
+                    </button>
+
+                    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2" id="room-slide-dots">
+                        {% for room in all_rooms %}
+                            <button type="button" class="room-dot w-2.5 h-2.5 rounded-full border border-white/60 bg-transparent" data-dot-index="{{ loop.index0 }}" aria-label="Go to slide {{ loop.index }}"></button>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
+            <section class="xl:col-span-8 border border-black/10 bg-white overflow-hidden">
+                <div class="px-6 py-5 border-b border-black/10 flex items-center justify-between">
+                    <h2 class="text-[11px] font-black uppercase tracking-[0.35em]">Recent Bookings</h2>
+                    <span class="text-[9px] uppercase tracking-[0.2em] text-gray-400">Latest activity</span>
+                </div>
+
+                <div class="divide-y divide-black/10">
+                    {% for booking in user_bookings %}
+                        {% set cost = booking_costs[booking.id]|default(null) %}
+                        <article class="px-6 py-6 flex flex-col md:flex-row md:items-center justify-between gap-5 hover:bg-[#fcfbf8] transition-colors">
+                            <div>
+                                <p class="text-[9px] uppercase tracking-[0.2em] text-gray-400 mb-2">Reference {{ booking.id }} • {{ booking.status }}</p>
+                                <h3 class="text-2xl font-black uppercase tracking-tight">Room {{ booking.room.number }} <span class="text-gray-300">/</span> {{ booking.room.category|default('Standard') }}</h3>
+                                <p class="text-[10px] uppercase tracking-[0.18em] text-gray-400 mt-2">
+                                    {{ booking.startDate ? booking.startDate|date('d M Y') : 'TBD' }} to {{ booking.endDate ? booking.endDate|date('d M Y') : 'TBD' }}
+                                </p>
+                                {% if cost %}
+                                    <p class="text-[10px] text-green-700 uppercase tracking-[0.14em] mt-2">
+                                        {{ cost.duration }} {{ cost.unit }}{{ cost.duration > 1 ? 's' : '' }} × ₱{{ cost.unit_rate|number_format(0) }} = ₱{{ cost.total|number_format(0) }}
+                                    </p>
+                                {% endif %}
+                            </div>
+
+                            <a href="{{ path('app_client_booking_show', {'id': booking.id}) }}" class="inline-flex items-center gap-2 border border-black px-4 py-2 text-[10px] font-black uppercase tracking-[0.14em] hover:bg-black hover:text-white transition-colors">
+                                Details
+                                <span aria-hidden="true">→</span>
+                            </a>
+                        </article>
+                    {% else %}
+                        <div class="px-6 py-16 text-center text-[10px] uppercase tracking-[0.2em] text-gray-400">
+                            No active bookings yet
+                        </div>
+                    {% endfor %}
+                </div>
+
+                {% if total_bookings > user_bookings|length %}
+                    <div class="px-6 py-4 bg-[#fbfaf6] border-t border-black/10 text-center">
+                        <a href="{{ path('app_client_booking_index') }}" class="text-[10px] font-black uppercase tracking-[0.2em] border-b border-black hover:text-yellow-600 hover:border-yellow-600 transition-colors">
+                            View full booking archive
+                        </a>
+                    </div>
+                {% endif %}
+            </section>
+
+            <aside class="xl:col-span-4">
+                <div class="sticky top-24 border border-black/10 bg-[#121318] text-white p-6">
+                    <h2 class="text-[11px] font-black uppercase tracking-[0.3em] text-yellow-300 mb-5">Recommended Rooms</h2>
+
+                    {% if user_location is not empty %}
+                        <p class="text-[9px] uppercase tracking-[0.18em] text-white/65 mb-5">Near {{ user_location }}</p>
+                    {% else %}
+                        <div class="mb-5 border border-yellow-300/40 bg-yellow-300/10 p-3">
+                            <p class="text-[9px] uppercase tracking-[0.16em] text-yellow-200">Set your city for nearby picks</p>
+                            <a href="{{ path('app_user_profile_edit') }}" class="inline-block mt-2 text-[9px] font-black uppercase tracking-[0.16em] border-b border-white/30 hover:text-yellow-300 hover:border-yellow-300 transition-colors">Update profile</a>
+                        </div>
+                    {% endif %}
+
+                    <div class="space-y-4">
+                        {% for room in recommended_rooms %}
+                            <article class="border border-white/15 p-4 bg-white/[0.03]">
+                                <p class="text-[8px] uppercase tracking-[0.2em] text-white/50 mb-2">Suggested</p>
+                                <h3 class="text-lg font-black uppercase tracking-tight">{{ room.category|default('Room')|replace({'_': ' '}) }}</h3>
+                                <p class="text-[10px] uppercase tracking-[0.16em] text-white/60 mt-1">{{ room.location ?: 'Location not specified' }}</p>
+                                <div class="mt-4 flex items-center justify-between">
+                                    <span class="text-sm text-white/85">₱{{ room.pricePerNight|number_format(0) }} / night</span>
+                                    <a href="{{ path('app_user_rooms_rooms') }}" class="px-3 py-1.5 bg-white text-black text-[9px] font-black uppercase tracking-[0.12em] hover:bg-yellow-400 transition-colors">Book</a>
+                                </div>
+                            </article>
+                        {% else %}
+                            <p class="py-8 text-center text-[9px] uppercase tracking-[0.16em] text-white/45">No recommendations yet</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const slides = Array.from(document.querySelectorAll('.room-slide'));
+        const dots = Array.from(document.querySelectorAll('.room-dot'));
+        const prevBtn = document.getElementById('room-slide-prev');
+        const nextBtn = document.getElementById('room-slide-next');
+
+        if (slides.length === 0) {
+            return;
+        }
+
+        let current = 0;
+        let timer = null;
+
+        function renderSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.style.opacity = i === index ? '1' : '0';
+                slide.style.pointerEvents = i === index ? 'auto' : 'none';
+            });
+
+            dots.forEach((dot, i) => {
+                if (i === index) {
+                    dot.classList.add('bg-yellow-400', 'border-yellow-400');
+                    dot.classList.remove('bg-transparent');
+                } else {
+                    dot.classList.remove('bg-yellow-400', 'border-yellow-400');
+                    dot.classList.add('bg-transparent');
+                }
+            });
+        }
+
+        function goNext() {
+            current = (current + 1) % slides.length;
+            renderSlide(current);
+        }
+
+        function goPrev() {
+            current = (current - 1 + slides.length) % slides.length;
+            renderSlide(current);
+        }
+
+        function restartTimer() {
+            if (timer) {
+                clearInterval(timer);
+            }
+            if (slides.length > 1) {
+                timer = setInterval(goNext, 4000);
+            }
+        }
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                goPrev();
+                restartTimer();
+            });
+        }
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                goNext();
+                restartTimer();
+            });
+        }
+
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                current = index;
+                renderSlide(current);
+                restartTimer();
+            });
+        });
+
+        renderSlide(current);
+        restartTimer();
+    });
+</script>
+{% endblock %}

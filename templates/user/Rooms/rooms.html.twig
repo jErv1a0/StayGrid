@@ -1,0 +1,138 @@
+{# templates/user/rooms/rooms.html.twig #}
+{% extends 'user/base.html.twig' %}
+
+{% block title %}StayGrid View Stays{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-[#f6f4ef] pb-24 font-sans antialiased">
+    <section class="relative overflow-hidden border-b border-black/10">
+        <div class="absolute inset-0 pointer-events-none" style="background:
+            radial-gradient(circle at 10% 20%, rgba(250, 204, 21, 0.24), transparent 34%),
+            radial-gradient(circle at 84% 70%, rgba(15, 23, 42, 0.10), transparent 36%),
+            linear-gradient(180deg, rgba(255,255,255,0.82) 0%, rgba(246,244,239,0.96) 100%);"></div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-8 pt-16 pb-12">
+            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-10">
+                <div class="max-w-3xl">
+                    <div class="flex items-center gap-3 mb-5">
+                        <span class="w-14 h-px bg-black"></span>
+                        <p class="text-[10px] font-black uppercase tracking-[0.38em] text-gray-500">Live Stay Catalog</p>
+                    </div>
+                    <h1 class="text-6xl md:text-8xl font-black tracking-[-0.04em] leading-[0.86] uppercase">
+                        Pick Your<br>
+                        <span class="text-transparent" style="-webkit-text-stroke: 1.1px #111827;">Next Room.</span>
+                    </h1>
+                    <p class="mt-6 text-base md:text-lg text-gray-600 max-w-2xl">
+                        Browse verified rooms with transparent pricing, real availability, and direct booking access.
+                    </p>
+                </div>
+
+                <div class="bg-black text-white p-6 min-w-[220px] border border-black/40">
+                    <p class="text-[8px] uppercase tracking-[0.35em] text-white/60 mb-3">Inventory Pulse</p>
+                    <p class="text-5xl font-black leading-none">{{ roomListings|length|default(0) }}</p>
+                    <p class="text-[9px] uppercase tracking-[0.22em] text-white/70 mt-2">Rooms Available</p>
+                    <div class="mt-5 flex items-center gap-2">
+                        <span class="h-2 w-2 rounded-full bg-green-400 animate-pulse"></span>
+                        <span class="text-[9px] uppercase tracking-widest text-white/80">Online</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="max-w-7xl mx-auto px-8 pt-10">
+        {% if featuredRooms is defined and featuredRooms is not empty %}
+            <section class="mb-10">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-[11px] font-black uppercase tracking-[0.3em] text-gray-500">Latest Added</h2>
+                    <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-400">{{ featuredRooms|length }} highlighted</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+                    {% for room in featuredRooms %}
+                        <a href="{{ path('app_user_rooms_show', { id: room.id }) }}" class="group border border-black/10 bg-white p-4 hover:border-black transition-colors">
+                            <p class="text-[8px] uppercase tracking-[0.22em] text-gray-400 mb-2">Room {{ room.number ?: 'N/A' }}</p>
+                            <p class="text-sm font-black uppercase tracking-tight line-clamp-1">{{ room.title|default(room.category)|replace({'_': ' '}) }}</p>
+                            <p class="mt-2 text-[10px] uppercase tracking-widest text-gray-500 line-clamp-1">{{ (room.location ?? 'Location not set')|replace({'_': ' '}) }}</p>
+                        </a>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+
+        {% if roomListings is defined and roomListings is not empty %}
+            <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                {% for room in roomListings %}
+                    {% set imgPath = null %}
+                    {% if room.image %}
+                        {% if room.image matches '/^uploads\\//' %}
+                            {% set imgPath = room.image %}
+                        {% else %}
+                            {% set imgPath = 'uploads/rooms/' ~ room.image %}
+                        {% endif %}
+                    {% endif %}
+
+                    <article class="group bg-white border border-black/10 overflow-hidden hover:border-black hover:-translate-y-1 transition-all duration-300">
+                        <div class="relative aspect-[5/4] overflow-hidden">
+                            <img src="{{ imgPath ? asset(imgPath) : asset('images/default_room.png') }}"
+                                 alt="Room {{ room.number }}"
+                                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                 onerror="this.onerror=null;this.src='{{ asset('images/default_room.png') }}';">
+
+                            <div class="absolute inset-x-0 top-0 p-4 flex items-start justify-between">
+                                <span class="bg-black/85 text-white text-[8px] px-3 py-1 uppercase tracking-[0.24em] font-black">
+                                    {{ room.getStatus()|default('Stable')|replace({'_': ' '}) }}
+                                </span>
+                                <span class="bg-yellow-400 text-black text-[8px] px-3 py-1 uppercase tracking-[0.24em] font-black">
+                                    {{ room.capacity ?: 1 }} Pax
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="p-6">
+                            <div class="flex items-start justify-between gap-4">
+                                <div>
+                                    <p class="text-[9px] uppercase tracking-[0.22em] text-gray-400 mb-2">Room {{ room.number ?: 'N/A' }}</p>
+                                    <h3 class="text-2xl font-black uppercase tracking-tight leading-none group-hover:text-yellow-600 transition-colors">
+                                        {{ room.title|default(room.category)|default('Untitled Room')|replace({'_': ' '}) }}
+                                    </h3>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-2xl font-black">₱{{ room.pricePerNight|default(0)|number_format(0) }}</p>
+                                    <p class="text-[8px] uppercase tracking-widest text-gray-400">per night</p>
+                                </div>
+                            </div>
+
+                            <p class="mt-4 text-[10px] uppercase tracking-[0.2em] text-gray-500 line-clamp-1">
+                                {{ (room.location ?? room.address ?? room.city ?? 'Location not specified')|replace({'_': ' '}) }}
+                            </p>
+
+                            <p class="mt-3 text-sm text-gray-600 leading-relaxed min-h-[42px] line-clamp-2">
+                                {{ room.description ?: 'Comfort-first room with practical amenities and a clean modern setup for short or extended stays.' }}
+                            </p>
+
+                            <div class="mt-6 pt-5 border-t border-black/10 flex items-center justify-between gap-3">
+                                <span class="text-[9px] uppercase tracking-[0.22em] text-gray-400">Verified Listing</span>
+                                <a href="{{ path('app_user_rooms_show', { id: room.id }) }}"
+                                   class="inline-flex items-center gap-2 bg-black text-white px-4 py-2 text-[10px] font-black uppercase tracking-[0.18em] hover:bg-yellow-400 hover:text-black transition-colors">
+                                    View Room
+                                    <span aria-hidden="true">→</span>
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </section>
+        {% else %}
+            <section class="mt-10 border-2 border-dashed border-black/10 bg-white px-8 py-24 text-center">
+                <p class="text-[10px] uppercase tracking-[0.34em] text-gray-400 font-black mb-4">No Rooms Available</p>
+                <h2 class="text-3xl font-black uppercase tracking-tight text-gray-800">Inventory is currently full</h2>
+                <p class="text-sm text-gray-500 mt-4">Try again later, or contact support for priority updates.</p>
+                <a href="/contact" class="inline-block mt-8 border-b-2 border-black text-[10px] font-black uppercase tracking-[0.2em] hover:text-yellow-600 hover:border-yellow-600 transition-colors">
+                    Contact Support
+                </a>
+            </section>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

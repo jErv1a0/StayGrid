@@ -9,14 +9,46 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\Length;
+
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Validator\Constraints\File;
+
 
 class AdminProfileType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            // Email field mapped to the entity
+            
+            ->add('fullName', TextType::class, [
+                'label' => 'Full Name',
+                'required' => false,
+                'attr' => [
+                    'placeholder' => 'Enter your full name',
+                ],
+            ])
+            
+            ->add('profilePictureFile', FileType::class, [
+                'label' => false, 
+                'mapped' => false, 
+                'required' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '5120k', 
+                        'mimeTypes' => [
+                            'image/jpeg',
+                            'image/png',
+                            'image/webp',
+                            'image/heic',
+                            'image/heif',
+                        ],
+                        'mimeTypesMessage' => 'Please upload a valid image (JPG, PNG, WEBP, HEIC, or HEIF). Max size: 5MB',
+                    ])
+                ],
+            ])
+
+
             ->add('email', EmailType::class, [
                 'label' => 'Login Email',
                 'required' => true,
@@ -25,11 +57,10 @@ class AdminProfileType extends AbstractType
                 ],
             ])
             
-            // Password fields NOT mapped to entity directly
             ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
-                'mapped' => false, // password is handled manually
-                'required' => false, // leave blank if not changing
+                'mapped' => false, 
+                'required' => false, 
                 'first_options' => [
                     'label' => 'New Password',
                     'attr' => [
@@ -43,13 +74,6 @@ class AdminProfileType extends AbstractType
                     ],
                 ],
                 'invalid_message' => 'The password fields must match.',
-                'constraints' => [
-                    new Length([
-                        'min' => 6,
-                        'minMessage' => 'Your password should be at least {{ limit }} characters',
-                        'max' => 4096,
-                    ]),
-                ],
             ]);
     }
 
@@ -57,6 +81,8 @@ class AdminProfileType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => LogInUsers::class,
+            // Add 'allow_extra_fields' to ensure unmapped fields are accepted
+            'allow_extra_fields' => true, 
         ]);
     }
 }

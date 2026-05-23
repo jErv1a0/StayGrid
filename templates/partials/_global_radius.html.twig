@@ -1,0 +1,11 @@
+<style>
+    /* Shared button radius only (reduced to 3%) */
+    :root { --global-radius: 3%; }
+
+    /* Only apply to interactive controls */
+    button, .btn, .btn-primary, a[class*="btn"], input[type="submit"],
+    .rounded-btn {
+        border-radius: var(--global-radius) !important;
+        transition: border-radius 160ms ease, box-shadow 160ms ease;
+    }
+</style>

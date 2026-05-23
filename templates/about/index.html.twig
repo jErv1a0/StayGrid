@@ -12,10 +12,11 @@
 
  
 <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
     body {
-        font-family: 'Inter', sans-serif;
+        font-family: 'Manrope', sans-serif;
         background-color: #f7f9fc;
     }
     .nav-link { color: #4b5563; }
@@ -33,196 +34,420 @@
 </head>
 <body>
 
-<nav class="bg-white shadow-sm sticky top-0 z-10">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-<div class="flex justify-between items-center h-16">
-<a href="/" class="flex items-center space-x-2 text-xl font-bold text-gray-800">
-StayGrid
-</a>
+{% include 'partials/_public_nav.html.twig' %}
 
+<section class="py-20 md:py-24 bg-[#0b0c10] text-white overflow-hidden relative">
+    <div class="absolute inset-0 pointer-events-none" style="background:
+        radial-gradient(circle at 18% 30%, rgba(250,204,21,0.12), transparent 40%),
+        radial-gradient(circle at 82% 72%, rgba(255,255,255,0.06), transparent 34%),
+        linear-gradient(130deg, rgba(255,255,255,0.03), transparent 42%);"></div>
+    <div class="absolute inset-0 opacity-[0.08] pointer-events-none" style="background-image: linear-gradient(rgba(255,255,255,0.7) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.7) 1px, transparent 1px); background-size: 72px 72px;"></div>
+    <div class="absolute top-0 left-0 w-full h-full pointer-events-none">
+        <div class="absolute top-[16%] left-[8%] w-3 h-3 border border-yellow-400/60 rotate-45"></div>
+        <div class="absolute top-[58%] left-[52%] w-2 h-2 bg-white/35"></div>
+        <div class="absolute top-[12%] right-[10%] w-28 h-px bg-white/20"></div>
+    </div>
 
-        <div class="hidden md:flex space-x-6 items-center">
-            {% set nav_items = [
-                { name: 'Home', url: '/' },
-                { name: 'Rooms', url: '/rooms' },
-                { name: 'About', url: '/about' },
-                { name: 'Contact', url: '/contact' }
-            ] %}
-            {% for item in nav_items %}
-                <a href="{{ item.url }}" class="nav-link text-sm font-medium flex items-center">
-                    {{ item.name }}
-                </a>
+    <div class="max-w-7xl mx-auto px-6 relative">
+        <div class="grid lg:grid-cols-12 gap-10 lg:gap-16 items-end mb-12 lg:mb-16 lg:-mt-4">
+            <div class="lg:col-span-8">
+                <span class="inline-block text-[10px] font-black uppercase tracking-[0.45em] text-yellow-400 mb-4">Key Features</span>
+                <h2 class="text-5xl sm:text-6xl lg:text-8xl font-black tracking-tight leading-[0.86]">
+                    The Grid<br/>
+                    <span class="text-transparent" style="-webkit-text-stroke: 1.5px #facc15;">Standard.</span>
+                </h2>
+            </div>
+            <div class="lg:col-span-4">
+                <p class="text-sm md:text-base text-white/70 leading-relaxed max-w-sm lg:ml-auto lg:mb-1">
+                    We stripped away the noise of traditional hospitality to build a high-performance living environment.
+                </p>
+            </div>
+        </div>
+
+        {% set features = [
+            {
+                title: 'Smart Matching',
+                desc: 'Neural booking systems that adapt to your travel patterns.',
+                index: 'ST-01'
+            },
+            {
+                title: 'Secure Platform',
+                desc: 'Hardware-level encryption for every digital key and payment.',
+                index: 'ST-02'
+            },
+            {
+                title: '24/7 Support',
+                desc: 'On-demand concierge via the Grid app, available globally.',
+                index: 'ST-03'
+            },
+            {
+                title: 'Direct Connect',
+                desc: 'Zero-latency communication. No middle-men, ever.',
+                index: 'ST-04'
+            }
+        ] %}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6">
+            {% for feature in features %}
+            <article class="group relative border border-white/15 bg-white/[0.03] p-8 md:p-10 transition-all duration-500 hover:-translate-y-1 hover:border-yellow-400/70 hover:bg-yellow-400/10 overflow-hidden">
+                <div class="flex items-center justify-between mb-12">
+                    <span class="text-[10px] font-mono uppercase tracking-[0.28em] text-white/60 group-hover:text-yellow-300 transition-colors">
+                        REF // {{ feature.index }}
+                    </span>
+                    <span class="w-10 h-[2px] bg-white/25 group-hover:bg-yellow-300 transition-colors"></span>
+                </div>
+
+                <h3 class="text-3xl md:text-4xl font-black uppercase tracking-tight leading-none mb-5 text-white">
+                    {{ feature.title }}
+                </h3>
+
+                <p class="text-sm md:text-base text-white/70 group-hover:text-white/90 leading-relaxed transition-colors max-w-md">
+                    {{ feature.desc }}
+                </p>
+            </article>
             {% endfor %}
         </div>
 
-        <a href="{{ path('app_login', {'redirect': 'book'}) }}" 
-       class="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-6 rounded-lg shadow-lg transition duration-200">
-        Book Now
-    </a>
-    </div>
-</div>
-
-</nav>
-
-<section class="py-20 bg-gray-50">
-  <div class="max-w-7xl mx-auto px-6 lg:px-8 text-center">
-    <h2 class="text-4xl font-extrabold text-gray-900 mb-12">
-      Why Choose StayGrid?
-    </h2>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
-      {% set features = [
-        {
-          title: 'Smart System',
-          description: 'Our intelligent booking and room management system ensures a seamless and efficient experience for both guests and administrators.',
-          icon: 'M9.75 17L9 20l-1 1h8l-1-1v-3m2-4v4a2 2 0 01-2 2H9a2 2 0 01-2-2v-4m12 0a2 2 0 00-2-2H9a2 2 0 00-2 2m12 0h.01M17 10h.01'
-        },
-        {
-          title: 'Secure Platform',
-          description: 'We prioritize security with end-to-end encryption, ensuring that your personal information and payment data are fully protected.',
-          icon: 'M13 10V3L4 14h7v7l9-11h-7z'
-        },
-        {
-          title: '24/7 Support',
-          description: 'Our friendly and reliable customer support team is available at all hours to assist you — because your comfort matters most.',
-          icon: 'M5 13a10 10 0 0010 10h1v-2a8 8 0 01-8-8H5z'
-        }
-      ] %}
-
-      {% for feature in features %}
-      <div class="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-2">
-        <div class="w-20 h-20 mx-auto flex items-center justify-center rounded-full bg-yellow-100 text-yellow-500 shadow-inner mb-6 group-hover:scale-110 transition">
-          <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" d="{{ feature.icon }}" />
-          </svg>
+        <div class="mt-8 pt-5 border-t border-white/15 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+            <div class="flex gap-3 items-center">
+                <div class="w-2 h-2 rounded-full bg-yellow-400"></div>
+                <div class="w-2 h-2 rounded-full bg-white/30"></div>
+                <div class="w-2 h-2 rounded-full bg-white/30"></div>
+            </div>
+            <span class="text-[10px] font-bold text-white/60 uppercase tracking-widest">StayGrid Systems Inc. &copy; 2026</span>
         </div>
-        <h3 class="text-xl font-bold text-gray-900 mb-3">{{ feature.title }}</h3>
-        <p class="text-gray-600 text-base">{{ feature.description }}</p>
-      </div>
-      {% endfor %}
     </div>
-  </div>
 </section>
 
-<section class="py-24 bg-white">
+{# <section class="py-24 bg-white">
   <div class="max-w-6xl mx-auto px-6 lg:px-8 grid md:grid-cols-2 gap-12 items-center">
     <div class="space-y-6">
       <h2 class="text-3xl font-extrabold text-gray-900">About StayGrid</h2>
       <p class="text-gray-600 text-lg leading-relaxed">
         StayGrid was founded with a vision to redefine convenience and comfort in the hospitality industry. 
-        We believe booking a stay should be simple, fast, and stress-free — powered by technology that works for you.
+                We believe booking a stay should be simple, fast, and stress-free - powered by technology that works for you.
       </p>
       <p class="text-gray-600 text-lg leading-relaxed">
         From smart room automation to seamless guest management, our goal is to make every stay memorable 
-        — for both travelers and hotel owners alike.
+                - for both travelers and hotel owners alike.
       </p>
     </div>
     <div>
       <img src="{{ asset('images/staygridposterx.png') }}" alt="StayGrid Team" class="rounded-2xl shadow-lg w-full object-cover">
     </div>
   </div>
+</section> #}
+<section class="py-32 bg-gray-900 text-white overflow-hidden border-t border-yellow-400">
+    <div class="max-w-7xl mx-auto px-6">
+        
+        <div class="grid lg:grid-cols-12 gap-0 border border-white/10">
+            
+            <div class="lg:col-span-5 p-10 lg:p-16 border-b lg:border-b-0 lg:border-r border-white/10 bg-gray-950 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-3 mb-12">
+                        <div class="w-3 h-3 bg-yellow-400 rotate-45"></div>
+                        <span class="text-[10px] font-black uppercase tracking-[0.5em] text-gray-500">Core_Directive // 01</span>
+                    </div>
+                    
+                    <h2 class="text-6xl lg:text-7xl font-black text-white tracking-tighter leading-[0.85] mb-12">
+                        Our<br/>
+                        Mission<br/>
+                        <span class="text-transparent" style="-webkit-text-stroke: 1px #facc15;">& Values.</span>
+                    </h2>
+                </div>
+
+                <div class="space-y-6">
+                    <p class="text-xl font-medium leading-snug text-gray-300">
+                        StayGrid exists to deliver <span class="text-white italic underline decoration-yellow-400 underline-offset-4">asymmetric value</span> through high-performance hospitality infrastructure.
+                    </p>
+                    <p class="text-xs text-gray-500 font-mono leading-relaxed max-w-sm uppercase tracking-widest">
+                        We believe in people-first design - ensuring our technology empowers rather than complicates.
+                    </p>
+                </div>
+            </div>
+
+            <div class="lg:col-span-7 grid grid-cols-1">
+                
+                {% set values = [
+                    { 
+                        'id': '01', 
+                        'title': 'Innovation', 
+                        'desc': 'We continuously iterate on our platform to meet modern hospitality standards. Stagnation is a system failure.' 
+                    },
+                    { 
+                        'id': '02', 
+                        'title': 'Integrity', 
+                        'desc': 'Transparency and radical honesty guide every interaction. We prioritize the protocol over the person.' 
+                    },
+                    { 
+                        'id': '03', 
+                        'title': 'Service', 
+                        'desc': 'Customer satisfaction is our North Star. We solve problems at zero-latency to ensure an uninterrupted experience.' 
+                    }
+                ] %}
+
+                {% for value in values %}
+                <div class="group relative p-10 lg:p-16 border-b last:border-b-0 border-white/10 hover:bg-yellow-400 transition-all duration-700 cursor-default">
+                    <div class="flex items-start justify-between relative z-10">
+                        <div class="max-w-md">
+                            <span class="text-[10px] font-mono text-yellow-400 group-hover:text-gray-900 transition-colors mb-4 block uppercase tracking-widest">Protocol_{{ value.id }}</span>
+                            <h3 class="text-4xl font-black text-white group-hover:text-gray-900 uppercase tracking-tighter mb-4 transition-colors">
+                                {{ value.title }}
+                            </h3>
+                            <p class="text-gray-400 group-hover:text-gray-800 font-medium leading-relaxed transition-colors">
+                                {{ value.desc }}
+                            </p>
+                        </div>
+                        
+                        <span class="text-8xl font-black text-white/5 group-hover:text-gray-900/10 transition-colors pointer-events-none select-none">
+                            {{ value.id }}
+                        </span>
+                    </div>
+
+                    <div class="absolute bottom-0 left-0 w-0 h-1 bg-gray-900 group-hover:w-full transition-all duration-700"></div>
+                </div>
+                {% endfor %}
+
+            </div>
+        </div>
+
+        <div class="mt-8 flex justify-between items-center opacity-30">
+            <div class="text-[10px] font-mono uppercase tracking-[0.5em]">System_Verified: 2026</div>
+            <div class="flex gap-4">
+                <div class="w-12 h-[1px] bg-white"></div>
+                <div class="w-4 h-[1px] bg-yellow-400"></div>
+            </div>
+        </div>
+    </div>
 </section>
 
-<section class="py-20 bg-gray-900 text-white">
-  <div class="max-w-6xl mx-auto px-6 lg:px-8 text-center">
-    <h2 class="text-3xl font-bold mb-8">Our Mission & Values</h2>
-    <p class="max-w-3xl mx-auto text-lg text-gray-300 mb-12">
-      At StayGrid, we are committed to delivering comfort, reliability, and trust through our innovative booking solutions.
-      We believe in people-first design — ensuring our technology empowers rather than complicates.
-    </p>
+<section class="relative py-32 bg-white overflow-hidden border-t border-gray-900">
+    <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 50px 50px;"></div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-      <div class="bg-gray-800 p-8 rounded-xl shadow-md hover:bg-gray-700 transition">
-        <h3 class="text-xl font-semibold mb-3 text-yellow-400">Innovation</h3>
-        <p class="text-gray-300">We continuously improve our platform to meet modern hospitality standards and user needs.</p>
-      </div>
-      <div class="bg-gray-800 p-8 rounded-xl shadow-md hover:bg-gray-700 transition">
-        <h3 class="text-xl font-semibold mb-3 text-yellow-400">Integrity</h3>
-        <p class="text-gray-300">Transparency and honesty guide every interaction with our partners and users.</p>
-      </div>
-      <div class="bg-gray-800 p-8 rounded-xl shadow-md hover:bg-gray-700 transition">
-        <h3 class="text-xl font-semibold mb-3 text-yellow-400">Service</h3>
-        <p class="text-gray-300">Customer satisfaction drives everything we do — from booking to support.</p>
-      </div>
+    <div class="max-w-7xl mx-auto px-6 relative z-10">
+        <div class="grid lg:grid-cols-12 gap-0 border border-gray-900">
+            
+            <div class="lg:col-span-5 relative bg-gray-50 flex items-center justify-center p-12 lg:p-20 border-b lg:border-b-0 lg:border-r border-gray-900 overflow-hidden group">
+                <div class="relative w-full aspect-square border border-gray-900 p-2 bg-white transition-transform duration-700 group-hover:-rotate-1">
+                    <div class="w-full h-full overflow-hidden relative">
+                        <img src="{{ asset('images/developer.jpg') }}" alt="Jervine Alvarico"
+                             class="w-full h-full object-cover grayscale transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-110">
+                        
+                        <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-yellow-400"></div>
+                        <div class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-yellow-400"></div>
+                    </div>
+                </div>
+
+                <div class="absolute bottom-10 right-10 bg-gray-900 text-yellow-400 px-6 py-3 shadow-[8px_8px_0px_0px_#facc15] flex items-center gap-3">
+                    <i data-feather="check-circle" class="w-4 h-4"></i>
+                    <span class="text-[10px] font-black uppercase tracking-widest">Identity_Verified</span>
+                </div>
+            </div>
+
+            <div class="lg:col-span-7 p-10 lg:p-20 flex flex-col justify-center bg-white">
+                <div class="mb-12">
+                    <span class="text-[10px] font-black uppercase tracking-[0.5em] text-yellow-500 mb-4 block">Lead</span>
+                    <h2 class="text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter leading-none mb-4 uppercase">
+                        Jervine <br/>
+                        <span class="text-transparent" style="-webkit-text-stroke: 1.5px #111827;">Alvarico.</span>
+                    </h2>
+                    <p class="text-gray-400 font-mono text-xs uppercase tracking-widest">Developer & Founder</p>
+                </div>
+
+                <div class="max-w-xl">
+                    <div class="relative pl-8 border-l-2 border-yellow-400 mb-10">
+                        <p class="text-xl font-bold text-gray-900 leading-tight mb-6 italic">
+                            "StayGrid is the synthesis of high-performance logic and human-centric design."
+                        </p>
+                        <p class="text-gray-500 leading-relaxed font-medium">
+                            Dedicated to revolutionizing the hospitality industry through modular technology - building secure, smart, and intuitive systems that empower property management at scale.
+                        </p>
+                    </div>
+
+                    <div class="flex flex-wrap gap-10 pt-10 border-t border-gray-100">
+                        <div>
+                            <p class="text-[10px] font-black text-gray-300 uppercase mb-2">Primary_Stack</p>
+                            <p class="text-xs font-bold text-gray-900 uppercase tracking-widest">PHP 8.x</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-gray-300 uppercase mb-2">Professional_Network</p>
+                            <a href="https://www.linkedin.com/in/jervine-alvarico-44b8a7255/" target="_blank" 
+                               class="text-xs font-black text-gray-900 uppercase tracking-widest hover:text-yellow-500 flex items-center gap-2 transition-colors">
+                                LinkedIn <i data-feather="external-link" class="w-3 h-3"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-0 border border-t-0 border-gray-900 bg-gray-50 p-10 lg:p-16">
+            <div class="flex items-end justify-between mb-10 gap-6">
+                <div>
+                    <span class="text-[10px] font-black uppercase tracking-[0.5em] text-yellow-500 mb-3 block">Core Team</span>
+                    <h3 class="text-3xl lg:text-4xl font-black text-gray-900 tracking-tighter uppercase leading-none">Meet the Team</h3>
+                    <p class="mt-3 text-xs font-bold text-gray-500 uppercase tracking-widest">Built by Specialists.</p>
+                </div>
+                <p class="hidden lg:block text-[10px] font-mono text-gray-400 uppercase tracking-widest">Added_Profiles: 2</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <article class="border border-gray-900 bg-white p-6 lg:p-8 group">
+                    <div class="flex items-start gap-5">
+                        <div class="w-20 h-20 border border-gray-900 p-1 shrink-0">
+                            <img src="https://i.pravatar.cc/300?img=12" alt="Developer profile"
+                                 class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" loading="lazy" referrerpolicy="no-referrer">
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-yellow-600 uppercase tracking-widest mb-2">Developer</p>
+                            <h4 class="text-xl font-black text-gray-900 uppercase tracking-tighter">Nico Ramirez</h4>
+                            <p class="text-xs text-gray-500 font-medium mt-3 leading-relaxed">Builds reliable backend flows and production-ready features with clean, testable architecture.</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="border border-gray-900 bg-white p-6 lg:p-8 group">
+                    <div class="flex items-start gap-5">
+                        <div class="w-20 h-20 border border-gray-900 p-1 shrink-0">
+                            <img src="https://i.pravatar.cc/300?img=47" alt="UI UX Designer profile"
+                                 class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" loading="lazy" referrerpolicy="no-referrer">
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-yellow-600 uppercase tracking-widest mb-2">UI / UX Designer</p>
+                            <h4 class="text-xl font-black text-gray-900 uppercase tracking-tighter">Mia Laurent</h4>
+                            <p class="text-xs text-gray-500 font-medium mt-3 leading-relaxed">Designs intuitive interfaces and polished user journeys that keep digital experiences clear and engaging.</p>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
     </div>
-  </div>
 </section>
 
-<section x-data="{ activeSlide: 1 }" 
-         x-init="setInterval(() => activeSlide = activeSlide === 5 ? 1 : activeSlide + 1, 5000)"
-         class="relative py-24 bg-gradient-to-b from-white via-gray-50 to-gray-100 overflow-hidden">
-
-  <div class="absolute -top-16 left-1/2 transform -translate-x-1/2 w-[700px] h-[700px] bg-yellow-100 opacity-30 rounded-full blur-3xl -z-10"></div>
-
-  <div class="max-w-6xl mx-auto text-center px-6">
-    <h2 class="text-4xl font-extrabold text-gray-900 mb-6">What Our <span class="text-yellow-500">Clients Say</span></h2>
-    <p class="text-gray-600 text-lg max-w-2xl mx-auto mb-12">
-      Hear from travelers and partners who have experienced StayGrid’s comfort and innovation firsthand.
-    </p>
-
-    <div class="relative w-full max-w-4xl mx-auto">
-  
-      <div x-show="activeSlide === 1" x-transition
-           class="bg-white rounded-2xl shadow-xl p-10 flex flex-col md:flex-row items-center text-left space-y-6 md:space-y-0 md:space-x-8">
-        <img src="{{ asset('images/Jas Pineda.jpg') }}" alt="Client 1" class="w-24 h-24 rounded-full object-cover shadow-md">
-        <div>
-          <h3 class="text-xl font-bold text-gray-900 mb-2">Jas Pineda</h3>
-          <p class="text-gray-500 mb-3 text-sm">Marketing Executive, Airbnb Traveler</p>
-          <p class="text-gray-700 italic">“StayGrid made our family vacation smooth and enjoyable. The booking process was fast, and the rooms were beyond expectations!”</p>
+<section x-data="{ activeSlide: 1, totalSlides: {{ 5 + feedbacks|length }} }" 
+         x-init="setInterval(() => activeSlide = activeSlide === totalSlides ? 1 : activeSlide + 1, 6000)"
+         class="relative py-32 bg-white border-t border-gray-900 overflow-hidden">
+    
+    <div class="max-w-7xl mx-auto px-6">
+        
+        <div class="flex flex-col lg:flex-row justify-between items-baseline mb-24 gap-6">
+            <div class="max-w-2xl">
+                <span class="text-[10px] font-black uppercase tracking-[0.5em] text-yellow-500 mb-4 block">Validation // Feedback</span>
+                <h2 class="text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter leading-none uppercase">
+                    Trusted by the <br/>
+                    <span class="text-transparent" style="-webkit-text-stroke: 1.5px #111827;">Network.</span>
+                </h2>
+            </div>
+            <div class="hidden lg:block">
+                <p class="text-[10px] font-mono text-gray-400 uppercase tracking-widest">Active_Sessions: {{ 5 + feedbacks|length }}</p>
+            </div>
         </div>
-      </div>
 
-  
-      <div x-show="activeSlide === 2" x-transition
-           class="bg-white rounded-2xl shadow-xl p-10 flex flex-col md:flex-row items-center text-left space-y-6 md:space-y-0 md:space-x-8">
-        <img src="{{ asset('images/JimAshley.jpg') }}" alt="Client 2" class="w-24 h-24 rounded-full object-cover shadow-md">
-        <div>
-          <h3 class="text-xl font-bold text-gray-900 mb-2">Jim Ashley</h3>
-          <p class="text-gray-500 mb-3 text-sm">Entrepreneur, Business Traveler</p>
-          <p class="text-gray-700 italic">“I loved the smart booking feature! StayGrid feels like the future of hotel stays. Everything was efficient and seamless.”</p>
-        </div>
-      </div>
+        <div class="relative min-h-[450px] border border-gray-900 bg-gray-50">
+            
+            <div class="absolute top-0 left-0 w-20 h-full border-r border-gray-900 bg-white hidden lg:flex flex-col items-center py-10 gap-8">
+                <div class="w-1 h-20 bg-yellow-400"></div>
+                <span class="[writing-mode:vertical-lr] rotate-180 text-[10px] font-black uppercase tracking-[0.3em] text-gray-300">USER_LOG_DATA</span>
+            </div>
 
-      <div x-show="activeSlide === 3" x-transition
-           class="bg-white rounded-2xl shadow-xl p-10 flex flex-col md:flex-row items-center text-left space-y-6 md:space-y-0 md:space-x-8">
-        <img src="{{ asset('images/Rhyza.jpg') }}" alt="Client 3" class="w-24 h-24 rounded-full object-cover shadow-md">
-        <div>
-          <h3 class="text-xl font-bold text-gray-900 mb-2">Ryza Mahinay</h3>
-          <p class="text-gray-500 mb-3 text-sm">Tech Startup Founder</p>
-          <p class="text-gray-700 italic">“StayGrid’s secure and smart system gave me peace of mind. It’s clear that innovation drives everything they do.”</p>
-        </div>
-      </div>
+            <div class="lg:ml-20 relative">
+                
+                {% set static_clients = [
+                    {'name': 'Jas Pineda', 'role': 'Marketing Executive', 'img': 'Jas Pineda.jpg', 'quote': 'StayGrid made our family vacation smooth and enjoyable. The booking process was fast, and the rooms were beyond expectations!'},
+                    {'name': 'Jim Ashley', 'role': 'Entrepreneur', 'img': 'JimAshley.jpg', 'quote': 'I loved the smart booking feature! StayGrid feels like the future of hotel stays. Everything was efficient and seamless.'},
+                    {'name': 'Ryza Mahinay', 'role': 'Tech Startup Founder', 'img': 'Rhyza.jpg', 'quote': 'StayGrids secure and smart system gave me peace of mind. Its clear that innovation drives everything they do.'},
+                    {'name': 'Demi Jane', 'role': 'Frequent Traveler', 'img': 'DemiJane.jpg', 'quote': 'The comfort and attention to detail in StayGrid properties are unmatched. Definitely my go-to booking platform now.'},
+                    {'name': 'Jasmine Armentano', 'role': 'Hotel Owner Partner', 'img': 'Jasmine.jpg', 'quote': 'Partnering with StayGrid has elevated our guest experience and increased our bookings. Their platform is top-notch.'}
+                ] %}
 
-      <div x-show="activeSlide === 4" x-transition
-           class="bg-white rounded-2xl shadow-xl p-10 flex flex-col md:flex-row items-center text-left space-y-6 md:space-y-0 md:space-x-8">
-        <img src="{{ asset('images/DemiJane.jpg') }}" alt="Client 4" class="w-24 h-24 rounded-full object-cover shadow-md">
-        <div>
-          <h3 class="text-xl font-bold text-gray-900 mb-2">Demi Jane</h3>
-          <p class="text-gray-500 mb-3 text-sm">Frequent Traveler</p>
-          <p class="text-gray-700 italic">“The comfort and attention to detail in StayGrid properties are unmatched. Definitely my go-to booking platform now.”</p>
-        </div>
-      </div>
+                {% for client in static_clients %}
+                <div x-show="activeSlide === {{ loop.index }}" 
+                     x-transition:enter="transition ease-out duration-500"
+                     x-transition:enter-start="opacity-0 translate-x-8"
+                     x-transition:enter-end="opacity-100 translate-x-0"
+                     class="flex flex-col lg:flex-row items-stretch min-h-[450px]">
+                    
+                    <div class="lg:w-1/3 p-10 lg:p-16 border-b lg:border-b-0 lg:border-r border-gray-900 bg-white flex flex-col justify-center items-center text-center">
+                        <div class="relative w-32 h-32 mb-8 border border-gray-900 p-1">
+                            <img src="{{ asset('images/' ~ client.img) }}" class="w-full h-full object-cover grayscale">
+                            <div class="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 flex items-center justify-center border border-gray-900">
+                                <i data-feather="quote" class="w-3 h-3 text-gray-900"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-black text-gray-900 uppercase tracking-tighter">{{ client.name }}</h3>
+                        <p class="text-[10px] font-bold text-yellow-600 uppercase tracking-widest mt-2">{{ client.role }}</p>
+                    </div>
 
-      <div x-show="activeSlide === 5" x-transition
-           class="bg-white rounded-2xl shadow-xl p-10 flex flex-col md:flex-row items-center text-left space-y-6 md:space-y-0 md:space-x-8">
-        <img src="{{ asset('images/Jasmine.jpg') }}" alt="Client 5" class="w-24 h-24 rounded-full object-cover shadow-md">
-        <div>
-          <h3 class="text-xl font-bold text-gray-900 mb-2">Jasmine Armentano</h3>
-          <p class="text-gray-500 mb-3 text-sm">Hotel Owner Partner</p>
-          <p class="text-gray-700 italic">“Partnering with StayGrid has elevated our guest experience and increased our bookings. Their platform is top-notch.”</p>
+                    <div class="lg:w-2/3 p-10 lg:p-20 flex flex-col justify-center relative bg-gray-50">
+                        <span class="text-6xl font-black text-gray-200 absolute top-10 left-10 select-none">&ldquo;</span>
+                        <p class="text-2xl lg:text-3xl font-bold text-gray-900 leading-tight relative z-10 italic">
+                            {{ client.quote }}
+                        </p>
+                        <div class="mt-12 flex items-center gap-4">
+                            <div class="h-px w-12 bg-gray-900"></div>
+                            <span class="text-[10px] font-mono text-gray-400 uppercase tracking-widest italic">Verification: AUTH_0{{ loop.index }}_STAYGRID</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+                {% for feedback in feedbacks %}
+                <div x-show="activeSlide === {{ 5 + loop.index }}" 
+                     x-transition:enter="transition ease-out duration-500"
+                     x-transition:enter-start="opacity-0 translate-x-8"
+                     x-transition:enter-end="opacity-100 translate-x-0"
+                     class="flex flex-col lg:flex-row items-stretch min-h-[450px]">
+                    
+                    <div class="lg:w-1/3 p-10 lg:p-16 border-b lg:border-b-0 lg:border-r border-gray-900 bg-white flex flex-col justify-center items-center text-center">
+                        <div class="relative w-32 h-32 mb-8 border border-gray-900 p-1">
+                            <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                                <span class="text-4xl font-black text-gray-300">{{ feedback.name|slice(0,1)|upper }}</span>
+                            </div>
+                            <div class="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 flex items-center justify-center border border-gray-900">
+                                <i data-feather="quote" class="w-3 h-3 text-gray-900"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-black text-gray-900 uppercase tracking-tighter">{{ feedback.name }}</h3>
+                        <p class="text-[10px] font-bold text-yellow-600 uppercase tracking-widest mt-2">Verified Guest</p>
+                    </div>
+
+                    <div class="lg:w-2/3 p-10 lg:p-20 flex flex-col justify-center relative bg-gray-50">
+                        <span class="text-6xl font-black text-gray-200 absolute top-10 left-10 select-none">&ldquo;</span>
+                        <p class="text-2xl lg:text-3xl font-bold text-gray-900 leading-tight relative z-10 italic">
+                            {{ feedback.content }}
+                        </p>
+                        <div class="mt-12 flex items-center gap-4">
+                            <div class="h-px w-12 bg-gray-900"></div>
+                            <span class="text-[10px] font-mono text-gray-400 uppercase tracking-widest italic">Date: {{ feedback.createdAt|date('M d, Y') }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+                </div>
         </div>
-      </div>
+
+        <div class="mt-12 flex items-center justify-between">
+            <div class="flex gap-4">
+                <template x-for="i in totalSlides">
+                    <button @click="activeSlide = i" 
+                            class="h-1 transition-all duration-500"
+                            :class="activeSlide === i ? 'w-12 bg-gray-900' : 'w-4 bg-gray-200 hover:bg-gray-400'"></button>
+                </template>
+            </div>
+            
+            <div class="flex gap-2">
+                <button @click="activeSlide = activeSlide === 1 ? totalSlides : activeSlide - 1" class="w-10 h-10 border border-gray-900 flex items-center justify-center hover:bg-gray-900 hover:text-white transition-all">
+                    <i data-feather="chevron-left" class="w-4"></i>
+                </button>
+                <button @click="activeSlide = activeSlide === totalSlides ? 1 : activeSlide + 1" class="w-10 h-10 border border-gray-900 flex items-center justify-center hover:bg-gray-900 hover:text-white transition-all">
+                    <i data-feather="chevron-right" class="w-4"></i>
+                </button>
+            </div>
+        </div>
+
     </div>
-
-
-    <div class="flex justify-center mt-10 space-x-3">
-      <template x-for="i in 5">
-        <button @click="activeSlide = i"
-                class="w-3 h-3 rounded-full transition"
-                :class="activeSlide === i ? 'bg-yellow-500 scale-125' : 'bg-gray-400'"></button>
-      </template>
-    </div>
-  </div>
 </section>
 
 <!-- Alpine.js (for slider animation) -->
@@ -231,6 +456,42 @@ StayGrid
 
 <main>
 {% block content %}{% endblock %}
+<footer class="bg-gray-900 text-white py-12">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+      <div>
+        <h3 class="text-xl font-bold mb-4">StayGrid</h3>
+        <p class="text-gray-400">Your trusted accommodation partner for unforgettable stays.</p>
+      </div>
+      <div>
+        <h4 class="font-bold text-yellow-400 mb-4">Navigation</h4>
+        <ul class="space-y-2 text-gray-400">
+          <li><a href="/" class="hover:text-yellow-400 transition">Home</a></li>
+          <li><a href="/rooms" class="hover:text-yellow-400 transition">Rooms</a></li>
+          <li><a href="/about" class="hover:text-yellow-400 transition">About Us</a></li>
+          <li><a href="/contact" class="hover:text-yellow-400 transition">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-bold text-yellow-400 mb-4">Support</h4>
+        <ul class="space-y-2 text-gray-400">
+          <li><a href="#" class="hover:text-yellow-400 transition">FAQ</a></li>
+          <li><a href="#" class="hover:text-yellow-400 transition">Booking Help</a></li>
+          <li><a href="#" class="hover:text-yellow-400 transition">Cancellation Policy</a></li>
+          <li><a href="#" class="hover:text-yellow-400 transition">Privacy</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-bold text-yellow-400 mb-4">Contact</h4>
+        <p class="text-gray-400 mb-2">Email: <a href="mailto:info@staygrid.com" class="hover:text-yellow-400 transition">info@staygrid.com</a></p>
+        <p class="text-gray-400">Phone: <a href="tel:+15551234567" class="hover:text-yellow-400 transition">+1 (555) 123-4567</a></p>
+      </div>
+    </div>
+    <div class="border-t border-gray-700 pt-8 text-center text-gray-500">
+      <p>&copy; 2026 StayGrid. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
 </main>
 
 

@@ -1,0 +1,82 @@
+{% extends 'staff/base.html.twig' %}
+
+{% block title %}StayGrid // UNIT_CATALOG{% endblock %}
+
+{% block body %}
+<section class="space-y-8">
+    <header class="relative overflow-hidden border border-black/10 bg-[#0b0c10] text-white p-7 md:p-9">
+        <div class="absolute inset-0 pointer-events-none" style="background:
+            radial-gradient(circle at 15% 24%, rgba(250,204,21,0.16), transparent 36%),
+            radial-gradient(circle at 82% 70%, rgba(255,255,255,0.08), transparent 32%);"></div>
+        <div class="relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+            <div>
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="px-2 py-0.5 bg-yellow-400 text-black text-[9px] font-black uppercase tracking-widest">Inventory Core</span>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-black uppercase tracking-tight text-white">Units.</h1>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <a href="{{ path('app_staff_roomlisting_bookings') }}" class="bg-white text-black px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-yellow-400 transition-colors">View Bookings</a>
+                <a href="{{ path('app_staff_roomlisting_new') }}" class="bg-yellow-400 text-black px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white transition-colors">Add New Unit</a>
+            </div>
+        </div>
+    </header>
+
+    {% if rooms is not empty %}
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {% for room in rooms %}
+                {% set imgPath = room.image ? (room.image matches '/^uploads\\//' ? room.image : 'uploads/rooms/' ~ room.image) : 'images/default_room.png' %}
+                <article class="group border border-black/10 bg-white overflow-hidden hover:-translate-y-1 transition-transform">
+                    <div class="relative aspect-[16/10] overflow-hidden">
+                        <img src="{{ asset(imgPath) }}" alt="{{ room.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                        <div class="absolute top-4 right-4">
+                            <span class="px-3 py-1 text-[8px] font-black uppercase tracking-widest border border-white text-white backdrop-blur-md {% if room.getStatus() == 'Available' %}bg-green-500/80{% elseif room.getStatus() == 'Occupied' %}bg-yellow-500/80{% else %}bg-red-500/80{% endif %}">{{ room.getStatus() }}</span>
+                        </div>
+                    </div>
+
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-[9px] font-mono text-gray-400 uppercase tracking-widest mb-1">{{ room.location|default('LOC_NOT_SET') }}</p>
+                                <h3 class="text-2xl font-black uppercase tracking-tighter text-gray-950">{{ room.title }}</h3>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[9px] font-black text-gray-400 uppercase">Rate</p>
+                                <p class="text-lg font-black text-gray-950">₱{{ room.pricePerNight }}</p>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-gray-500 leading-relaxed font-medium uppercase italic mb-6 h-10 overflow-hidden">
+                            {{ room.description|default('No technical description provided for this unit.')|slice(0, 80) }}...
+                        </p>
+
+                        <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                            <div class="flex gap-4">
+                                <a href="{{ path('app_staff_roomlisting_edit', {'id': room.id}) }}" class="text-[10px] font-black uppercase tracking-widest text-black border-b border-black">Edit</a>
+                                <a href="{{ path('app_staff_booking_new', {'roomId': room.id}) }}" class="text-[10px] font-black uppercase tracking-widest text-yellow-600 border-b border-yellow-600">Book</a>
+                            </div>
+                            <form method="post" action="{{ path('app_staff_roomlisting_delete', {'id': room.id}) }}" onsubmit="return confirm('Confirm Unit Deletion?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ room.id) }}">
+                                <button type="submit" class="text-[10px] font-black uppercase tracking-widest text-red-300 hover:text-red-600 transition-colors italic">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-950 text-white px-3 py-2 text-[10px] font-mono">
+                        CAP_{{ room.capacity|default('00') }}
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="py-24 text-center border-2 border-dashed border-gray-200 bg-white">
+            <p class="text-[10px] font-black uppercase tracking-[0.5em] text-gray-300 italic">Inventory_Empty // No_Units_Found</p>
+        </div>
+    {% endif %}
+
+    <footer class="pt-8 border-t border-gray-200 flex justify-between items-center text-[9px] font-mono text-gray-400 uppercase tracking-widest">
+        <span>Displaying {{ rooms|length }} Active Nodes</span>
+        <span>StayGrid Core</span>
+    </footer>
+</section>
+{% endblock %}

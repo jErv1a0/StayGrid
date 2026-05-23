@@ -1,0 +1,55 @@
+
+
+{% extends 'user/base.html.twig' %}
+
+{% block title %}My Bookings{% endblock %}
+
+{% block body %}
+<div class="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8 pt-24">
+    <div class="bg-white shadow sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6 flex items-center justify-between">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">My Bookings</h3>
+            <a href="{{ path('app_roomlisting_index') }}" class="text-sm text-yellow-600 hover:underline">Browse Rooms</a>
+        </div>
+        <div class="border-t border-gray-200">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Check-in</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Check-out</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for booking in bookings %}
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ booking.id }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ booking.room.category|default('N/A') }} ({{ booking.room.number }}) — {{ booking.room.location|default('N/A') }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ booking.startDate ? booking.startDate|date('F j, Y') : '—' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ booking.endDate ? booking.endDate|date('F j, Y') : '—' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                {% if booking.status == 'confirmed' %}
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Confirmed</span>
+                                {% else %}
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">{{ booking.status|capitalize }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="{{ path('app_client_booking_show', {'id': booking.id}) }}" class="text-indigo-600 hover:text-indigo-900">View</a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td class="px-6 py-8 text-center text-sm text-gray-500" colspan="6">You have no bookings yet.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="mt-6"></div>
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'user/base.html.twig' %}
+
+{% block title %}StayGrid User Home{% endblock %}
+
+{% block body %}
+<section class="min-h-screen bg-[#f6f4ef] flex items-center justify-center px-6">
+    <div class="max-w-2xl w-full border border-black/10 bg-white p-10 text-center">
+        <p class="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 mb-4">User Module</p>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight uppercase mb-5">
+            Dashboard Ready.
+        </h1>
+        <p class="text-gray-600 mb-8">
+            This user home view now follows the shared StayGrid style system.
+        </p>
+        <a href="{{ path('app_user_dashboard') }}" class="inline-flex items-center px-8 py-4 bg-black text-white text-[11px] font-black uppercase tracking-[0.28em] hover:bg-yellow-400 hover:text-black transition-colors">
+            Open Dashboard
+        </a>
+    </div>
+</section>
+{% endblock %}

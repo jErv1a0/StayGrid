@@ -1,22 +1,48 @@
-# This file is the entry point to configure your own services.
-# Files in the packages/ subdirectory configure your dependencies.
+# config/services.yaml
 
-# Put parameters here that don't need to change on each machine where the app is deployed
-# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    # Directory to store uploaded room images
     rooms_images_directory: '%kernel.project_dir%/public/uploads/rooms'
+    # Define the parameter name and its absolute path value
+    profile_pictures_directory: '%kernel.project_dir%/public/uploads/profile_pictures'
 
 services:
-    # default configuration for services in *this* file
-    _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
+    _defaults:
+        autowire: true      
+        autoconfigure: true 
+        # CRITICAL FIX: Use bind to map the parameter name to the controller argument
+        bind:
+            $profilePictureDirectory: '%profile_pictures_directory%'
+
     App\:
         resource: '../src/'
+        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    # Make UserFixtures public so DoctrineFixturesBundle can always instantiate it during fixture loading.
+    App\DataFixtures\UserFixtures:
+        public: true
+
+    # The explicit App\Controller\User\ProfileController block is NOT needed when using bind.
+
+    # Ensure our activity subscriber is kept as a runtime service and not inlined away
+    App\EventSubscriber\UserActivitySubscriber:
+        public: true
+        tags:
+            - { name: 'kernel.event_subscriber' }
+            - { name: 'security.event_subscriber', dispatcher: 'main' }
+            - { name: 'security.event_subscriber', dispatcher: 'admin' }
+
+    # Explicitly register SafeUrlExtension to expose safe_path() to Twig
+    App\Twig\SafeUrlExtension:
+        tags: ['twig.extension']
+        public: false
+
+    # Configure a dedicated Guzzle client for KnpU OAuth2 in local dev (non-prod only).
+    knpu.oauth2.guzzle:
+        class: GuzzleHttp\Client
+        arguments:
+            - {
+                timeout: 30,
+                verify: false,
+              }
+        public: false

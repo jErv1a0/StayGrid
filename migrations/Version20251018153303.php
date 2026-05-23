@@ -19,13 +19,29 @@ final class Version20251018153303 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE roomlisting ADD main_photo_filename VARCHAR(255) DEFAULT NULL, ADD bedroom_photo_filename VARCHAR(255) DEFAULT NULL, ADD kitchen_photo_filename VARCHAR(255) DEFAULT NULL, ADD living_area_photo_filename VARCHAR(255) DEFAULT NULL');
+        // Only add columns if they don't already exist (safety for test DBs)
+        try {
+            $exists = (bool) $this->connection->fetchOne("SHOW COLUMNS FROM roomlisting LIKE 'main_photo_filename'");
+        } catch (\Throwable $e) {
+            $exists = false;
+        }
+
+        if (!$exists) {
+            $this->addSql('ALTER TABLE roomlisting ADD main_photo_filename VARCHAR(255) DEFAULT NULL, ADD bedroom_photo_filename VARCHAR(255) DEFAULT NULL, ADD kitchen_photo_filename VARCHAR(255) DEFAULT NULL, ADD living_area_photo_filename VARCHAR(255) DEFAULT NULL');
+        }
     }
 
     public function down(Schema $schema): void
     {
-        // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE roomlisting DROP main_photo_filename, DROP bedroom_photo_filename, DROP kitchen_photo_filename, DROP living_area_photo_filename');
+        // Drop columns only if they exist
+        try {
+            $exists = (bool) $this->connection->fetchOne("SHOW COLUMNS FROM roomlisting LIKE 'main_photo_filename'");
+        } catch (\Throwable $e) {
+            $exists = false;
+        }
+
+        if ($exists) {
+            $this->addSql('ALTER TABLE roomlisting DROP main_photo_filename, DROP bedroom_photo_filename, DROP kitchen_photo_filename, DROP living_area_photo_filename');
+        }
     }
 }

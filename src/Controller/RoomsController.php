@@ -32,7 +32,7 @@ class RoomsController extends AbstractController
             ],
         ];
 
-        return $this->render('rooms/index.html.twig', [
+        return $this->render('vrooms/index.html.twig', [
             'rooms' => $rooms
         ]);
     }
@@ -40,7 +40,7 @@ class RoomsController extends AbstractController
     #[Route('/rooms/studio-deluxe', name: 'app_room_studio_deluxe')]
     public function studioDeluxe(): Response
     {
-        return $this->render('rooms/studio_deluxe.html.twig', [
+        return $this->render('vrooms/studio_deluxe.html.twig', [
             'title' => 'Studio Deluxe - StayGrid',
             'description' => 'Perfect for solo travelers or couples.',
             'image' => 'images/studiosuite.png'
@@ -50,7 +50,7 @@ class RoomsController extends AbstractController
     #[Route('/rooms/executive-suite', name: 'app_room_executive_suite')]
     public function executiveSuite(): Response
     {
-        return $this->render('rooms/executive_suite.html.twig', [
+        return $this->render('vrooms/executive_suite.html.twig', [
             'title' => 'Executive Suite - StayGrid',
             'description' => 'Spacious stay with a full kitchen.',
             'image' => 'images/executivesuite.png'
@@ -60,7 +60,7 @@ class RoomsController extends AbstractController
     #[Route('/rooms/family-apartment', name: 'app_room_family_apartment')]
     public function familyApartment(): Response
     {
-        return $this->render('rooms/family_apartment.html.twig', [
+        return $this->render('vrooms/family_apartment.html.twig', [
             'title' => 'Family Apartment - StayGrid',
             'description' => 'Multiple rooms ideal for groups.',
             'image' => 'images/familyapartment.png'

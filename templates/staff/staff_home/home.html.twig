@@ -1,0 +1,276 @@
+{% extends 'staff/base.html.twig' %}
+
+{% block title %}StayGrid // CORE_DASHBOARD{% endblock %}
+
+{% block body %}
+<div class="space-y-8">
+    <section class="relative overflow-hidden border border-black/10 bg-[#0b0c10] text-white p-7 md:p-9">
+        <div class="absolute inset-0 pointer-events-none" style="background:
+            radial-gradient(circle at 15% 24%, rgba(250,204,21,0.16), transparent 36%),
+            radial-gradient(circle at 82% 70%, rgba(255,255,255,0.08), transparent 32%);"></div>
+        <div class="relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+            <div>
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="px-2 py-0.5 bg-yellow-400 text-black text-[9px] font-black uppercase tracking-widest">Master View</span>
+                    <span class="text-[9px] font-mono text-white/60 uppercase tracking-widest">Last Sync: {{ "now"|date("H:i:s") }}</span>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-black uppercase tracking-tight">Staff Overview.</h1>
+            </div>
+            <div class="w-full lg:w-auto border border-white/20 bg-black/35 px-6 py-4">
+                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-white/60 mb-1">System Time</p>
+                <div id="real-time-clock" class="font-mono leading-tight"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <article class="border border-black/10 bg-white p-5">
+            <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Total Units</p>
+            <p class="text-4xl font-black text-gray-950 mt-2">{{ rooms|default([])|length }}</p>
+        </article>
+        <article class="border border-black/10 bg-white p-5">
+            <p class="text-[10px] font-black text-green-700 uppercase tracking-widest">Active Bookings</p>
+            <p class="text-4xl font-black text-gray-950 mt-2">{{ bookings|default([])|length }}</p>
+        </article>
+        <article class="border border-black/10 bg-white p-5">
+            <p class="text-[10px] font-black text-red-700 uppercase tracking-widest">Pending</p>
+            <p class="text-4xl font-black text-gray-950 mt-2">{{ pendingCount|default(0) }}</p>
+        </article>
+        <article class="border border-black/10 bg-[#111827] text-white p-5">
+            <p class="text-[10px] font-black text-yellow-400 uppercase tracking-widest">Occupancy Rate</p>
+            <p class="text-3xl font-black mt-2">{{ occupancyRate }}%</p>
+        </article>
+    </section>
+
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <article class="border border-black/10 bg-white p-6">
+            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Confirmed</p>
+            <p class="text-4xl font-black text-green-700">{{ bookingStatusCounts.confirmed }}</p>
+        </article>
+        <article class="border border-black/10 bg-white p-6">
+            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Upcoming Check-ins (7 Days)</p>
+            <p class="text-4xl font-black text-blue-700">{{ upcomingCheckins }}</p>
+        </article>
+        <article class="border border-black/10 bg-white p-6">
+            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Hourly Bookings</p>
+            <p class="text-4xl font-black text-yellow-700">{{ bookingTypeCounts.hourly }}</p>
+        </article>
+    </section>
+
+    <section class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <article class="border border-black/10 bg-white p-6 xl:col-span-2">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-[11px] font-black uppercase tracking-[0.25em]">Monthly Booking Trend</h2>
+                <span class="text-[9px] font-mono uppercase text-gray-400">Last 6 Months</span>
+            </div>
+            <div class="h-72">
+                <canvas id="monthly-bookings-chart"></canvas>
+            </div>
+        </article>
+
+        <article class="border border-black/10 bg-white p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-[11px] font-black uppercase tracking-[0.25em]">Booking Status Mix</h2>
+                <span class="text-[9px] font-mono uppercase text-gray-400">Current</span>
+            </div>
+            <div class="h-72">
+                <canvas id="booking-status-chart"></canvas>
+            </div>
+        </article>
+    </section>
+
+    <section class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <article class="border border-black/10 bg-white p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-[11px] font-black uppercase tracking-[0.25em]">Room Utilization</h2>
+                <span class="text-[9px] font-mono uppercase text-gray-400">Status Breakdown</span>
+            </div>
+            <div class="h-64">
+                <canvas id="room-utilization-chart"></canvas>
+            </div>
+        </article>
+
+        <article class="border border-black/10 bg-white p-6 xl:col-span-2">
+            <h2 class="text-[11px] font-black uppercase tracking-[0.25em] mb-4">Operations Snapshot</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-[11px]">
+                <div class="border border-gray-200 p-4">
+                    <p class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Daily Bookings</p>
+                    <p class="text-3xl font-black text-gray-950 mt-1">{{ bookingTypeCounts.daily }}</p>
+                </div>
+                <div class="border border-gray-200 p-4">
+                    <p class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Cancelled + Rejected</p>
+                    <p class="text-3xl font-black text-red-600 mt-1">{{ bookingStatusCounts.cancelled + bookingStatusCounts.rejected }}</p>
+                </div>
+                <div class="border border-gray-200 p-4">
+                    <p class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Available Rooms</p>
+                    <p class="text-3xl font-black text-green-700 mt-1">{{ roomStatusCounts.available }}</p>
+                </div>
+                <div class="border border-gray-200 p-4">
+                    <p class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Occupied Rooms</p>
+                    <p class="text-3xl font-black text-yellow-700 mt-1">{{ roomStatusCounts.occupied }}</p>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <div class="lg:col-span-2 space-y-12">
+            <section>
+                <div class="flex items-center justify-between mb-5">
+                    <h2 class="text-xs font-black uppercase tracking-[0.3em] flex items-center gap-3">
+                        <span class="w-8 h-[2px] bg-yellow-400"></span> Recent Bookings
+                    </h2>
+                    <a href="{{ path('app_staff_roomlisting_bookings') }}" class="text-[10px] font-bold uppercase border-b-2 border-gray-950 hover:text-yellow-600 transition-all">Manage All</a>
+                </div>
+
+                <div class="border border-black/10 bg-white overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-[#111827] text-white text-[9px] font-black uppercase tracking-widest">
+                            <tr>
+                                <th class="px-6 py-3">Ref_ID</th>
+                                <th class="px-6 py-3">Unit</th>
+                                <th class="px-6 py-3">Occupant</th>
+                                <th class="px-6 py-3">Timeline</th>
+                                <th class="px-6 py-3 text-right">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-black/10">
+                            {% for booking in bookings|slice(0, 5) %}
+                                <tr class="hover:bg-gray-50 transition-colors text-[11px]">
+                                    <td class="px-6 py-4 font-mono text-gray-400">#{{ booking.id }}</td>
+                                    <td class="px-6 py-4 font-black uppercase">{{ booking.room ? booking.room.title : 'Unallocated' }}</td>
+                                    <td class="px-6 py-4 text-gray-600 uppercase">{{ booking.user ? booking.user.email : 'Guest' }}</td>
+                                    <td class="px-6 py-4 font-black text-gray-500 uppercase">{{ booking.startDate|date('d.M') }} &rarr; {{ booking.endDate|date('d.M') }}</td>
+                                    <td class="px-6 py-4 text-right">
+                                        <span class="inline-block px-2 py-1 text-[9px] font-black uppercase tracking-widest border {% if booking.status == 'confirmed' %}border-green-500 text-green-600{% else %}border-yellow-500 text-yellow-600{% endif %}">{{ booking.status }}</span>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="px-6 py-10 text-center text-[10px] font-black uppercase tracking-[0.4em] text-gray-300">No recent bookings found</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <div class="space-y-10">
+            <div class="bg-gray-950 text-white p-8 shadow-[10px_10px_0px_0px_rgba(250,204,21,1)]">
+                <h2 class="text-[11px] font-black uppercase tracking-[0.3em] mb-8 flex items-center justify-between">
+                    Quick Actions <i data-feather="zap" class="w-4 h-4 text-yellow-400"></i>
+                </h2>
+                <div class="space-y-3">
+                    <a href="{{ path('app_staff_roomlisting_new') }}" class="block bg-yellow-400 text-black text-[10px] font-black uppercase py-3 px-4 hover:bg-white transition-colors">Add New Unit</a>
+                    <a href="{{ path('app_staff_roomlisting_bookings') }}" class="block bg-white text-black text-[10px] font-black uppercase py-3 px-4 hover:bg-yellow-400 transition-colors">View Booking Ledger</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const dateStr = now.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: '2-digit' }).toUpperCase();
+            const el = document.getElementById('real-time-clock');
+            if (el) {
+                el.innerHTML = `
+                    <div class="text-4xl font-black text-white tracking-tighter">${timeStr}</div>
+                    <div class="text-[10px] font-bold text-yellow-600 tracking-widest mt-1">${dateStr}</div>
+                `;
+            }
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        const monthlyLabels = {{ monthlyBookingLabels|json_encode|raw }};
+        const monthlyData = {{ monthlyBookingData|json_encode|raw }};
+        const bookingStatusData = {{ [bookingStatusCounts.confirmed, bookingStatusCounts.pending, bookingStatusCounts.cancelled, bookingStatusCounts.rejected, bookingStatusCounts.other]|json_encode|raw }};
+        const roomUtilizationData = {{ [roomStatusCounts.available, roomStatusCounts.occupied, roomStatusCounts.other]|json_encode|raw }};
+
+        const monthlyCtx = document.getElementById('monthly-bookings-chart');
+        if (monthlyCtx) {
+            new Chart(monthlyCtx, {
+                type: 'line',
+                data: {
+                    labels: monthlyLabels,
+                    datasets: [{
+                        label: 'Bookings',
+                        data: monthlyData,
+                        borderColor: '#111827',
+                        backgroundColor: 'rgba(250, 204, 21, 0.35)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: '#facc15',
+                        pointBorderColor: '#111827',
+                        pointBorderWidth: 2,
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { precision: 0 } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        const statusCtx = document.getElementById('booking-status-chart');
+        if (statusCtx) {
+            new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Confirmed', 'Pending', 'Cancelled', 'Rejected', 'Other'],
+                    datasets: [{
+                        data: bookingStatusData,
+                        backgroundColor: ['#16a34a', '#facc15', '#ef4444', '#f97316', '#64748b'],
+                        borderColor: '#ffffff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
+                }
+            });
+        }
+
+        const roomCtx = document.getElementById('room-utilization-chart');
+        if (roomCtx) {
+            new Chart(roomCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Available', 'Occupied', 'Other'],
+                    datasets: [{
+                        data: roomUtilizationData,
+                        backgroundColor: ['#22c55e', '#f59e0b', '#6b7280'],
+                        borderColor: '#111827',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { precision: 0 } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+    </script>
+{% endblock %}

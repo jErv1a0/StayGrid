@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'partials/_global_radius.html.twig' %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}StayGrid // System Core{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{{ asset('icons/staygrid16x16.png') }}"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Manrope', 'sans-serif'],
+                    },
+                    colors: {
+                        'grid-black': '#0A0A0A',
+                        'grid-slate': '#FBFBFB',
+                        'grid-yellow': '#FACC15',
+                        'grid-border': '#E5E7EB',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Manrope', sans-serif; }
+        .sidebar-transition { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .nav-active { @apply bg-grid-black text-white shadow-xl; }
+        
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+    {% block stylesheets %}{% endblock %}
+</head>
+<body class="bg-[#f6f4ef] text-grid-black flex min-h-screen overflow-x-hidden">
+
+    {# --- SIDEBAR NAVIGATION --- #}
+    <aside id="sidebar" class="sidebar-transition w-72 bg-[#0b0c10] text-white border-r border-white/10 z-50 fixed inset-y-0 left-0 lg:translate-x-0 -translate-x-full flex flex-col">
+        
+        <div class="p-8 shrink-0">
+            <div class="flex items-center justify-between">
+                <h2 class="text-2xl font-black tracking-tighter uppercase">
+                    Stay<span class="text-grid-yellow">Grid</span><span class="text-[10px] text-white/40 ml-1">v2</span>
+                </h2>
+                <button id="close-sidebar" class="lg:hidden text-white/50 hover:text-white">
+                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="mt-3 h-px w-16 bg-grid-yellow"></div>
+        </div>
+
+        <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto no-scrollbar">
+            {% set current_route = app.request.attributes.get('_route') %}
+
+            {# Dashboard #}
+            <a href="{{ path('app_user_dashboard') }}"
+               class="flex items-center gap-4 px-4 py-4 rounded-none text-[10px] font-black uppercase tracking-[0.3em] transition-all group
+               {{ current_route == 'app_user_dashboard' ? 'bg-yellow-400 text-black' : 'text-white/50 hover:bg-white/10 hover:text-white' }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+                Dashboard
+            </a>
+
+            {# Inventory #}
+            <a href="{{ path('app_user_rooms_rooms') }}"
+               class="flex items-center gap-4 px-4 py-4 rounded-none text-[10px] font-black uppercase tracking-[0.3em] transition-all group
+               {{ 'room' in current_route ? 'bg-yellow-400 text-black' : 'text-white/50 hover:bg-white/10 hover:text-white' }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+                Room Listing
+            </a>
+
+            {# Profile #}
+                <a href="{{ path('app_user_profile_edit') }}"
+               class="flex items-center gap-4 px-4 py-4 rounded-none text-[10px] font-black uppercase tracking-[0.3em] transition-all group
+               {{ 'profile' in current_route ? 'bg-yellow-400 text-black' : 'text-white/50 hover:bg-white/10 hover:text-white' }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                Your Profile
+            </a>
+        </nav>
+
+        {# Logout #}
+        <div class="p-4 border-t border-white/10">
+            <a href="{{ path('app_logout') }}"
+               onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+               class="flex items-center gap-4 px-4 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-red-400 hover:bg-red-500/10 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Log out
+            </a>
+            <form id="logout-form" action="{{ path('app_logout') }}" method="POST" class="hidden">
+                <input type="hidden" name="_token" value="{{ csrf_token('logout') }}">
+            </form>
+        </div>
+    </aside>
+
+    {# --- MAIN CONTENT AREA --- #}
+    <div class="flex-1 flex flex-col lg:pl-72 transition-all duration-300 min-w-0">
+        
+        {# Top Navigation Bar #}
+        <header class="h-20 bg-[#f6f4ef]/90 backdrop-blur border-b border-black/10 px-8 flex items-center justify-between sticky top-0 z-40">
+            <button id="open-sidebar" class="lg:hidden p-2 -ml-2 text-gray-700">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16m-7 6h7" stroke-width="2"></path></svg>
+            </button>
+
+            <div class="hidden md:flex items-center gap-4">
+                <span class="h-2 w-2 rounded-full bg-green-500"></span>
+                <span class="text-[9px] font-black uppercase tracking-[0.4em] text-gray-500">Network Status: Optimal</span>
+            </div>
+
+            <div class="flex items-center gap-8">
+                <div class="text-right hidden sm:block">
+                    <p class="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-1"></p>
+                    <p class="text-xs font-bold uppercase tracking-tighter">{{ "now"|date("H:i") }} // {{ "now"|date("d.M.Y") }}</p>
+                </div>
+                <div class="h-10 w-10 bg-black text-grid-yellow flex items-center justify-center font-black text-xs uppercase tracking-tighter">
+                    {{ app.user ? app.user.email|slice(0, 2)|upper : '??' }}
+                </div>
+            </div>
+        </header>
+
+        {# Content Injection #}
+        <main class="flex-1">
+            {% block body %}{% endblock %}
+        </main>
+
+        {# Footer Status Bar #}
+        <footer class="p-8 border-t border-black/10 flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#f6f4ef]">
+            <p class="text-[8px] font-mono text-gray-500 uppercase tracking-[0.4em]">© StayGrid Protocol 2026 // Secure Encryption Enabled</p>
+            <div class="flex gap-6">
+                <span class="text-[8px] font-black text-gray-500 uppercase tracking-widest">Sys v2.0.6</span>
+                <span class="text-[8px] font-black text-gray-500 uppercase tracking-widest">Cloud Sync Active</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.getElementById('sidebar');
+            const openBtn = document.getElementById('open-sidebar');
+            const closeBtn = document.getElementById('close-sidebar');
+            if (typeof feather !== 'undefined') { feather.replace(); }
+
+            const toggleSidebar = () => {
+                sidebar.classList.toggle('-translate-x-full');
+            };
+
+            openBtn?.addEventListener('click', toggleSidebar);
+            closeBtn?.addEventListener('click', toggleSidebar);
+        });
+    </script>
+    {% block javascripts %}{% endblock %}
+</body>
+</html>

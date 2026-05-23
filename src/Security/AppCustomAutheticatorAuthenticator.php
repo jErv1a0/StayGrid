@@ -49,13 +49,42 @@ class AppCustomAutheticatorAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
-        // 1️⃣ If user tried to access a page before logging in, go back there
+        // Prefer role-based dash redirect for admin/staff users; if neither, return to intended target path
+        // 1️⃣ Determine roles first
+        $user = $token->getUser();
+        $roles = [];
+        if (is_object($user) && method_exists($user, 'getRoles')) {
+            $roles = $user->getRoles();
+        } elseif (method_exists($token, 'getRoleNames')) {
+            $roles = $token->getRoleNames();
+        }
+        // 2️⃣ Redirect by highest-priority role
+        if (in_array('ROLE_ADMIN', $roles, true)) {
+            return new RedirectResponse($this->urlGenerator->generate('app_admin_home'));
+        }
+
+        if (in_array('ROLE_STAFF', $roles, true)) {
+            try {
+                $target = $this->urlGenerator->generate('app_staff_dashboard');
+            } catch (\Symfony\Component\Routing\Exception\RouteNotFoundException $e) {
+                // Fallback to landing page if staff dashboard route is missing
+                $target = $this->urlGenerator->generate('app_landing');
+                @trigger_error('Route "app_staff_dashboard" not found; falling back to app_landing', E_USER_WARNING);
+            }
+
+            $response = new RedirectResponse($target);
+            // Clear any admin remember-me cookie (prevents accidental admin auto-login from old cookie)
+            $response->headers->clearCookie('_admin_remember_me', '/admin');
+            return $response;
+        }
+
+        // 3️⃣ If neither admin nor staff, return to the intended target path (if any)
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
             return new RedirectResponse($targetPath);
         }
 
-        // 2️⃣ Otherwise, redirect to admin dashboard
-        return new RedirectResponse($this->urlGenerator->generate('app_admin_home'));
+        // Default: regular client dashboard
+        return new RedirectResponse($this->urlGenerator->generate('app_user_dashboard'));
     }
 
     protected function getLoginUrl(Request $request): string

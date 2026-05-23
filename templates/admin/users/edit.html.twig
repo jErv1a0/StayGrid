@@ -1,0 +1,127 @@
+{# templates/admin/user/edit.html.twig #}
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}StayGrid // EDIT_USER_{{ user.id }}{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-[#f6f4ef] py-10">
+    <div class="max-w-3xl mx-auto px-4 space-y-8">
+
+        {# --- HEADER SECTION --- #}
+        <div class="flex flex-col md:flex-row justify-between items-end gap-6 border-b border-black/10 pb-8">
+            <div>
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="px-2 py-0.5 bg-gray-950 text-yellow-400 text-[9px] font-black uppercase tracking-[0.3em]">Access_Control_v4.1</span>
+                    <span class="text-[9px] font-mono text-gray-400 uppercase tracking-widest italic underline decoration-yellow-400 underline-offset-4">UID: {{ user.id }}</span>
+                </div>
+                <h1 class="text-5xl font-black text-gray-950 uppercase tracking-tighter leading-none">
+                    Edit_User
+                </h1>
+                <p class="mt-4 text-[11px] font-mono text-gray-500 uppercase tracking-widest italic">Target: {{ user.email }}</p>
+            </div>
+            
+                <a href="{{ path('app_admin_user_index') }}"
+                    class="group inline-flex items-center gap-2 bg-white border border-black px-6 py-3 hover:bg-yellow-400 transition-colors">
+                <i data-feather="arrow-left" class="w-4 h-4 text-gray-950"></i>
+                <span class="text-xs font-black uppercase tracking-widest text-gray-950">Abort_Changes</span>
+            </a>
+        </div>
+
+        {# --- MAIN FORM TERMINAL --- #}
+        <div class="bg-white border border-black/10 overflow-hidden">
+            <div class="bg-[#111827] px-6 py-4 border-b border-black/10 flex justify-between items-center">
+                <h2 class="text-[11px] font-black text-white uppercase tracking-[0.4em]">User_Credential_Override</h2>
+                <div class="h-2 w-2 rounded-full bg-yellow-400 animate-pulse"></div>
+            </div>
+
+            <div class="p-8">
+                {# Define Brutalist Styles #}
+                {% set input_class = 'w-full bg-gray-50 border border-black/20 p-4 font-mono text-sm focus:bg-white focus:border-black focus:outline-none transition-colors placeholder-gray-300' %}
+                {% set label_class = 'block text-[10px] font-black text-gray-950 uppercase tracking-[0.2em] mb-2' %}
+                {% set error_class = 'text-red-600 text-[10px] font-bold uppercase mt-2 italic bg-red-50 p-2 border-l-4 border-red-600' %}
+
+                {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'space-y-8'}}) }}
+
+                    {# Email Field #}
+                    <div>
+                        {{ form_label(form.email, 'Security_Login_Email', {'label_attr': {'class': label_class}}) }}
+                        {{ form_widget(form.email, {'attr': {'class': input_class, 'placeholder': 'SYS_ADMIN@DOMAIN.COM'}}) }}
+                        {{ form_errors(form.email, {'attr': {'class': error_class}}) }}
+                    </div>
+
+                    {# Password Block #}
+                    <div class="p-6 bg-gray-100 border border-black/20">
+                        <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6 border-b border-gray-300 pb-2">Credential_Refresh_Protocol</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                {{ form_label(form.password.first, 'New Password', {'label_attr': {'class': label_class}}) }}
+                                {{ form_widget(form.password.first, {'attr': {'class': input_class, 'placeholder': '••••••••'}}) }}
+                                {{ form_errors(form.password.first, {'attr': {'class': error_class}}) }}
+                            </div>
+                            <div>
+                                {{ form_label(form.password.second, 'Confirm Password', {'label_attr': {'class': label_class}}) }}
+                                {{ form_widget(form.password.second, {'attr': {'class': input_class, 'placeholder': '••••••••'}}) }}
+                                {{ form_errors(form.password.second, {'attr': {'class': error_class}}) }}
+                            </div>
+                        </div>
+                        <p class="text-[9px] font-mono text-gray-400 mt-4 uppercase">Note: Leave blank to retain existing encrypted signature.</p>
+                    </div>
+
+                    {# Roles Panel #}
+                    {% if form.roles is defined %}
+                        <div>
+                            <label class="{{ label_class }}">Authorization_Clearance_Levels</label>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {% for role in form.roles %}
+                                    <label class="group relative flex items-center p-4 border border-black/20 bg-white cursor-pointer hover:bg-yellow-50 has-[:checked]:bg-yellow-400 transition-all">
+                                        <div class="flex items-center h-5">
+                                            {{ form_widget(role, {'attr': {'class': 'w-5 h-5 border border-black text-gray-950 focus:ring-0 rounded-none'}}) }}
+                                        </div>
+                                        <div class="ml-3">
+                                            <span class="text-xs font-black uppercase tracking-tighter text-gray-950">
+                                                {{ role.vars.label|replace({'ROLE_': ''}) }}
+                                            </span>
+                                        </div>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {# Verification Status #}
+                    {% if form.isVerified is defined %}
+                        <div class="pt-4 border-t-2 border-gray-100">
+                            <label class="inline-flex items-center group cursor-pointer">
+                                <div class="relative">
+                                    {{ form_widget(form.isVerified, {'attr': {'class': 'peer sr-only'}}) }}
+                                    <div class="w-10 h-6 bg-gray-200 border-2 border-gray-950 peer-checked:bg-green-500 transition-colors"></div>
+                                    <div class="absolute left-1 top-1 w-4 h-4 bg-gray-950 peer-checked:translate-x-4 transition-transform"></div>
+                                </div>
+                                <span class="ml-4 text-[10px] font-black text-gray-950 uppercase tracking-widest">Mark_as_Verified_Identity</span>
+                            </label>
+                            <p class="text-[9px] font-mono text-gray-400 mt-1 uppercase ml-14">Manual override for email authentication status.</p>
+                        </div>
+                    {% endif %}
+
+                    {# Submit Button #}
+                    <div class="pt-10 border-t-4 border-double border-gray-100">
+                        {{ form_rest(form) }}
+                        <button type="submit"
+                            class="w-full flex items-center justify-center gap-3 bg-yellow-400 border border-black py-5 hover:bg-black hover:text-white transition-colors">
+                            <i data-feather="save" class="w-5 h-5"></i>
+                            <span class="text-sm font-black uppercase tracking-[0.3em]">Commit_Changes_to_Disk</span>
+                        </button>
+                    </div>
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+
+        <div class="mt-8 text-center">
+             <p class="text-[9px] font-mono text-gray-300 uppercase tracking-[0.5em] italic">
+                Secure_Admin_Terminal_Node_01
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

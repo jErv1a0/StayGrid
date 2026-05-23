@@ -1,0 +1,184 @@
+{% extends 'staff/base.html.twig' %}
+
+{% block title %}StayGrid // Staff_Profile_Settings{% endblock %}
+
+{% block body %}
+<div class="max-w-5xl mx-auto py-10 space-y-8">
+
+    {% for message in app.flashes('success') %}
+        <div class="mb-6 border-2 border-green-700 bg-green-50 text-green-800 px-4 py-3 text-xs font-black uppercase tracking-wider">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="mb-6 border-2 border-red-700 bg-red-50 text-red-800 px-4 py-3 text-xs font-black uppercase tracking-wider">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {% if not profileForm.vars.valid %}
+        <div class="mb-6 border-2 border-red-700 bg-red-50 text-red-800 px-4 py-3 text-xs font-black uppercase tracking-wider">
+            Some fields are invalid. Please review highlighted inputs.
+        </div>
+    {% endif %}
+
+    <section class="relative overflow-hidden border border-black/10 bg-[#0b0c10] text-white p-7 md:p-9">
+        <div class="absolute inset-0 pointer-events-none" style="background:
+            radial-gradient(circle at 15% 24%, rgba(250,204,21,0.16), transparent 36%),
+            radial-gradient(circle at 82% 70%, rgba(255,255,255,0.08), transparent 32%);"></div>
+        <div class="relative z-10 flex flex-col md:flex-row justify-between md:items-end gap-5">
+            <div>
+                <p class="text-[10px] font-black uppercase tracking-[0.35em] text-yellow-400 mb-2">Staff Identity Controls</p>
+                <h1 class="text-4xl md:text-5xl font-black uppercase tracking-tight">Profile Settings.</h1>
+                <p class="text-xs text-white/70 mt-3 uppercase tracking-wide">Manage staff profile details, photo, and credentials.</p>
+            </div>
+        </div>
+    </section>
+
+    {{ form_start(profileForm, {
+        'attr': {
+            'class': 'space-y-12',
+            'id': 'staff-profile-form',
+            'enctype': 'multipart/form-data'
+        }
+    }) }}
+
+    <div class="sticky top-0 z-30 bg-[#f6f4ef]/90 backdrop-blur-sm py-4 border-b border-black/10">
+        <div class="flex justify-end">
+            <button type="submit" class="bg-yellow-400 border border-black py-3 px-8 text-[11px] font-black uppercase tracking-[0.22em] hover:bg-black hover:text-white transition-colors">
+                Update Profile
+            </button>
+        </div>
+    </div>
+
+    {% set profileImageUrl = profileForm.vars.value.profilePicture
+        ? asset('uploads/profile_pictures/' ~ profileForm.vars.value.profilePicture)
+        : asset('images/default-admin-avatar.jpg')
+    %}
+
+    <div class="bg-[#111827] p-8 border border-black/10 flex flex-col md:flex-row items-center gap-8">
+        <div class="relative group">
+            <div class="h-24 w-24 rounded-none border border-yellow-400 overflow-hidden">
+                <img class="h-full w-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                     src="{{ profileImageUrl }}"
+                     alt="Staff Avatar">
+            </div>
+            <div class="absolute -bottom-2 -right-2 bg-yellow-400 p-1.5 border border-black cursor-pointer hover:scale-110 transition-transform"
+                 onclick="document.getElementById('{{ profileForm.profilePictureFile.vars.id }}').click()">
+                <i data-feather="camera" class="w-3 h-3 text-black"></i>
+            </div>
+        </div>
+
+        <div class="text-center md:text-left">
+            <h2 class="text-2xl font-black text-white uppercase tracking-tighter">
+                {{ profileForm.vars.value.fullName|default(app.user.userIdentifier) }}
+            </h2>
+            <div class="mt-2 flex flex-wrap justify-center md:justify-start gap-2">
+                {% for role in app.user.roles %}
+                    <span class="text-[9px] font-mono font-bold bg-white/10 text-yellow-400 border border-white/20 px-2 py-0.5 uppercase tracking-widest">
+                        {{ role }}
+                    </span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-8">
+
+        <div class="border border-black/10 bg-white">
+            <div class="bg-[#111827] px-6 py-3 border-b border-black/10 flex justify-between items-center">
+                <h2 class="text-[10px] font-black text-white uppercase tracking-[0.3em]">Personal Info Registry</h2>
+                <i data-feather="user" class="w-4 h-4 text-yellow-400"></i>
+            </div>
+
+            <div class="p-8 space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8 items-center">
+                    <div class="md:col-span-1">
+                        <span class="block text-[10px] font-black uppercase text-gray-400 mb-1">Avatar_Source</span>
+                        <button type="button" onclick="document.getElementById('{{ profileForm.profilePictureFile.vars.id }}').click()"
+                                class="text-[9px] font-mono font-bold text-yellow-600 hover:text-yellow-700 underline uppercase">
+                            Upload_New_File
+                        </button>
+                        {{ form_errors(profileForm.profilePictureFile) }}
+                    </div>
+
+                    <div class="md:col-span-3 space-y-2">
+                        <label class="block text-[10px] font-black uppercase tracking-widest text-gray-950">
+                            Full_Name_Override
+                        </label>
+                        {{ form_widget(profileForm.fullName, {
+                            'attr': {
+                                'class': 'block w-full bg-gray-50 border border-black/20 p-4 font-mono text-sm font-bold focus:bg-white focus:border-black focus:outline-none transition-all',
+                                'placeholder': 'Enter full name'
+                            }
+                        }) }}
+                        {{ form_errors(profileForm.fullName) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="border border-black/10 bg-white">
+            <div class="bg-[#111827] px-6 py-3 border-b border-black/10 flex justify-between items-center">
+                <h2 class="text-[10px] font-black text-white uppercase tracking-[0.3em]">Access Credentials</h2>
+                <i data-feather="lock" class="w-4 h-4 text-yellow-400"></i>
+            </div>
+
+            <div class="p-8 space-y-10">
+                <div class="space-y-3">
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-gray-950">
+                        Primary_Auth_Email
+                    </label>
+                    {{ form_widget(profileForm.email, {
+                        'attr': {
+                            'class': 'block w-full max-w-lg bg-gray-50 border border-black/20 p-4 font-mono text-sm font-bold focus:bg-white focus:border-black focus:outline-none transition-all'
+                        }
+                    }) }}
+                    {{ form_errors(profileForm.email) }}
+                    <p class="text-[9px] font-mono text-gray-400 uppercase italic">Verification required for changes to take effect.</p>
+                </div>
+
+                <div class="pt-6 border-t border-dashed border-gray-200">
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="px-2 py-0.5 bg-red-100 text-red-600 text-[9px] font-black uppercase">Security_Critical</span>
+                        <p class="text-[10px] font-black text-gray-950 uppercase">Update_Access_Key</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <span class="text-[9px] font-mono text-gray-400 uppercase">New_Key</span>
+                            {{ form_widget(profileForm.plainPassword.first, {
+                                'attr': {
+                                    'class': 'block w-full bg-gray-50 border border-black/20 p-4 font-mono text-sm font-bold focus:bg-white focus:border-black focus:outline-none transition-all',
+                                    'placeholder': '••••••••'
+                                }
+                            }) }}
+                            {{ form_errors(profileForm.plainPassword.first) }}
+                        </div>
+                        <div class="space-y-2">
+                            <span class="text-[9px] font-mono text-gray-400 uppercase">Confirm_Key</span>
+                            {{ form_widget(profileForm.plainPassword.second, {
+                                'attr': {
+                                    'class': 'block w-full bg-gray-50 border border-black/20 p-4 font-mono text-sm font-bold focus:bg-white focus:border-black focus:outline-none transition-all',
+                                    'placeholder': '••••••••'
+                                }
+                            }) }}
+                            {{ form_errors(profileForm.plainPassword.second) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ form_rest(profileForm) }}
+    {{ form_end(profileForm) }}
+
+    <div class="mt-12 flex justify-between items-center border-t border-black/10 pt-6">
+        <span class="text-[9px] font-mono text-gray-400 uppercase">Staff_UID: {{ app.user.id|default('0000') }}</span>
+        <span class="text-[9px] font-mono text-gray-400 uppercase tracking-widest">StayGrid_Staff_Module_v1.0</span>
+    </div>
+
+</div>
+{% endblock %}

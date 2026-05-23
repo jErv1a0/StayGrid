@@ -1,8 +1,10 @@
+# config/packages/security.yaml
 
 security:
 
     role_hierarchy:
-        ROLE_ADMIN: [ROLE_CLIENT]
+        ROLE_ADMIN: [ROLE_CLIENT, ROLE_STAFF]
+        ROLE_STAFF: [ROLE_CLIENT]
         ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
 
     providers:
@@ -16,10 +18,20 @@ security:
             algorithm: auto
 
     firewalls:
+
         dev:
             pattern: ^/(_(profiler|wdt))
             security: false
 
+        # API firewall - uses session-based authentication (works cross-device)
+        api:
+            pattern: ^/api
+            lazy: true
+            provider: app_user_provider
+            stateless: false
+            user_checker: App\Security\UserChecker
+
+        # ---------- ADMIN FIREWALL ----------
         admin:
             pattern: ^/admin
             lazy: true
@@ -27,27 +39,59 @@ security:
             form_login:
                 login_path: app_admin_login
                 check_path: app_admin_login
-                default_target_path: app_admin_home
+                default_target_path: app_admin_home 
                 csrf_token_id: admin_authenticate
             logout:
                 path: app_admin_logout
-                target: app_admin_login 
+                target: app_admin_login
+            
+            # --- FEATURE: Remember Me for Admin Firewall ---
+            remember_me:
+                secret: '%kernel.secret%'
+                user_provider: app_user_provider 
+                name: _admin_remember_me 
+                lifetime: 2592000
+                path: /admin 
 
+        # ---------- MAIN FIREWALL (Client/Standard User) ----------
         main:
             lazy: true
             provider: app_user_provider
+            user_checker: App\Security\UserChecker
+            entry_point: form_login
+            custom_authenticators:
+                - App\Security\GoogleAuthenticator
             form_login:
                 login_path: app_login
                 check_path: app_login
-                default_target_path: app_home
-                csrf_token_id: authenticate
+                default_target_path: app_user_dashboard
+                csrf_token_id: authenticate 
             logout:
                 path: app_logout
-                target: app_landing  
+                target: app_landing
+
+            remember_me:
+                secret: '%kernel.secret%'
+                user_provider: app_user_provider 
+                name: _remember_me 
+                lifetime: 2592000 
+                path: / 
 
     access_control:
-        - { path: ^/admin/login, roles: PUBLIC_ACCESS }
+
+        - { path: ^/admin/login$, roles: PUBLIC_ACCESS }
+        - { path: ^/staff/roomlisting/bookings, roles: PUBLIC_ACCESS }
+        - { path: ^/api/login$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/logout$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/register$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/verify-email$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/rooms/?$, roles: PUBLIC_ACCESS }
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/admin, roles: ROLE_ADMIN }
+
+        - { path: ^/user, roles: [ROLE_CLIENT, ROLE_STAFF] }
+        
         - { path: ^/(login|logout|about|contact)/, roles: PUBLIC_ACCESS }
         - { path: ^/$, roles: PUBLIC_ACCESS }
+
         - { path: ^/client, roles: ROLE_CLIENT }

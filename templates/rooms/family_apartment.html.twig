@@ -10,7 +10,8 @@
 
             <!-- Room Image -->
             <div class="relative">
-                <img src="{{ asset('images/familyapartmentFH.png') }}" alt="Family Apartment" class="rounded-xl shadow-lg w-full object-cover">
+                {% set heroImg = 'images/familyapartmentFH.png' %}
+                <img src="{{ asset(heroImg) }}" alt="Family Apartment" class="rounded-xl shadow-lg w-full object-cover" onerror="this.onerror=null;this.src='{{ asset('images/default_room.png') }}'">
                 <span class="absolute top-4 left-4 bg-yellow-500 text-gray-900 font-semibold px-3 py-1 rounded-lg text-sm">
                     Family Apartment
                 </span>

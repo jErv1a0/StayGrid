@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Explore Our Rooms - StayGrid</title>
+  <link rel="icon" type="image/png" href="{{ asset('icons/staygrid16x16.png') }}"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/feather-icons"></script>
+  <style>
+    body {
+        font-family: 'Manrope', sans-serif;
+        background-color: #f7f9fc;
+    }
+    .nav-link { color: #4b5563; }
+    .nav-link:hover { color: #FFD700; }
+    .btn-primary { background-color: #FFD700; border-color: #FFD700; }
+    .btn-primary:hover { background-color: #e6c200; }
+    .feature-icon-bg { background-color: #FFF4B0; color: #FFD700; }
+
+    .card-hover { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+    .card-hover:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+    .gradient-overlay { background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(0,0,0,0.4) 100%); }
+    .room-badge { animation: float 3s ease-in-out infinite; }
+    @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
+
+<!-- Navigation -->
+<header class="sticky top-0 z-20 backdrop-blur border-b border-black/10 bg-[#f6f4ef]/85">
+    <div class="max-w-7xl mx-auto px-5 md:px-8 h-16 flex items-center justify-between">
+        <a href="{{ path('app_home') }}" class="text-xl font-bold tracking-tight text-black">StayGrid</a>
+
+        <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-black/70">
+            <a href="{{ path('app_home') }}" class="hover:text-black transition-colors">Home</a>
+            <a href="{{ path('app_rooms') }}" class="hover:text-black transition-colors">Rooms</a>
+            <a href="{{ path('app_about') }}" class="hover:text-black transition-colors">About</a>
+            <a href="{{ path('app_contact') }}" class="hover:text-black transition-colors">Contact</a>
+        </nav>
+
+        {% if app.user %}
+            <a href="{{ path('app_booking') }}" class="inline-flex items-center px-5 py-2.5 bg-black text-white text-xs font-bold tracking-[0.2em] uppercase hover:bg-yellow-400 hover:text-black transition-colors">Book Now</a>
+        {% else %}
+            <a href="{{ path('app_login', {'redirect': 'book'}) }}" class="inline-flex items-center px-5 py-2.5 bg-black text-white text-xs font-bold tracking-[0.2em] uppercase hover:bg-yellow-400 hover:text-black transition-colors">Book Now</a>
+        {% endif %}
+    </div>
+</header>
+
+<section class="relative pt-24 pb-16 bg-white overflow-hidden">
+    <div class="max-w-7xl mx-auto px-6">
+        
+        <div class="flex flex-wrap items-center justify-between gap-6 mb-16 border-b border-gray-100 pb-6">
+            <div class="flex items-center gap-6">
+                <span class="text-[10px] font-black uppercase tracking-[0.4em] text-gray-900">Inventory_2026</span>
+                <div class="h-3 w-px bg-gray-200"></div>
+                <div class="flex items-center gap-2">
+                    <div class="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse"></div>
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Active_Units</span>
+                </div>
+            </div>
+            <div class="hidden md:block">
+                <span class="text-[9px] font-mono text-gray-300 uppercase tracking-[0.2em]">System_Ref: SG-INV-P1</span>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-12 gap-10 items-start">
+            
+            <div class="lg:col-span-7">
+                <h1 class="text-6xl md:text-8xl font-black text-gray-900 leading-[0.9] tracking-tighter uppercase">
+                    Rooms<br/>
+                    <span class="text-transparent" style="-webkit-text-stroke: 1px #111827;">Crafted.</span>
+                </h1>
+            </div>
+
+            <div class="lg:col-span-5 lg:pt-2">
+                <div class="max-w-md">
+                    <p class="text-lg font-bold text-gray-900 uppercase tracking-tight mb-4 flex items-center gap-3">
+                        <span class="w-8 h-[2px] bg-yellow-400"></span>
+                        Efficiency is the new luxury.
+                    </p>
+                    <p class="text-gray-500 text-sm leading-relaxed mb-8">
+                        Every square foot is a result of intentional design. High-performance living environments calibrated for the modern traveler.
+                    </p>
+                    
+                    <div class="inline-flex items-center gap-4 py-2 px-4 bg-gray-50 border-l-2 border-gray-900">
+                        <span class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Current_Phase</span>
+                        <span class="text-[10px] font-bold uppercase text-gray-900">01 Selection</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-16 group cursor-default">
+            <div class="w-full h-px bg-gray-100 relative overflow-hidden">
+                <div class="absolute inset-0 w-1/3 bg-yellow-400 translate-x-0 transition-transform duration-1000"></div>
+            </div>
+            <div class="flex justify-between mt-3">
+                <p class="text-[9px] font-mono text-gray-400 uppercase tracking-tighter italic">Initializing StayGrid Inventory Core...</p>
+                <div class="flex items-center gap-2 text-yellow-500">
+                    <i data-feather="arrow-down" class="w-3 h-3"></i>
+                    <span class="text-[9px] font-black uppercase tracking-widest">Scroll</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<section class="py-32 bg-white border-t border-gray-900">
+    <div class="max-w-7xl mx-auto px-6">
+        
+        <div class="flex flex-col lg:flex-row justify-between items-end mb-24 gap-8">
+            <div class="max-w-2xl">
+                <span class="text-[10px] font-black uppercase tracking-[0.5em] text-yellow-500 block mb-4">Unit_Classification</span>
+                <h2 class="text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter leading-none uppercase">
+                    Featured <br/>
+                    <span class="text-transparent" style="-webkit-text-stroke: 1.5px #111827;">Inventory.</span>
+                </h2>
+            </div>
+            <p class="text-gray-400 text-sm font-medium max-w-xs leading-relaxed">
+                Choose the specific spatial configuration that aligns with your operational requirements.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+            
+            {% set room_types = [
+                {
+                    'name': 'Studio Deluxe',
+                    'tag': 'Premium',
+                    'img': 'studioMP.png',
+                    'desc': 'Perfect for solo travelers and couples seeking efficiency in a compact, modern space.',
+                    'specs': ['1-2 Guests', '25 SQM', 'Queen Bed'],
+                    'path': 'app_room_studio_deluxe'
+                },
+                {
+                    'name': 'Executive Suite',
+                    'tag': 'Luxury',
+                    'img': 'executiveMP.png',
+                    'desc': 'Spacious luxury accommodation with separate living area for the high-performance traveler.',
+                    'specs': ['2-3 Guests', '50 SQM', 'King + Sofa'],
+                    'path': 'app_room_executive_suite'
+                },
+                {
+                    'name': 'Family Apartment',
+                    'tag': 'Spacious',
+                    'img': 'faMP.png',
+                    'desc': 'Perfect for families and large groups with multiple rooms and high-capacity living spaces.',
+                    'specs': ['4-6 Guests', '75 SQM', '2 Beds + Sofa'],
+                    'path': 'app_room_family_apartment'
+                }
+            ] %}
+
+            {% for room in room_types %}
+            <div class="group flex flex-col border border-gray-900 bg-white hover:shadow-[15px_15px_0px_0px_#facc15] transition-all duration-500">
+                <div class="relative h-72 overflow-hidden border-b border-gray-900">
+                    <img src="{{ asset('images/' ~ room.img) }}" 
+                         alt="{{ room.name }}" 
+                         class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000">
+                    
+                    <div class="absolute top-0 left-0 bg-gray-900 text-white text-[9px] font-black uppercase tracking-[0.3em] px-4 py-2">
+                        {{ room.tag }}
+                    </div>
+                </div>
+
+                <div class="p-8 flex flex-col flex-grow">
+                    <div class="flex justify-between items-baseline mb-4">
+                        <h3 class="text-2xl font-black text-gray-900 uppercase tracking-tighter">{{ room.name }}</h3>
+                        <span class="text-[9px] font-mono text-gray-400">TYPE_0{{ loop.index }}</span>
+                    </div>
+                    
+                    <p class="text-gray-500 text-sm leading-relaxed mb-8 flex-grow font-medium">
+                        {{ room.desc }}
+                    </p>
+                    
+                    <div class="grid grid-cols-3 gap-2 border-t border-gray-100 pt-6 mb-8">
+                        {% for spec in room.specs %}
+                        <div class="text-center">
+                            <p class="text-[8px] font-black text-gray-300 uppercase tracking-widest mb-1">Spec</p>
+                            <p class="text-[10px] font-bold text-gray-900 uppercase leading-none">{{ spec }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <a href="{{ path(room.path) }}" 
+                       class="relative w-full py-4 bg-gray-900 text-white text-xs font-black uppercase tracking-[0.3em] text-center overflow-hidden transition-colors hover:bg-yellow-400 hover:text-gray-900">
+                        View Unit Details
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-white py-12">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+      <div>
+        <h3 class="text-xl font-bold mb-4">StayGrid</h3>
+        <p class="text-gray-400">Your trusted accommodation partner for unforgettable stays.</p>
+      </div>
+      <div>
+        <h4 class="font-bold text-yellow-400 mb-4">Navigation</h4>
+        <ul class="space-y-2 text-gray-400">
+          <li><a href="/" class="hover:text-yellow-400 transition">Home</a></li>
+          <li><a href="/rooms" class="hover:text-yellow-400 transition">Rooms</a></li>
+          <li><a href="/about" class="hover:text-yellow-400 transition">About Us</a></li>
+          <li><a href="/contact" class="hover:text-yellow-400 transition">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-bold text-yellow-400 mb-4">Support</h4>
+        <ul class="space-y-2 text-gray-400">
+          <li><a href="#" class="hover:text-yellow-400 transition">FAQ</a></li>
+          <li><a href="#" class="hover:text-yellow-400 transition">Booking Help</a></li>
+          <li><a href="#" class="hover:text-yellow-400 transition">Cancellation Policy</a></li>
+          <li><a href="#" class="hover:text-yellow-400 transition">Privacy</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-bold text-yellow-400 mb-4">Contact</h4>
+        <p class="text-gray-400 mb-2">Email: <a href="mailto:info@staygrid.com" class="hover:text-yellow-400 transition">info@staygrid.com</a></p>
+        <p class="text-gray-400">Phone: <a href="tel:+15551234567" class="hover:text-yellow-400 transition">+1 (555) 123-4567</a></p>
+      </div>
+    </div>
+    <div class="border-t border-gray-700 pt-8 text-center text-gray-500">
+      <p>&copy; 2026 StayGrid. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
+

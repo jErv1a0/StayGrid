@@ -1,0 +1,295 @@
+ {# templates/booking/new.html.twig #}
+{% extends 'user/base.html.twig' %}
+
+{% block title %}StayGrid // BOOKING THIS STAY{{ room.number }}{% endblock %}
+
+{% block body %}
+{# --- ERROR MODAL FOR DUPLICATE BOOKINGS --- #}
+{% if duplicate_booking_error is defined and duplicate_booking_error %}
+<div id="errorModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
+    <div class="bg-white rounded-lg shadow-2xl max-w-md w-full mx-4 p-8 border-l-4 border-red-500 animate-in fade-in duration-300">
+        <div class="flex items-start gap-4">
+            <div class="flex-shrink-0">
+                <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <h3 class="text-lg font-black uppercase tracking-tight text-gray-900 mb-2">
+                    Booking_Error
+                </h3>
+                <p class="text-sm text-gray-600 font-light leading-relaxed italic">
+                    {{ duplicate_booking_error }}
+                </p>
+                <div class="mt-6">
+                    <p class="text-[10px] text-gray-400 uppercase font-mono tracking-widest mb-4">
+                        Reference: SG-{{ "now"|date("Ymdhis") }}
+                    </p>
+                    <button onclick="closeErrorModal()" class="w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase text-sm py-3 px-4 transition-colors duration-200 tracking-wide">
+                        Acknowledge_Error
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function closeErrorModal() {
+        document.getElementById('errorModal').style.display = 'none';
+    }
+</script>
+{% endif %}
+
+<div class="min-h-screen bg-[#FBFBFB] font-sans antialiased pb-24">
+
+    {# --- HEADER SECTION --- #}
+    <div class="max-w-6xl mx-auto px-8 pt-16 mb-12">
+        <div class="flex items-center gap-3 mb-4">
+            <span class="w-10 h-px bg-yellow-500"></span>
+            <span class="text-[10px] font-black uppercase tracking-[0.4em] text-gray-400 italic">Book</span>
+        </div>
+        <h1 class="text-5xl font-black tracking-tighter uppercase leading-none">
+            Secure_Booking<span class="text-gray-200">:</span> {{ room.category }}
+        </h1>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-8">
+        <div class="bg-white border border-gray-100 shadow-2xl flex flex-col lg:flex-row">
+            
+            {# --- LEFT PANEL: ASSET SPECIFICATIONS --- #}
+            <div class="lg:w-5/12 bg-gray-950 p-10 text-white flex flex-col">
+                <div class="mb-8">
+                    <p class="text-[9px] font-black uppercase tracking-[0.5em] text-yellow-500 italic mb-4">// Selected</p>
+                    <h2 class="text-4xl font-black tracking-tighter uppercase leading-tight mb-2">
+                        {{ room.category }}
+                    </h2>
+                    <p class="text-xs font-mono text-white/40 tracking-widest uppercase">Registry No: #{{ room.number }}</p>
+                </div>
+
+                {# Image Asset with StayGrid Treatment #}
+                <div class="aspect-video w-full overflow-hidden bg-white/5 mb-8 border border-white/10">
+                    {% set imagePath = room.image ? (room.image matches '#^uploads/#' ? room.image : 'uploads/rooms/' ~ room.image) : null %}
+                    <img src="{{ imagePath ? asset(imagePath) : asset('images/default_room.png') }}" 
+                         alt="{{ room.category }}" 
+                         class="w-full h-full object-cover grayscale opacity-80"
+                         onerror="this.onerror=null;this.src='{{ asset('images/default_room.png') }}';">
+                </div>
+
+                <div class="space-y-6 flex-1">
+                    <div class="flex justify-between items-end border-b border-white/10 pb-4">
+                        <span class="text-[9px] font-black uppercase tracking-widest text-white/40">Per Night</span>
+                        <span class="text-2xl font-black tracking-tighter text-yellow-400">₱{{ room.pricePerNight|number_format(0) }}</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 bg-white/5 border border-white/5">
+                            <p class="text-[8px] font-black uppercase tracking-widest text-white/40 mb-1">Capacity</p>
+                            <p class="text-xs font-bold uppercase tracking-tight">{{ room.capacity }} Personnel</p>
+                        </div>
+                        <div class="p-4 bg-white/5 border border-white/5">
+                            <p class="text-[8px] font-black uppercase tracking-widest text-white/40 mb-1">Status</p>
+                            <p class="text-xs font-bold uppercase tracking-tight text-green-400 italic">Ready</p>
+                        </div>
+                    </div>
+
+                    <p class="text-[10px] text-white/50 leading-relaxed font-light tracking-wide italic">
+                        "{{ room.description|default('A secure, climate-controlled node designed for high-efficiency occupancy and spatial optimization.') }}"
+                    </p>
+                </div>
+            </div>
+
+            {# --- RIGHT PANEL: PROTOCOL INPUTS --- #}
+            <div class="lg:w-7/12 p-12 bg-white flex flex-col justify-center">
+                <h3 class="text-[11px] font-black uppercase tracking-[0.5em] italic mb-10 border-b border-gray-100 pb-4">
+                    
+                </h3>
+
+                {{ form_start(bookingForm, {'attr': {'class': 'space-y-8'}}) }}
+                    
+                    {# Input Styling Overrides #}
+                    {% set input_class = 'mt-2 block w-full px-4 py-4 bg-gray-50 border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-black font-mono text-sm transition-all' %}
+                    {% set label_class = 'text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 italic' %}
+
+                    {# --- BOOKING TYPE SELECTOR --- #}
+                    <div>
+                        {{ form_label(bookingForm.bookingType, 'Booking_Mode', {'label_attr': {'class': label_class}}) }}
+                        {{ form_widget(bookingForm.bookingType, {'attr': {'class': input_class}}) }}
+                        <div class="text-red-500 text-[10px] mt-1 uppercase font-bold">{{ form_errors(bookingForm.bookingType) }}</div>
+                    </div>
+
+                    {# --- DAILY BOOKING FIELDS --- #}
+                    <div class="daily-booking-fields grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            {{ form_label(bookingForm.startDate, 'Check_In_Sync', {'label_attr': {'class': label_class}}) }}
+                            {{ form_widget(bookingForm.startDate, {'attr': {'class': input_class}}) }}
+                            <div class="text-red-500 text-[10px] mt-1 uppercase font-bold">{{ form_errors(bookingForm.startDate) }}</div>
+                        </div>
+
+                        <div>
+                            {{ form_label(bookingForm.endDate, 'Check_Out_Sync', {'label_attr': {'class': label_class}}) }}
+                            {{ form_widget(bookingForm.endDate, {'attr': {'class': input_class}}) }}
+                            <div class="text-red-500 text-[10px] mt-1 uppercase font-bold">{{ form_errors(bookingForm.endDate) }}</div>
+                        </div>
+                    </div>
+
+                    {# --- HOURLY BOOKING FIELDS --- #}
+                    <div class="hourly-booking-fields" style="display: none;">
+                        <div>
+                            {{ form_label(bookingForm.numberOfHours, 'Duration_Hours', {'label_attr': {'class': label_class}}) }}
+                            {{ form_widget(bookingForm.numberOfHours, {'attr': {'class': input_class}}) }}
+                            <p class="text-[8px] text-gray-500 mt-2 italic">Minimum 4 hours required</p>
+                            <div class="text-red-500 text-[10px] mt-1 uppercase font-bold">{{ form_errors(bookingForm.numberOfHours) }}</div>
+                        </div>
+                    </div>
+
+                    {% if bookingForm.user is defined %}
+                    <div class="pt-4">
+                        {{ form_label(bookingForm.user, 'Delegate_Authorization', {'label_attr': {'class': label_class}}) }}
+                        {{ form_widget(bookingForm.user, {'attr': {'class': input_class}}) }}
+                        <div class="text-red-500 text-[10px] mt-1 uppercase font-bold">{{ form_errors(bookingForm.user) }}</div>
+                    </div>
+                    {% endif %}
+
+                    {# --- CALENDAR: AVAILABILITY VISUALIZATION --- #}
+                    <div class="pt-8 bg-gray-50 p-6 border border-gray-200">
+                        <p class="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 italic mb-4">Availability_Calendar</p>
+                        <div id="calendar" class="grid grid-cols-7 gap-2">
+                            <!-- Calendar will be generated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="pt-4 flex items-center gap-4 text-[9px] font-mono uppercase tracking-widest">
+                        <div class="flex items-center gap-2">
+                            <div class="w-4 h-4 bg-green-100 border border-green-400"></div>
+                            <span class="text-gray-600">Available</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-4 h-4 bg-red-100 border border-red-500 line-through"></div>
+                            <span class="text-gray-600">Booked</span>
+                        </div>
+                    </div>
+
+                    <div class="pt-12">
+                        <button type="submit" 
+                                class="group w-full bg-black text-white py-6 px-8 text-[12px] font-black uppercase tracking-[0.6em] flex justify-between items-center hover:bg-yellow-400 hover:text-black transition-all duration-300">
+                            Book Now
+                            <span class="group-hover:translate-x-2 transition-transform">→</span>
+                        </button>
+                        
+                        <p class="mt-6 text-[8px] font-mono text-gray-300 uppercase text-center tracking-[0.4em]">
+                            End-to-End Encryption Enabled // Ref: SG-{{ "now"|date("U") }}
+                        </p>
+                    </div>
+
+                {{ form_end(bookingForm) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const bookedDatesString = '{{ bookedDates is defined ? bookedDates : "[]" | raw }}';
+    const bookedDates = JSON.parse(bookedDatesString);
+    const calendar = document.getElementById('calendar');
+    const startDateInput = document.querySelector('[id$="_startDate"]');
+    const endDateInput = document.querySelector('[id$="_endDate"]');
+    
+    // Generate calendar for next 60 days
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    for (let i = 0; i < 60; i++) {
+        const date = new Date(today);
+        date.setDate(date.getDate() + i);
+        const dateStr = date.toISOString().split('T')[0];
+        
+        const dayDiv = document.createElement('div');
+        dayDiv.className = 'p-2 text-center text-[9px] font-mono font-bold border cursor-pointer rounded transition-all';
+        dayDiv.textContent = date.getDate();
+        dayDiv.title = dateStr;
+        
+        if (bookedDates.includes(dateStr)) {
+            dayDiv.className += ' bg-red-100 border-red-500 line-through text-red-700';
+            dayDiv.style.opacity = '0.6';
+        } else {
+            dayDiv.className += ' bg-green-50 border-green-300 text-green-700 hover:bg-green-200';
+            dayDiv.addEventListener('click', function() {
+                if (!startDateInput.value) {
+                    startDateInput.value = dateStr;
+                } else if (!endDateInput.value) {
+                    if (new Date(dateStr) > new Date(startDateInput.value)) {
+                        endDateInput.value = dateStr;
+                    } else {
+                        startDateInput.value = dateStr;
+                        endDateInput.value = '';
+                    }
+                } else {
+                    startDateInput.value = dateStr;
+                    endDateInput.value = '';
+                }
+            });
+        }
+        
+        calendar.appendChild(dayDiv);
+    }
+    
+    // Disable booked dates in native date picker (data attribute)
+    if (startDateInput) {
+        const mutationObserver = new MutationObserver(() => {
+            // Re-validate booked dates when date changes
+            const selectedStart = new Date(startDateInput.value);
+            const selectedEnd = new Date(endDateInput.value);
+            
+            if (selectedStart && selectedEnd && selectedStart < selectedEnd) {
+                let hasBooking = false;
+                let current = new Date(selectedStart);
+                while (current < selectedEnd) {
+                    const dateStr = current.toISOString().split('T')[0];
+                    if (bookedDates.includes(dateStr)) {
+                        hasBooking = true;
+                        break;
+                    }
+                    current.setDate(current.getDate() + 1);
+                }
+                
+                if (hasBooking) {
+                    startDateInput.setAttribute('data-booking-error', 'true');
+                } else {
+                    startDateInput.removeAttribute('data-booking-error');
+                }
+            }
+        });
+        
+        mutationObserver.observe(startDateInput, { attributes: true });
+    }
+
+    // Handle booking type toggle
+    const bookingTypeSelector = document.querySelector('[name$="_bookingType"]');
+    const dailyFields = document.querySelector('.daily-booking-fields');
+    const hourlyFields = document.querySelector('.hourly-booking-fields');
+    const hoursInput = document.querySelector('[name$="_numberOfHours"]');
+
+    if (bookingTypeSelector) {
+        function toggleBookingType() {
+            if (bookingTypeSelector.value === 'hourly') {
+                dailyFields.style.display = 'none';
+                hourlyFields.style.display = 'block';
+                if (hoursInput) hoursInput.required = true;
+                if (startDateInput) startDateInput.required = false;
+                if (endDateInput) endDateInput.required = false;
+            } else {
+                dailyFields.style.display = 'grid';
+                hourlyFields.style.display = 'none';
+                if (hoursInput) hoursInput.required = false;
+                if (startDateInput) startDateInput.required = true;
+                if (endDateInput) endDateInput.required = true;
+            }
+        }
+
+        bookingTypeSelector.addEventListener('change', toggleBookingType);
+        toggleBookingType(); // Initialize on page load
+    }
+});
+</script>
+{% endblock %}

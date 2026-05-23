@@ -1,10 +1,42 @@
 
 services:
+  app:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: staygrid_app
+    restart: unless-stopped
+    working_dir: /var/www/staygrid
+    volumes:
+      - .:/var/www/staygrid
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      APP_ENV: ${APP_ENV:-prod}
+      APP_DEBUG: ${APP_DEBUG:-0}
+      DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql:3306/${MYSQL_DATABASE}?serverVersion=8.0&charset=utf8mb4
+    networks:
+      - staygrid_network
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: staygrid_nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/staygrid:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+    networks:
+      - staygrid_network
 
   mysql:
     image: mysql:8.0
-    container_name: mysql_container
-    restart: always
+    container_name: staygrid_mysql
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -14,13 +46,18 @@ services:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     networks:
-      - staygrid_mysql_network 
+      - staygrid_network
 
 networks:
-  staygrid_mysql_network:
+  staygrid_network:
     driver: bridge
 
-    # Inside the nginx service definition in docker-compose.yaml
 volumes:
-  - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+  mysql_data:

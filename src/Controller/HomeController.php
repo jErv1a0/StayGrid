@@ -13,12 +13,9 @@ class HomeController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function index(): Response
     {
-        return $this->render('landing/landingpage.html.twig', [
-        ]);
-
-              if (null === $this->getUser()) {
-            return $this->redirectToRoute('app_login');
-        }
+        // Home should show public landing page for guests.
+        // Authenticated users remain on landing (or you can change this to dashboards). 
+        return $this->render('landingpage/landing.html.twig', []);
     }
     
 }

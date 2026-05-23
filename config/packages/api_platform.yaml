@@ -1,0 +1,6 @@
+api_platform:
+    title: StayGrid API
+    version: 1.0.0
+    description: 'API for StayGrid - Room booking platform'
+    defaults:
+        stateless: false

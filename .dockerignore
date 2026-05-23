@@ -1,0 +1,9 @@
+var/
+vendor/
+node_modules/
+public/build/
+public/uploads/
+.git/
+.idea/
+.vscode/
+tests/_output/

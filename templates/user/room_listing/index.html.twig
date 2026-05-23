@@ -1,0 +1,96 @@
+{% extends 'user/base.html.twig' %}
+
+{% block title %}StayGrid // Explore Spaces{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-[#f6f4ef] text-black pb-20">
+    <section class="relative border-b border-black/10 overflow-hidden">
+        <div class="absolute inset-0 pointer-events-none" style="background:
+            radial-gradient(circle at 12% 16%, rgba(250,204,21,0.18), transparent 32%),
+            radial-gradient(circle at 88% 72%, rgba(17,24,39,0.08), transparent 30%);"></div>
+
+        <div class="max-w-7xl mx-auto px-8 pt-14 pb-12 relative z-10">
+            <header class="flex flex-col md:flex-row md:items-end justify-between gap-10">
+                <div class="max-w-3xl">
+                    <div class="flex items-center gap-3 mb-5">
+                        <span class="w-12 h-px bg-yellow-500"></span>
+                        <span class="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">Curated Availability 2026</span>
+                    </div>
+                    <h1 class="text-6xl md:text-8xl font-black tracking-[-0.04em] leading-[0.84] uppercase mb-6">
+                        The<br/>
+                        <span class="text-transparent" style="-webkit-text-stroke: 1.1px #111827;">Collection.</span>
+                    </h1>
+                    <p class="text-base md:text-lg text-gray-600 font-medium leading-relaxed max-w-2xl">
+                        A selection of industrial-luxury nodes designed for the modern nomad. High-fidelity living, synchronized with your journey.
+                    </p>
+                </div>
+                <div class="hidden lg:block text-right">
+                    <p class="text-[9px] font-black uppercase tracking-[0.45em] text-gray-400 mb-2">Ref Scroll Inv</p>
+                    <div class="h-20 w-px bg-black/15 ml-auto"></div>
+                </div>
+            </header>
+        </div>
+    </section>
+
+    <div class="max-w-7xl mx-auto px-8 pt-14">
+        {% if rooms is not empty %}
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-14">
+                {% for room in rooms %}
+                    <article class="group relative border border-black/10 bg-white overflow-hidden">
+                        <div class="aspect-[4/5] overflow-hidden bg-gray-100 relative">
+                            {% set room_img = room.image ? asset('uploads/rooms/' ~ room.image) : asset('images/default_room.png') %}
+                            <img src="{{ room_img }}"
+                                 class="w-full h-full object-cover transition-transform duration-700 scale-105 group-hover:scale-110"
+                                 alt="Room {{ room.number }}">
+
+                            <div class="absolute top-5 left-5 bg-black text-white px-3 py-1 text-[8px] font-black uppercase tracking-[0.3em]">
+                                {{ (room.category ?: 'Standard Node')|replace({'_': ' '}) }}
+                            </div>
+                        </div>
+
+                        <div class="p-6 space-y-4">
+                            <div class="flex justify-between items-end gap-4">
+                                <h2 class="text-3xl font-black tracking-tight uppercase group-hover:text-yellow-600 transition-colors">
+                                    Room {{ room.number ?: 'X' }}
+                                </h2>
+                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ (room.location ?: 'Metro Manila')|replace({'_': ' '}) }}</p>
+                            </div>
+
+                            <p class="text-sm text-gray-600 leading-relaxed min-h-[48px]">
+                                {{ room.description ?: 'Minimalist layout with integrated smart-systems and panoramic industrial views.' }}
+                            </p>
+
+                            <div class="pt-5 border-t border-black/10 flex justify-between items-center">
+                                <div>
+                                    <span class="text-2xl font-black">₱{{ room.pricePerNight|default(0)|number_format(0) }}</span>
+                                    <span class="text-[9px] font-black uppercase tracking-widest text-gray-400">/ Cycle</span>
+                                </div>
+                                <a href="{{ path('app_login', {'redirect': 'book'}) }}"
+                                   class="text-[10px] font-black uppercase tracking-[0.24em] border-b-2 border-black pb-1 group-hover:text-yellow-600 group-hover:border-yellow-600 transition-all">
+                                    Initialize Stay
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+
+            <section class="mt-20 bg-[#0b0c10] p-12 lg:p-16 text-center relative overflow-hidden border border-black/10">
+                <div class="absolute inset-0 opacity-[0.08]" style="background-image: linear-gradient(rgba(255,255,255,0.7) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.7) 1px, transparent 1px); background-size: 36px 36px;"></div>
+                <h3 class="relative z-10 text-3xl lg:text-5xl font-black text-white tracking-tight uppercase mb-8">
+                    Secure your <span class="text-transparent" style="-webkit-text-stroke: 1px #ffffff;">Position</span>.
+                </h3>
+                <a href="{{ path('app_login') }}"
+                   class="relative z-10 inline-block bg-yellow-400 text-black px-10 py-4 text-[11px] font-black uppercase tracking-[0.32em] hover:bg-white transition-all">
+                    Request Access Portal
+                </a>
+            </section>
+        {% else %}
+            <div class="py-32 text-center border-2 border-dashed border-black/10 bg-white">
+                    <h2 class="text-2xl font-black uppercase tracking-tight text-gray-500">Current Inventory: 0</h2>
+                <p class="text-gray-500 text-xs font-bold uppercase tracking-widest mt-4">No nodes available for synchronization.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

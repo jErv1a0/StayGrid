@@ -2,26 +2,27 @@
 
 <html lang="en">
 <head>
+    {% include 'partials/_global_radius.html.twig' %}
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>{% block title %}{{ page_title|default("StayGrid") }}{% endblock %}</title>
     <link rel="icon" type="image/png" href="{{ asset('icons/staygrid16x16.png') }}"/>
-<link rel="icon" type="image/png" href="/icons/staygrid16x16.png?v=1"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="//unpkg.com/alpinejs" defer></script>
 
-<script src="https://cdn.tailwindcss.com"></script>
-
-<style>
-    body {
-        font-family: 'Inter', sans-serif;
-        background-color: #f7f9fc;
-    }
-    .nav-link { color: #4b5563; }
-    .nav-link:hover { color: #FFD700; }
-    .btn-primary { background-color: #FFD700; border-color: #FFD700; }
-    .btn-primary:hover { background-color: #e6c200; } 
-
-    .feature-icon-bg { background-color: #FFF4B0; color: #FFD700; }
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fc;
+        }
+        .nav-link { color: #4b5563; }
+        .nav-link:hover { color: #FFD700; }
+        .btn-primary { background-color: #FFD700; border-color: #FFD700; }
+        .btn-primary:hover { background-color: #e6c200; }
+        .feature-icon-bg { background-color: #FFF4B0; color: #FFD700; }
+        
+        /* Button radius controlled by included partial: templates/partials/_global_radius.html.twig */
 
     {% block styles %}{% endblock %} 
 
@@ -30,35 +31,36 @@
 </head>
 <body>
 
-      <nav class="bg-white shadow-sm sticky top-0 z-10">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-16">
-           <a href="/" class="flex items-center space-x-2 text-xl font-bold text-gray-800">
-           StayGrid
-           </a>
+    </div>
 
-         <div class="hidden md:flex space-x-6 items-center">
-             {% set nav_items = [
-                 { name: 'Home', url: '/' },
-                 { name: 'Rooms', url: '/rooms' },
-                 { name: 'About', url: '/about' },
-                 { name: 'Contact', url: '/contact' }
-             ] %}
-             {% for item in nav_items %}
-                 <a href="{{ item.url }}" class="nav-link text-sm font-medium flex items-center">
-                     {{ item.name }}
-                 </a>
-             {% endfor %}
-         </div>
-         
-          <a href="{{ path('app_login', {'redirect': 'book'}) }}" 
-               class="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-6 rounded-lg shadow-lg transition duration-200">
-              Book Now
-          </a>
-       </div>
-       </div>
+    <nav class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="/" class="flex items-center space-x-2 text-xl font-bold text-gray-800">
+                    StayGrid
+                </a>
 
-   </nav>
+                <div class="hidden md:flex space-x-6 items-center">
+                    {% set nav_items = [
+                        { name: 'Home', url: '/' },
+                        { name: 'Rooms', url: '/rooms' },
+                        { name: 'About', url: '/about' },
+                        { name: 'Contact', url: '/contact' }
+                    ] %}
+                    {% for item in nav_items %}
+                        <a href="{{ item.url }}" class="nav-link text-sm font-medium flex items-center">
+                            {{ item.name }}
+                        </a>
+                    {% endfor %}
+                </div>
+
+                <a href="{{ path('app_login', {'redirect': 'book'}) }}"
+                   class="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-6 rounded-lg shadow-lg transition duration-200">
+                    Book Now
+                </a>
+            </div>
+        </div>
+    </nav>
 
       <main>
           {# 🛑 CRITICAL FIX: The missing content block was preventing child templates from rendering their body content. #}

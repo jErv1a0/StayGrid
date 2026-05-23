@@ -1,52 +1,119 @@
+{# templates/admin/user/index.html.twig #}
 {% extends 'admin/base.html.twig' %}
 
-{% block title %}Active Users{% endblock %}
+{% block title %}StayGrid // USER_REGISTRY{% endblock %}
 
 {% block body %}
-<div class="max-w-6xl mx-auto py-10">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">Active Users</h1>
-    </div>
+<div class="min-h-screen bg-[#f6f4ef] py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <section class="relative overflow-hidden border border-black/10 bg-[#0b0c10] text-white p-7 md:p-9">
+            <div class="absolute inset-0 pointer-events-none" style="background:
+                radial-gradient(circle at 15% 24%, rgba(250,204,21,0.16), transparent 36%),
+                radial-gradient(circle at 82% 70%, rgba(255,255,255,0.08), transparent 32%);"></div>
+            <div class="relative z-10 flex flex-col xl:flex-row xl:items-end xl:justify-between gap-6">
+                <div>
+                    <p class="text-[10px] font-black uppercase tracking-[0.35em] text-yellow-400 mb-2">Access Management v4.1</p>
+                    <h1 class="text-4xl md:text-5xl font-black uppercase tracking-tight">User Registry.</h1>
+                    <p class="text-xs text-white/70 mt-3 uppercase tracking-wide">DB State: Encrypted</p>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <a href="{{ path('app_admin_user_activity_index') }}" class="inline-flex items-center gap-2 bg-white text-black border border-white px-5 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:bg-yellow-400 hover:border-yellow-400 transition-colors">
+                        <i data-feather="activity" class="w-4 h-4"></i>
+                        Activity Logs
+                    </a>
+                    <a href="{{ path('app_register') }}" class="inline-flex items-center gap-2 bg-yellow-400 text-black border border-yellow-400 px-5 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:bg-white hover:border-white transition-colors">
+                        <i data-feather="user-plus" class="w-4 h-4"></i>
+                        New Identity
+                    </a>
+                </div>
+            </div>
+        </section>
 
-    <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Roles</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Verified</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                {% for user in users %}
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ user.id }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ user.email }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ user.roles|join(', ') }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            {% if user.isVerified is defined and user.isVerified %}
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                    Verified
-                                </span>
-                            {% else %}
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                    Pending
-                                </span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">
-                            No users found.
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <article class="border border-black/10 bg-white px-5 py-5">
+                <p class="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 mb-2">Total Users</p>
+                <p class="text-4xl font-black tracking-tight">{{ users|length }}</p>
+            </article>
+            <article class="border border-black/10 bg-white px-5 py-5">
+                <p class="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 mb-2">Verified</p>
+                <p class="text-4xl font-black tracking-tight">{{ users|filter(u => u.isVerified is defined and u.isVerified)|length }}</p>
+            </article>
+            <article class="border border-black/10 bg-white px-5 py-5">
+                <p class="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 mb-2">Pending</p>
+                <p class="text-4xl font-black tracking-tight">{{ users|filter(u => u.isVerified is not defined or not u.isVerified)|length }}</p>
+            </article>
+        </section>
+
+        <section class="border border-black/10 bg-white overflow-hidden">
+            <div class="bg-[#111827] px-6 py-4 flex justify-between items-center">
+                <h2 class="text-[10px] font-black text-white uppercase tracking-[0.35em]">Active Identity Nodes</h2>
+                <span class="text-[10px] font-mono text-yellow-400 uppercase">{{ users|length }} Records</span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full border-collapse">
+                    <thead>
+                        <tr class="bg-[#f8f8f6] border-b border-black/10">
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-gray-900 uppercase tracking-widest">UID</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-gray-900 uppercase tracking-widest">Network Email</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-gray-900 uppercase tracking-widest">Clearance Level</th>
+                            <th class="px-6 py-4 text-center text-[10px] font-black text-gray-900 uppercase tracking-widest">Verification</th>
+                            <th class="px-6 py-4 text-right text-[10px] font-black text-gray-900 uppercase tracking-widest">Operations</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-black/10">
+                        {% for user in users %}
+                            <tr class="hover:bg-[#fcfbf7] transition-colors group">
+                                <td class="px-6 py-5 whitespace-nowrap text-xs font-black text-gray-500">#{{ user.id }}</td>
+                                <td class="px-6 py-5 whitespace-nowrap">
+                                    <div class="text-sm font-black text-gray-900 group-hover:text-yellow-700 transition-colors">{{ user.email }}</div>
+                                </td>
+                                <td class="px-6 py-5 whitespace-nowrap">
+                                    <div class="flex flex-wrap gap-1.5">
+                                        {% for role in user.roles %}
+                                            <span class="px-2 py-0.5 bg-black text-white text-[9px] font-black tracking-tight uppercase">{{ role|replace({'ROLE_': ''}) }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-5 whitespace-nowrap text-center">
+                                    {% if user.isVerified is defined and user.isVerified %}
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-green-100 border border-green-600 text-green-700 text-[10px] font-black uppercase tracking-wide">Verified</span>
+                                    {% else %}
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-red-100 border border-red-600 text-red-700 text-[10px] font-black uppercase tracking-wide">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-5 whitespace-nowrap text-right">
+                                    <div class="flex justify-end gap-2">
+                                        {% if user.isVerified is defined and user.isVerified %}
+                                            <form method="post" action="{{ path('app_admin_users_unverify', {'id': user.id}) }}">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('unverify_user_' ~ user.id) }}">
+                                                <button type="submit" class="px-3 py-1.5 bg-red-50 border border-red-500 text-red-700 text-[10px] font-black uppercase tracking-wide hover:bg-red-500 hover:text-white transition-colors">
+                                                    Revoke
+                                                </button>
+                                            </form>
+                                        {% else %}
+                                            <form method="post" action="{{ path('app_admin_users_verify', {'id': user.id}) }}">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('verify_user_' ~ user.id) }}">
+                                                <button type="submit" class="px-3 py-1.5 bg-green-50 border border-green-600 text-green-700 text-[10px] font-black uppercase tracking-wide hover:bg-green-600 hover:text-white transition-colors">
+                                                    Approve
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="px-6 py-12 text-center">
+                                    <i data-feather="users" class="w-10 h-10 text-gray-300 mx-auto mb-3"></i>
+                                    <span class="text-[10px] font-mono text-gray-400 uppercase tracking-[0.3em]">No Identity Records Detected</span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </div>
 </div>
 {% endblock %}

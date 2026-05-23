@@ -1,0 +1,126 @@
+{% extends 'staff/base.html.twig' %}
+
+{% block title %}StayGrid // UNIT_CALIBRATION_{{ room.id|default('NEW') }}{% endblock %}
+
+{% block body %}
+<div class="space-y-8">
+    <section class="relative overflow-hidden border border-black/10 bg-[#0b0c10] text-white p-7 md:p-9">
+        <div class="absolute inset-0 pointer-events-none" style="background:
+            radial-gradient(circle at 12% 24%, rgba(250,204,21,0.16), transparent 35%),
+            radial-gradient(circle at 82% 72%, rgba(255,255,255,0.08), transparent 33%);"></div>
+        <div class="relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+            <div>
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="px-2 py-0.5 bg-yellow-400 text-black text-[9px] font-black uppercase tracking-widest">Inventory Override</span>
+                    <span class="text-[9px] font-mono text-white/60 uppercase tracking-widest">Node ID: {{ room.id|default('000') }}</span>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-black uppercase tracking-tight">Unit Calibration.</h1>
+                <p class="text-xs text-white/70 mt-3 uppercase tracking-wide">Edit room details, pricing profile, and listing visibility.</p>
+            </div>
+            <a href="{{ path('app_staff_roomlisting_index') }}" class="inline-flex items-center gap-2 bg-white text-black border border-white px-5 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:bg-yellow-400 hover:border-yellow-400 transition-colors">
+                <i data-feather="arrow-left" class="w-4 h-4"></i>
+                Back To Registry
+            </a>
+        </div>
+    </section>
+
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <section class="xl:col-span-2 border border-black/10 bg-white p-6 md:p-8">
+            {{ form_start(form, {'attr': {'class': 'space-y-10'}}) }}
+                <div class="space-y-8 room-edit-form">
+                    {{ form_widget(form) }}
+                </div>
+
+                <div class="pt-6 border-t border-black/10 flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <button type="submit" class="bg-gray-950 text-white px-8 py-4 text-[10px] font-black uppercase tracking-[0.35em] hover:bg-yellow-400 hover:text-gray-950 transition-all">
+                            Commit Data
+                        </button>
+                        <a href="{{ path('app_staff_roomlisting_index') }}" class="text-[10px] font-black uppercase tracking-[0.25em] text-gray-400 hover:text-black">Discard Changes</a>
+                    </div>
+                </div>
+            {{ form_end(form) }}
+        </section>
+
+        <aside class="space-y-6">
+            <section class="border border-black/10 bg-white overflow-hidden">
+                <div class="p-5 border-b border-black/10 bg-[#111827] text-white flex items-center justify-between">
+                    <p class="text-[10px] font-black uppercase tracking-[0.3em]">Live Preview</p>
+                    <span class="text-[9px] font-mono uppercase text-yellow-400">{{ room.getStatus()|default('PENDING') }}</span>
+                </div>
+                <div class="relative">
+                    <div class="aspect-[4/3] overflow-hidden bg-gray-100">
+                        {% set imgPath = room.image ? (room.image matches '/^uploads\\//' ? room.image : 'uploads/rooms/' ~ room.image) : 'images/default_room.png' %}
+                        <img src="{{ asset(imgPath) }}" class="w-full h-full object-cover" alt="Room preview image">
+                    </div>
+                    <div class="absolute top-4 right-4 bg-black/80 text-white px-3 py-1 text-[9px] font-black uppercase tracking-widest border border-white/20">
+                        {{ room.getStatus()|default('PENDING') }}
+                    </div>
+                </div>
+                <div class="p-5 space-y-2">
+                    <p class="text-lg font-black uppercase tracking-tight text-gray-950">{{ room.title|default('Untitled Room') }}</p>
+                    <p class="text-[10px] font-mono uppercase text-gray-400">{{ room.location|default('Location not set') }}</p>
+                </div>
+            </section>
+
+            {% if delete_form is defined %}
+                <section class="border border-red-200 bg-red-50 p-5">
+                    <p class="text-[10px] font-black uppercase tracking-[0.3em] text-red-700 mb-3">Danger Zone</p>
+                    <p class="text-xs text-red-600 mb-4">Delete this room record permanently from the registry.</p>
+                    {{ form_start(delete_form) }}
+                        <button type="submit" class="w-full bg-red-600 text-white py-3 text-[10px] font-black uppercase tracking-[0.25em] hover:bg-red-700 transition-colors">
+                            Purge Record
+                        </button>
+                    {{ form_end(delete_form) }}
+                </section>
+            {% endif %}
+        </aside>
+    </div>
+</div>
+
+<style>
+    .room-edit-form label {
+        display: block;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+    }
+
+    .room-edit-form input,
+    .room-edit-form textarea,
+    .room-edit-form select {
+        width: 100%;
+        background: #f9fafb;
+        border: 1px solid rgba(17, 24, 39, 0.15);
+        padding: 0.85rem 1rem;
+        font-weight: 700;
+        font-size: 0.9rem;
+        outline: none;
+        transition: all 0.2s ease;
+    }
+
+    .room-edit-form input:focus,
+    .room-edit-form textarea:focus,
+    .room-edit-form select:focus {
+        border-color: #111827;
+        background: #ffffff;
+    }
+
+    .room-edit-form ul {
+        list-style: none;
+        padding: 0;
+        margin: 0.4rem 0 0;
+    }
+
+    .room-edit-form li {
+        color: #dc2626;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+</style>
+{% endblock %}

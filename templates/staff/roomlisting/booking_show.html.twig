@@ -1,0 +1,104 @@
+{# templates/staff/booking/show.html.twig #}
+{% extends 'staff/base.html.twig' %}
+
+{% block title %}StayGrid // FILE_{{ booking.id }}{% endblock %}
+
+{% block body %}
+<section class="min-h-screen bg-grid-gray flex flex-col">
+
+    {# --- TOP NAV: FILE NAVIGATION --- #}
+    <div class="px-8 py-6 flex justify-between items-center border-b-4 border-grid-black bg-white sticky top-0 z-50">
+        <div class="flex items-center gap-6">
+            <span class="text-[10px] font-black uppercase tracking-[0.5em] text-yellow-500">Record_Manifest</span>
+            <span class="text-[10px] font-mono text-gray-300 uppercase tracking-widest italic">Hash_ID: {{ booking.id }}</span>
+        </div>
+        <a href="{{ path('app_staff_roomlisting_bookings') }}" 
+           class="group flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-black transition-all">
+            <i data-feather="chevron-left" class="w-3 h-3 transition-transform group-hover:-translate-x-1"></i>
+            Back_to_Ledger
+        </a>
+    </div>
+
+    <div class="flex-1 max-w-7xl mx-auto w-full grid lg:grid-cols-12 gap-0">
+        
+        {# --- LEFT SIDE: THE UNIT VISUAL --- #}
+        <div class="lg:col-span-5 p-8 lg:p-20 border-r border-gray-100 flex flex-col justify-between bg-white">
+            <div>
+                <h1 class="text-[120px] font-black text-gray-950 leading-[0.8] tracking-tighter uppercase mb-6 italic">
+                    File<br/>
+                    <span class="text-transparent" style="-webkit-text-stroke: 1px #d1d5db;">#{{ booking.id }}</span>
+                </h1>
+                <p class="max-w-xs text-[10px] font-bold text-gray-400 uppercase leading-relaxed tracking-widest mb-12">
+                    // Visual confirmation of unit allocation. verify occupancy before physical entry.
+                </p>
+                
+                <div class="aspect-[4/5] w-full bg-gray-100 overflow-hidden grayscale border border-gray-100">
+                    {% set imgPath = booking.room.image ? (booking.room.image matches '/^uploads\\//' ? booking.room.image : 'uploads/rooms/' ~ booking.room.image) : 'images/default_room.png' %}
+                    <img src="{{ asset(imgPath) }}" class="w-full h-full object-cover" alt="Unit Visual">
+                </div>
+            </div>
+
+            <div class="pt-12">
+                <p class="text-[9px] font-black text-gray-300 uppercase tracking-[0.4em] mb-2">Unit_Allocation</p>
+                <h3 class="text-2xl font-black uppercase tracking-tighter text-gray-950">{{ booking.room.title|default('Unit ' ~ booking.room.number) }}</h3>
+            </div>
+        </div>
+
+        {# --- RIGHT SIDE: THE DATA MANIFEST --- #}
+        <div class="lg:col-span-7 bg-[#FBFBFB] p-8 lg:p-24 flex flex-col justify-center">
+            
+            <div class="space-y-12">
+                
+                {# User Detail #}
+                <div class="group border-b border-gray-200 pb-6 transition-all">
+                    <p class="text-[9px] font-black uppercase tracking-[0.4em] text-yellow-600 mb-2">01_Occupant_Identity</p>
+                    <p class="text-4xl font-black uppercase tracking-tighter text-gray-900 leading-none group-hover:italic transition-all">
+                        {{ booking.user ? booking.user.email : 'GUEST_UNIDENTIFIED' }}
+                    </p>
+                </div>
+
+                {# Timeline Detail #}
+                <div class="grid grid-cols-2 gap-12">
+                    <div class="border-b border-gray-200 pb-6">
+                        <p class="text-[9px] font-black uppercase tracking-[0.4em] text-gray-400 mb-2">02_Entry_Node</p>
+                        <p class="text-2xl font-black uppercase tracking-tighter text-gray-950">{{ booking.startDate ? booking.startDate|date('D, d.M.y') : 'N/A' }}</p>
+                    </div>
+                    <div class="border-b border-gray-200 pb-6">
+                        <p class="text-[9px] font-black uppercase tracking-[0.4em] text-gray-400 mb-2">03_Exit_Node</p>
+                        <p class="text-2xl font-black uppercase tracking-tighter text-gray-950">{{ booking.endDate ? booking.endDate|date('D, d.M.y') : 'N/A' }}</p>
+                    </div>
+                </div>
+
+                {# Status Detail #}
+                <div class="flex items-center justify-between border-b border-gray-200 pb-6">
+                    <div>
+                        <p class="text-[9px] font-black uppercase tracking-[0.4em] text-gray-400 mb-2">04_Protocol_Status</p>
+                        <p class="text-2xl font-black uppercase tracking-tighter italic {% if booking.status == 'confirmed' %}text-green-600{% else %}text-yellow-600{% endif %}">
+                            {{ booking.status|upper }}
+                        </p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[9px] font-black uppercase tracking-[0.4em] text-gray-400 mb-2">System_Validation</p>
+                        <p class="text-[10px] font-mono font-bold text-gray-300">SECURE_SYNC_COMPLETE</p>
+                    </div>
+                </div>
+            </div>
+
+            {# Action Footer #}
+            <div class="mt-20 flex flex-wrap items-center gap-6">
+                     <a href="{{ path('app_staff_booking_edit', {id: booking.id}) }}" 
+                         class="bg-gray-950 text-white px-12 py-6 text-[10px] font-black uppercase tracking-[0.4em] hover:bg-yellow-400 hover:text-gray-950 transition-all shadow-xl shadow-black/10">
+                    Modify_Record
+                </a>
+                
+                <form method="post" action="{{ path('app_staff_booking_delete', {id: booking.id}) }}" onsubmit="return confirm('WARNING: Permanent File Deletion?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete-booking-' ~ booking.id) }}">
+                    <button type="submit" class="text-[10px] font-black uppercase tracking-widest text-red-300 hover:text-red-600 transition-colors border-b border-transparent hover:border-red-600 pb-1 italic">
+                        Purge_From_Database
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

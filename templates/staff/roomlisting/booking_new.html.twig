@@ -1,0 +1,275 @@
+{# templates/staff/booking/new.html.twig #}
+{% extends 'staff/base.html.twig' %}
+
+{% block title %}StayGrid // INITIALIZE_RESERVATION{% endblock %}
+
+{% block body %}
+{# --- ERROR MODAL FOR DUPLICATE BOOKINGS --- #}
+{% if duplicate_booking_error is defined and duplicate_booking_error %}
+<div id="errorModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
+    <div class="bg-white rounded-lg shadow-2xl max-w-md w-full mx-4 p-8 border-l-4 border-red-500 animate-in fade-in duration-300">
+        <div class="flex items-start gap-4">
+            <div class="flex-shrink-0">
+                <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <h3 class="text-lg font-black uppercase tracking-tight text-gray-900 mb-2">
+                    Booking_Error
+                </h3>
+                <p class="text-sm text-gray-600 font-light leading-relaxed italic">
+                    {{ duplicate_booking_error }}
+                </p>
+                <div class="mt-6">
+                    <p class="text-[10px] text-gray-400 uppercase font-mono tracking-widest mb-4">
+                        Reference: SG-{{ "now"|date("Ymdhis") }}
+                    </p>
+                    <button onclick="closeErrorModal()" class="w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase text-sm py-3 px-4 transition-colors duration-200 tracking-wide">
+                        Acknowledge_Error
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function closeErrorModal() {
+        document.getElementById('errorModal').style.display = 'none';
+    }
+</script>
+{% endif %}
+
+<section class="min-h-screen bg-grid-gray flex flex-col overflow-hidden">
+
+    {# --- HEADER: SYSTEM STATE --- #}
+    <div class="sticky top-0 z-40 px-8 py-6 flex justify-between items-center border-b-4 border-grid-black bg-white">
+        <div class="flex items-center gap-6">
+            <span class="text-[10px] font-black uppercase tracking-[0.5em] text-yellow-500">New_Entry_Protocol</span>
+            <div class="flex items-center gap-2">
+                <span class="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                <span class="text-[9px] font-mono text-gray-400 uppercase tracking-widest">Gateway_Active</span>
+            </div>
+        </div>
+        <a href="{{ path('app_staff_roomlisting_bookings') }}" 
+           class="group flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-black transition-all">
+            <i data-feather="x" class="w-3 h-3 transition-transform group-hover:rotate-90"></i>
+            Abort_Sequence
+        </a>
+    </div>
+
+    <div class="flex-1 max-w-7xl mx-auto w-full grid lg:grid-cols-12 gap-0 px-4 py-8 lg:px-8">
+        
+        {# --- LEFT: THE INITIALIZATION UI --- #}
+        <div class="lg:col-span-8 p-8 lg:p-12 bg-white border border-black/10 lg:border-r-0 lg:rounded-r-none">
+            <div class="mb-16">
+                <h1 class="text-[80px] md:text-[100px] font-black text-gray-950 leading-[0.8] tracking-tighter uppercase mb-6 italic">
+                    Create<br/>
+                    <span class="text-transparent" style="-webkit-text-stroke: 1px #d1d5db;">Booking.</span>
+                </h1>
+                <p class="max-w-md text-xs font-bold text-gray-400 uppercase leading-relaxed tracking-widest">
+                    // Establishing a new occupancy node. Ensure all timestamps and user credentials are validated before deployment.
+                </p>
+            </div>
+
+            {{ form_start(bookingForm, {'attr': {'class': 'space-y-12 max-w-2xl'}}) }}
+                
+                {# Booking Type Selector #}
+                <div class="group border-b border-gray-100 focus-within:border-gray-950 transition-all pb-2">
+                    {{ form_label(bookingForm.bookingType, '01_Booking_Mode', {'label_attr': {'class': 'block text-[9px] font-black uppercase tracking-[0.4em] text-gray-400 group-focus-within:text-yellow-500 mb-2'}}) }}
+                    {{ form_widget(bookingForm.bookingType, {'attr': {'class': 'w-full bg-transparent border-none p-0 text-2xl font-black uppercase tracking-tighter focus:ring-0 cursor-pointer appearance-none text-gray-950'}}) }}
+                </div>
+
+                <div class="daily-booking-grid grid grid-cols-1 md:grid-cols-2 gap-12">
+                    {# Start Date #}
+                    <div class="group border-b border-gray-100 focus-within:border-gray-950 transition-all pb-2">
+                        {{ form_label(bookingForm.startDate, '02_Entry_Timestamp', {'label_attr': {'class': 'block text-[9px] font-black uppercase tracking-[0.4em] text-gray-400 group-focus-within:text-yellow-500 mb-2'}}) }}
+                        {{ form_widget(bookingForm.startDate, {'attr': {'class': 'w-full bg-transparent border-none p-0 text-2xl font-black uppercase tracking-tighter focus:ring-0 cursor-pointer text-gray-950'}}) }}
+                    </div>
+
+                    {# End Date #}
+                    <div class="group border-b border-gray-100 focus-within:border-gray-950 transition-all pb-2">
+                        {{ form_label(bookingForm.endDate, '03_Exit_Timestamp', {'label_attr': {'class': 'block text-[9px] font-black uppercase tracking-[0.4em] text-gray-400 group-focus-within:text-yellow-500 mb-2'}}) }}
+                        {{ form_widget(bookingForm.endDate, {'attr': {'class': 'w-full bg-transparent border-none p-0 text-2xl font-black uppercase tracking-tighter focus:ring-0 cursor-pointer text-gray-950'}}) }}
+                    </div>
+                </div>
+
+                {# Hourly Duration Field #}
+                <div class="hourly-booking-group" style="display: none;">
+                    <div class="group border-b border-gray-100 focus-within:border-gray-950 transition-all pb-2">
+                        {{ form_label(bookingForm.numberOfHours, '02_Duration_Hours', {'label_attr': {'class': 'block text-[9px] font-black uppercase tracking-[0.4em] text-gray-400 group-focus-within:text-yellow-500 mb-2'}}) }}
+                        {{ form_widget(bookingForm.numberOfHours, {'attr': {'class': 'w-full bg-transparent border-none p-0 text-2xl font-black uppercase tracking-tighter focus:ring-0 cursor-pointer text-gray-950', 'min': '4', 'step': '1'}}) }}
+                        <p class="text-[8px] text-gray-400 mt-2 italic uppercase tracking-widest">Minimum 4 Hours Required</p>
+                    </div>
+                </div>
+
+                {# User Selection (If defined in form) #}
+                {% if bookingForm.user is defined %}
+                <div class="group border-b border-gray-100 focus-within:border-gray-950 transition-all pb-2">
+                    {{ form_label(bookingForm.user, '04_Occupant_Credential', {'label_attr': {'class': 'block text-[9px] font-black uppercase tracking-[0.4em] text-gray-400 group-focus-within:text-yellow-500 mb-2'}}) }}
+                    {{ form_widget(bookingForm.user, {'attr': {'class': 'w-full bg-transparent border-none p-0 text-2xl font-black uppercase tracking-tighter focus:ring-0 cursor-pointer appearance-none text-gray-950'}}) }}
+                </div>
+                {% endif %}
+
+                {# Status #}
+                <div class="group border-b border-gray-100 focus-within:border-gray-950 transition-all pb-2">
+                    {{ form_label(bookingForm.status, '05_Initial_Status', {'label_attr': {'class': 'block text-[9px] font-black uppercase tracking-[0.4em] text-gray-400 group-focus-within:text-yellow-500 mb-2'}}) }}
+                    {{ form_widget(bookingForm.status, {'attr': {'class': 'w-full bg-transparent border-none p-0 text-2xl font-black uppercase tracking-tighter focus:ring-0 cursor-pointer appearance-none text-gray-950'}}) }}
+                </div>
+
+                {# --- CALENDAR: AVAILABILITY VISUALIZATION --- #}
+                <div class="pt-8 bg-white p-6 border border-black/10">
+                    <p class="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 italic mb-4">Availability_Calendar</p>
+                    <div id="calendar" class="grid grid-cols-7 gap-2">
+                        <!-- Calendar will be generated by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="pt-4 flex items-center gap-4 text-[9px] font-mono uppercase tracking-widest">
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 bg-green-100 border border-green-400"></div>
+                        <span class="text-gray-600">Available</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 bg-red-100 border border-red-500 line-through"></div>
+                        <span class="text-gray-600">Booked</span>
+                    </div>
+                </div>
+
+                <div class="pt-10">
+                    <button type="submit" 
+                            class="bg-gray-950 text-white px-16 py-7 text-[10px] font-black uppercase tracking-[0.5em] hover:bg-yellow-400 hover:text-gray-950 transition-all shadow-2xl shadow-black/20">
+                        Deploy_Reservation
+                    </button>
+                </div>
+
+            {{ form_end(bookingForm) }}
+        </div>
+
+        {# --- RIGHT: SYSTEM METADATA --- #}
+        <aside class="lg:col-span-4 p-8 lg:p-10 flex flex-col justify-between bg-white border border-black/10 lg:rounded-l-none">
+            <div>
+                <p class="text-[9px] font-black uppercase tracking-[0.4em] text-gray-400 mb-8 border-b border-gray-100 pb-4">Deployment_Checklist</p>
+                <ul class="space-y-6">
+                    <li class="flex items-start gap-4">
+                        <span class="text-[10px] font-mono text-yellow-500">01</span>
+                        <p class="text-[10px] font-bold uppercase tracking-tight text-gray-500 leading-snug">Verify unit availability for the requested timeframe.</p>
+                    </li>
+                    <li class="flex items-start gap-4">
+                        <span class="text-[10px] font-mono text-yellow-500">02</span>
+                        <p class="text-[10px] font-bold uppercase tracking-tight text-gray-500 leading-snug">Ensure user identity matches official government records.</p>
+                    </li>
+                    <li class="flex items-start gap-4">
+                        <span class="text-[10px] font-mono text-yellow-500">03</span>
+                        <p class="text-[10px] font-bold uppercase tracking-tight text-gray-500 leading-snug">Upon deployment, automated key-codes will be generated.</p>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="p-8 border-2 border-dashed border-gray-200 opacity-50">
+                <p class="text-[8px] font-mono text-gray-400 uppercase leading-relaxed">
+                    System_Log:<br/>
+                    Ready_to_receive_input...<br/>
+                    Waiting_for_deployment_command...
+                </p>
+            </div>
+        </aside>
+    </div>
+</section>
+
+<style>
+    select, input {
+        border: none !important;
+        background: transparent !important;
+        padding-left: 0 !important;
+    }
+    select:focus, input:focus {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const bookedDatesString = '{{ bookedDates is defined ? bookedDates : "[]" | raw }}';
+    const bookedDates = JSON.parse(bookedDatesString);
+    const calendar = document.getElementById('calendar');
+    const startDateInput = document.querySelector('[id$="_startDate"]');
+    const endDateInput = document.querySelector('[id$="_endDate"]');
+    
+    if (!calendar) return;
+    
+    // Generate calendar for next 60 days
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    for (let i = 0; i < 60; i++) {
+        const date = new Date(today);
+        date.setDate(date.getDate() + i);
+        const dateStr = date.toISOString().split('T')[0];
+        
+        const dayDiv = document.createElement('div');
+        dayDiv.className = 'p-2 text-center text-[9px] font-mono font-bold border cursor-pointer rounded transition-all';
+        dayDiv.textContent = date.getDate();
+        dayDiv.title = dateStr;
+        
+        if (bookedDates.includes(dateStr)) {
+            dayDiv.className += ' bg-red-100 border-red-500 line-through text-red-700';
+            dayDiv.style.opacity = '0.6';
+        } else {
+            dayDiv.className += ' bg-green-50 border-green-300 text-green-700 hover:bg-green-200';
+            dayDiv.addEventListener('click', function() {
+                if (!startDateInput.value) {
+                    startDateInput.value = dateStr;
+                } else if (!endDateInput.value) {
+                    if (new Date(dateStr) > new Date(startDateInput.value)) {
+                        endDateInput.value = dateStr;
+                    } else {
+                        startDateInput.value = dateStr;
+                        endDateInput.value = '';
+                    }
+                } else {
+                    startDateInput.value = dateStr;
+                    endDateInput.value = '';
+                }
+            });
+        }
+        
+        calendar.appendChild(dayDiv);
+    }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle booking type toggle for staff form
+    const bookingTypeSelector = document.querySelector('[name$="_bookingType"]');
+    const dailyGrid = document.querySelector('.daily-booking-grid');
+    const hourlyGroup = document.querySelector('.hourly-booking-group');
+    const startDateInput = document.querySelector('[id$="_startDate"]');
+    const endDateInput = document.querySelector('[id$="_endDate"]');
+    const hoursInput = document.querySelector('[id$="_numberOfHours"]');
+
+    if (bookingTypeSelector && dailyGrid && hourlyGroup) {
+        function toggleBookingType() {
+            if (bookingTypeSelector.value === 'hourly') {
+                dailyGrid.style.display = 'none';
+                hourlyGroup.style.display = 'block';
+                if (hoursInput) hoursInput.required = true;
+                if (startDateInput) startDateInput.required = false;
+                if (endDateInput) endDateInput.required = false;
+            } else {
+                dailyGrid.style.display = 'grid';
+                hourlyGroup.style.display = 'none';
+                if (hoursInput) hoursInput.required = false;
+                if (startDateInput) startDateInput.required = true;
+                if (endDateInput) endDateInput.required = true;
+            }
+        }
+
+        bookingTypeSelector.addEventListener('change', toggleBookingType);
+        toggleBookingType(); // Initialize on page load
+    }
+});
+</script>
+{% endblock %}
