@@ -3,8 +3,7 @@ FROM php:8.2-fpm
 ENV APP_ENV=prod \
     APP_DEBUG=0 \
     COMPOSER_ALLOW_SUPERUSER=1 \
-    PORT=8080 \
-    DATABASE_URL=sqlite:///:memory:
+    PORT=8080
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
