@@ -28,6 +28,8 @@ RUN composer install --no-dev --no-interaction --no-progress --prefer-dist --opt
 
 COPY entrypoint.sh /entrypoint.sh
 
+RUN sed -i 's/\r$//' /entrypoint.sh
+
 RUN chmod +x /entrypoint.sh \
     && mkdir -p var/cache var/log public/uploads \
     && chown -R www-data:www-data var public/uploads /var/lib/nginx /var/log/nginx
