@@ -34,6 +34,8 @@ Recommended environment variables:
 
 If you use Railway MySQL, point `DATABASE_URL` to the Railway-provided connection string.
 
+Important: The `Dockerfile` no longer sets a default `DATABASE_URL`. You MUST set `DATABASE_URL` in Railway service Environment to your MySQL connection string (for example `mysql://user:pass@host:3306/dbname`) or migrations will attempt to run against SQLite defaults and fail.
+
 ## Deploy checklist
 
 1. Keep `railway.json` in the repository root.
