@@ -16,7 +16,7 @@ services:
 
     App\:
         resource: '../src/'
-        exclude: '../src/{DataFixtures,DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+        exclude: '../src/{Command/Deployment,DataFixtures,DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
 
     # The explicit App\Controller\User\ProfileController block is NOT needed when using bind.
 
@@ -54,3 +54,8 @@ when@test:
         App\DataFixtures\:
             resource: '../src/DataFixtures/'
             tags: ['doctrine.fixture.orm']
+
+when@prod:
+    services:
+        App\Command\Deployment\MakeMigrationCommand:
+            tags: ['console.command']
