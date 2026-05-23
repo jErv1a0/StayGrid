@@ -1,13 +1,21 @@
 FROM php:8.2-fpm
 
+ENV APP_ENV=prod \
+    APP_DEBUG=0 \
+    COMPOSER_ALLOW_SUPERUSER=1 \
+    PORT=8080 \
+    DATABASE_URL=sqlite:///:memory:
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     unzip \
+    nginx \
     libicu-dev \
     libzip-dev \
     libpng-dev \
     libxml2-dev \
-    && docker-php-ext-install pdo_mysql intl zip opcache \
+    libsqlite3-dev \
+    && docker-php-ext-install pdo_mysql pdo_sqlite intl zip opcache \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -15,8 +23,17 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/staygrid
 
 COPY composer.json composer.lock ./
+COPY . .
 RUN composer install --no-dev --no-interaction --no-progress --prefer-dist --optimize-autoloader
 
-COPY . .
+COPY docker/nginx/main.conf /etc/nginx/nginx.conf
+COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY entrypoint.sh /entrypoint.sh
 
-RUN mkdir -p var/cache var/log public/uploads && chown -R www-data:www-data var public/uploads
+RUN chmod +x /entrypoint.sh \
+    && mkdir -p var/cache var/log public/uploads \
+    && chown -R www-data:www-data var public/uploads /var/lib/nginx /var/log/nginx
+
+EXPOSE 8080
+
+ENTRYPOINT ["/entrypoint.sh"]

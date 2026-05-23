@@ -16,11 +16,7 @@ services:
 
     App\:
         resource: '../src/'
-        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
-
-    # Make UserFixtures public so DoctrineFixturesBundle can always instantiate it during fixture loading.
-    App\DataFixtures\UserFixtures:
-        public: true
+        exclude: '../src/{DataFixtures,DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
 
     # The explicit App\Controller\User\ProfileController block is NOT needed when using bind.
 
@@ -46,3 +42,15 @@ services:
                 verify: false,
               }
         public: false
+
+when@dev:
+    services:
+        App\DataFixtures\:
+            resource: '../src/DataFixtures/'
+            tags: ['doctrine.fixture.orm']
+
+when@test:
+    services:
+        App\DataFixtures\:
+            resource: '../src/DataFixtures/'
+            tags: ['doctrine.fixture.orm']
