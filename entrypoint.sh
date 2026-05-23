@@ -52,49 +52,13 @@ if [ ! -f vendor/autoload.php ]; then
   fi
 fi
 
-# Start PHP-FPM
-echo "Starting PHP-FPM..."
-php-fpm -D
+# Wait for MySQL before any Symfony console command can touch Doctrine.
+echo "Waiting for database before booting Symfony commands..."
 
-# Warm Symfony cache
-echo "Clearing and warming Symfony cache..."
-
-php bin/console cache:clear \
-  --env=$APP_ENV \
-  --no-debug || true
-
-php bin/console cache:warmup \
-  --env=$APP_ENV \
-  --no-debug || true
-
-# Prepare DB and run migrations after DB is reachable
-echo "Preparing database and running Doctrine migrations..."
-
-# Determine DB connection info from DATABASE_URL or fallback envs
-DB_HOST="${DB_HOST:-}"
-DB_PORT="${DB_PORT:-}"
-DB_USER="${DB_USER:-}"
-DB_PASS="${DB_PASS:-}"
-DB_NAME="${DB_NAME:-}"
-
-if [ -n "$DATABASE_URL" ]; then
-  # extract user:pass and host:port/db from DATABASE_URL like mysql://user:pass@host:port/dbname
-  CREDS=$(echo "$DATABASE_URL" | sed -E 's#.*//([^@]+)@.*#\1#' 2>/dev/null || true)
-  HOSTPORT=$(echo "$DATABASE_URL" | sed -E 's#.*@([^/]+).*#\1#' 2>/dev/null || true)
-  DB_USER=$(echo "$CREDS" | cut -d':' -f1)
-  DB_PASS=$(echo "$CREDS" | cut -d':' -f2-)
-  DB_HOST=$(echo "$HOSTPORT" | cut -d':' -f1)
-  DB_PORT=$(echo "$HOSTPORT" | cut -d':' -f2)
-  DB_NAME=$(echo "$DATABASE_URL" | sed -E 's#.*//[^@]+@[^/]+/([^?]+).*#\1#' 2>/dev/null || true)
-fi
-
-
-# Prefer DATABASE_URL when set; robustly parse and test connectivity using PHP
 MAX_RETRIES=80
 COUNT=0
 DB_READY=0
 
-echo "Waiting for database (checking DATABASE_URL or MYSQL_* env vars)"
 while [ "$COUNT" -lt "$MAX_RETRIES" ]; do
   php -r '
     $url = getenv("DATABASE_URL");
@@ -123,11 +87,23 @@ if [ "$DB_READY" -ne 1 ]; then
   exit 1
 fi
 
-# Run composer auto-scripts now that DB is reachable
-if command -v composer >/dev/null 2>&1; then
-  echo "Running composer auto-scripts..."
-  composer run-script symfony-cmd --no-interaction || true
-fi
+# Start PHP-FPM
+echo "Starting PHP-FPM..."
+php-fpm -D
+
+# Warm Symfony cache
+echo "Clearing and warming Symfony cache..."
+
+php bin/console cache:clear \
+  --env=$APP_ENV \
+  --no-debug || true
+
+php bin/console cache:warmup \
+  --env=$APP_ENV \
+  --no-debug || true
+
+# Prepare DB and run migrations after DB is reachable
+echo "Preparing database and running Doctrine migrations..."
 
 # Run migrations with retries; allow no migration to succeed
 COUNT=0
