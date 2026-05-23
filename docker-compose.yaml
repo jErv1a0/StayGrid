@@ -3,7 +3,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: dockerfile
+      dockerfile: Dockerfile
     container_name: staygrid_app
     restart: unless-stopped
     working_dir: /var/www/staygrid

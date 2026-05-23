@@ -4,7 +4,8 @@ This repository now includes a Railway-ready Docker setup for the Symfony web ap
 
 ## Files used by Railway
 
-- [dockerfile](dockerfile)
+- [Dockerfile](Dockerfile)
+- [railway.json](railway.json)
 - [entrypoint.sh](entrypoint.sh)
 - [docker/nginx/main.conf](docker/nginx/main.conf)
 - [docker/nginx/default.conf](docker/nginx/default.conf)
@@ -18,7 +19,7 @@ This repository now includes a Railway-ready Docker setup for the Symfony web ap
 
 ## Railway service settings
 
-Use the repository `dockerfile` as the service build.
+`railway.json` forces Railway to use the repository `Dockerfile` as the service build.
 
 Recommended environment variables:
 
@@ -35,7 +36,7 @@ If you use Railway MySQL, point `DATABASE_URL` to the Railway-provided connectio
 
 ## Deploy checklist
 
-1. Set the service to use `dockerfile`.
+1. Keep `railway.json` in the repository root.
 2. Add your production environment variables.
 3. Connect a database.
 4. Deploy.
@@ -48,5 +49,5 @@ php bin/console doctrine:migrations:migrate --no-interaction
 ## Notes
 
 - The existing [docker-compose.yaml](docker-compose.yaml) remains the local development stack.
-- The same [dockerfile](dockerfile) now serves both Railway and local compose.
-- If Railway does not auto-detect it, point the service Dockerfile path at [dockerfile](dockerfile).
+- The same [Dockerfile](Dockerfile) now serves both Railway and local compose.
+- If you ever change the Dockerfile path, update [railway.json](railway.json) too.

@@ -9,6 +9,7 @@ ENV APP_ENV=prod \
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     unzip \
+    gettext-base \
     nginx \
     libicu-dev \
     libzip-dev \
@@ -26,8 +27,6 @@ COPY composer.json composer.lock ./
 COPY . .
 RUN composer install --no-dev --no-interaction --no-progress --prefer-dist --optimize-autoloader
 
-COPY docker/nginx/main.conf /etc/nginx/nginx.conf
-COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
 COPY entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh \
