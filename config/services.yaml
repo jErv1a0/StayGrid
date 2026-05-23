@@ -4,6 +4,7 @@ parameters:
     rooms_images_directory: '%kernel.project_dir%/public/uploads/rooms'
     # Define the parameter name and its absolute path value
     profile_pictures_directory: '%kernel.project_dir%/public/uploads/profile_pictures'
+    app_secret_fallback: 'staygrid-default-secret'
 
 services:
 
