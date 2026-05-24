@@ -19,6 +19,8 @@ DEFAULT_URI=$DEFAULT_URI
 EOF
 fi
 
+echo "Configuring Nginx..."
+
 cp /var/www/staygrid/nginx-main.conf /etc/nginx/nginx.conf
 
 rm -f \
@@ -28,12 +30,20 @@ rm -f \
 
 envsubst '$PORT' < /var/www/staygrid/nginx.conf > /etc/nginx/conf.d/default.conf
 
-echo "Preparing writable Symfony directories..."
+echo "Preparing Symfony writable directories..."
 
-mkdir -p var/cache var/log var/sessions
+mkdir -p \
+  var/cache \
+  var/cache/prod \
+  var/cache/prod/twig \
+  var/log \
+  var/sessions
 
 chmod -R 777 var || true
+chmod -R 777 /var/www/staygrid/var || true
+
 chown -R www-data:www-data var || true
+chown -R www-data:www-data /var/www/staygrid/var || true
 
 if [ ! -f vendor/autoload.php ]; then
   echo "vendor/autoload.php missing — running composer install..."
@@ -113,13 +123,33 @@ NGINX_PID=$!
     exit 1
   fi
 
-  echo "Clearing Symfony cache..."
+  echo "Fixing Symfony permissions..."
+
+  mkdir -p \
+    var/cache \
+    var/cache/prod \
+    var/cache/prod/twig \
+    var/log \
+    var/sessions
+
+  chmod -R 777 var || true
+  chmod -R 777 /var/www/staygrid/var || true
+
+  chown -R www-data:www-data var || true
+  chown -R www-data:www-data /var/www/staygrid/var || true
+
+  echo "Removing old Symfony cache..."
 
   rm -rf var/cache/* || true
+  rm -rf /var/www/staygrid/var/cache/* || true
+
+  echo "Clearing Symfony cache..."
 
   php bin/console cache:clear \
     --env=$APP_ENV \
     --no-debug || true
+
+  echo "Warming Symfony cache..."
 
   php bin/console cache:warmup \
     --env=$APP_ENV \
