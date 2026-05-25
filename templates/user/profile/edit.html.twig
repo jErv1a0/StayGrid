@@ -38,9 +38,11 @@
             <div class="space-y-6">
                 <p class="text-[9px] font-black uppercase tracking-[0.4em] text-gray-400 italic">Your Profile Picture</p>
                 <div class="relative group w-48 h-48 mx-auto lg:mx-0">
-                    {% set profileImageUrl = profileForm.vars.value.profilePicture 
-                        ? asset('uploads/profile_pictures/' ~ profileForm.vars.value.profilePicture) 
-                        : asset('images/default-admin-avatar.jpg') 
+                    {% set profileImageUrl = profileForm.vars.value.profilePicture
+                        ? (profileForm.vars.value.profilePicture starts with 'http'
+                            ? profileForm.vars.value.profilePicture
+                            : asset('uploads/profile_pictures/' ~ profileForm.vars.value.profilePicture))
+                        : asset('images/default-admin-avatar.jpg')
                     %}
                     <img class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500 border border-black/10 shadow-2xl" 
                          src="{{ profileImageUrl }}" 

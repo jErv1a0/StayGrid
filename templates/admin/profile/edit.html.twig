@@ -53,7 +53,9 @@
     </div>
 
     {% set profileImageUrl = profileForm.vars.value.profilePicture 
-        ? asset('uploads/profile_pictures/' ~ profileForm.vars.value.profilePicture) 
+        ? (profileForm.vars.value.profilePicture starts with 'http'
+            ? profileForm.vars.value.profilePicture
+            : asset('uploads/profile_pictures/' ~ profileForm.vars.value.profilePicture))
         : asset('images/default-admin-avatar.jpg') 
     %}
 
