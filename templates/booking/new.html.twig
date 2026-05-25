@@ -68,8 +68,11 @@
 
                 {# Image Asset with StayGrid Treatment #}
                 <div class="aspect-video w-full overflow-hidden bg-white/5 mb-8 border border-white/10">
-                    {% set imagePath = room.image ? (room.image matches '#^uploads/#' ? room.image : 'uploads/rooms/' ~ room.image) : null %}
-                    <img src="{{ imagePath ? asset(imagePath) : asset('images/default_room.png') }}" 
+                    {% set imagePath = room.image ? (
+                        room.image starts with 'http' ? room.image 
+                        : (room.image matches '#^uploads/#' ? room.image : 'uploads/rooms/' ~ room.image)
+                    ) : null %}
+                    <img src="{{ imagePath ? (imagePath starts with 'http' ? imagePath : asset(imagePath)) : asset('images/default_room.png') }}" 
                          alt="{{ room.category }}" 
                          class="w-full h-full object-cover grayscale opacity-80"
                          onerror="this.onerror=null;this.src='{{ asset('images/default_room.png') }}';">
