@@ -16,7 +16,8 @@ final class AboutController extends AbstractController
         $feedbacks = [];
 
         try {
-            $feedbacks = $feedbackRepository->findBy([], ['createdAt' => 'DESC']);
+            // Only show feedback that has been approved by an admin
+            $feedbacks = $feedbackRepository->findApproved(20);
         } catch (Throwable) {
             // Keep the about page available even if feedback storage is not ready yet.
         }

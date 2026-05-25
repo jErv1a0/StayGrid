@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\FeedbackRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\LogInUsers;
 
 #[ORM\Entity(repositoryClass: FeedbackRepository::class)]
 class Feedback
@@ -24,6 +25,16 @@ class Feedback
 
     #[ORM\Column(length: 100)]
     private ?string $email = null;
+
+    #[ORM\Column(type: 'boolean')]
+    private bool $approved = false;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $approvedAt = null;
+
+    #[ORM\ManyToOne(targetEntity: LogInUsers::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?LogInUsers $approvedBy = null;
 
     public function getId(): ?int
     {
@@ -75,6 +86,39 @@ class Feedback
     {
         $this->email = $email;
 
+        return $this;
+    }
+
+    public function isApproved(): bool
+    {
+        return $this->approved;
+    }
+
+    public function setApproved(bool $approved): static
+    {
+        $this->approved = $approved;
+        return $this;
+    }
+
+    public function getApprovedAt(): ?\DateTimeImmutable
+    {
+        return $this->approvedAt;
+    }
+
+    public function setApprovedAt(?\DateTimeImmutable $approvedAt): static
+    {
+        $this->approvedAt = $approvedAt;
+        return $this;
+    }
+
+    public function getApprovedBy(): ?LogInUsers
+    {
+        return $this->approvedBy;
+    }
+
+    public function setApprovedBy(?LogInUsers $user): static
+    {
+        $this->approvedBy = $user;
         return $this;
     }
 }

@@ -27,11 +27,13 @@ final class ContactController extends AbstractController
                 $feedback->setName($name);
                 $feedback->setEmail($email);
                 $feedback->setCreatedAt(new \DateTimeImmutable());
+                // Keep new submissions unapproved until an admin reviews them
+                $feedback->setApproved(false);
 
                 $entityManager->persist($feedback);
                 $entityManager->flush();
 
-                $this->addFlash('success', 'Thank you for your feedback! It will be displayed on our About page.');
+                $this->addFlash('success', 'Thank you — your feedback was received and is pending admin approval.');
             }
         }
 
