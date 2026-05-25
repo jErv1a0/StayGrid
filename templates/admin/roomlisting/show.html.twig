@@ -6,7 +6,7 @@
 {% block body %}
 <div class="min-h-screen bg-[#f6f4ef] py-10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    {% set roomImagePath = room_listing.image ? (room_listing.image matches '/^uploads\\//' ? room_listing.image : 'uploads/rooms/' ~ room_listing.image) : null %}
+    {% set roomImagePath = room_listing.image ? (room_listing.image matches '/^uploads\\//' ? room_listing.image : 'images/' ~ room_listing.image) : null %}
     {% set roomCategoryKey = room_listing.category|default('')|lower %}
     {% set roomImageFallback = 'images/default_room.png' %}
     {% if 'family' in roomCategoryKey %}
@@ -51,7 +51,7 @@
                     {% if room_listing.image %}
                         <img class="w-full h-[400px] object-cover hover:scale-[1.02] transition-all duration-500"
                              src="{{ roomImageSrc }}"
-                             onerror="this.onerror=null;this.src='{{ asset(roomImageFallback) }}';"
+                             onerror="this.onerror=null;this.src='{{ room_listing.image matches '/^uploads\\//' ? asset(room_listing.image) : asset('uploads/rooms/' ~ room_listing.image) }}';"
                              alt="Room {{ room_listing.number }}">
                     {% else %}
                         <div class="w-full h-[400px] flex flex-col items-center justify-center bg-gray-100">
