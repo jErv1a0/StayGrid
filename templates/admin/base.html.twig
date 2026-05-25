@@ -97,6 +97,13 @@
                 Users
             </a>
 
+            {# Feedback approvals #}
+            <a href="{{ path('app_admin_feedback_index') }}"
+               class="flex items-center px-6 py-4 text-[11px] font-black uppercase tracking-widest transition-all hover:bg-white/5 hover:pl-8 group {{ current_route starts with 'app_admin_feedback' ? 'sidebar-link-active' : '' }}">
+                <i data-feather="message-square" class="w-4 h-4 mr-3 {{ current_route starts with 'app_admin_feedback' ? 'text-grid-black' : 'text-grid-yellow' }}"></i>
+                Feedback
+            </a>
+
                 {# Profile #}
                 <a href="{{ path('app_admin_profile') }}"
                     class="flex items-center px-6 py-4 text-[11px] font-black uppercase tracking-widest transition-all hover:bg-white/5 hover:pl-8 group {{ current_route starts with 'app_admin_profile' ? 'sidebar-link-active' : '' }}">
