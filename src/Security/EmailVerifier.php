@@ -5,19 +5,19 @@ namespace App\Security;
 use App\Entity\LogInUsers;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Mailer\Mailer;
-use Symfony\Component\Mailer\Transport\Transport;
-use Symfony\Component\Mime\Email;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mailer\MailerInterface;
 use SymfonyCasts\Bundle\VerifyEmail\VerifyEmailHelperInterface;
 
 class EmailVerifier
 {
     public function __construct(
         private VerifyEmailHelperInterface $verifyEmailHelper,
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
+        private MailerInterface $mailer
     ) {}
 
-    public function sendEmailConfirmation(string $verifyEmailRouteName, LogInUsers $user): void
+    public function sendEmailConfirmation(string $verifyEmailRouteName, LogInUsers $user, TemplatedEmail $email): void
     {
         $signatureComponents = $this->verifyEmailHelper->generateSignature(
             $verifyEmailRouteName,
@@ -26,32 +26,13 @@ class EmailVerifier
             ['id' => $user->getId()]
         );
 
-        $signedUrl = $signatureComponents->getSignedUrl();
+        $email->context([
+            'signedUrl' => $signatureComponents->getSignedUrl(),
+            'expiresAtMessageKey' => $signatureComponents->getExpirationMessageKey(),
+            'expiresAtMessageData' => $signatureComponents->getExpirationMessageData(),
+        ]);
 
-        $email = (new Email())
-            ->from('alvrcoqviermv05@gmail.com')
-            ->to($user->getEmail())
-            ->subject('Verify your Email')
-            ->text(
-                "Hello!\n\n" .
-                "Click the link below to verify your email:\n\n" .
-                $signedUrl . "\n\n" .
-                "This link will expire soon.\n\n" .
-                "Thank you!"
-            );
-
-        $mailerDsn = trim((string) ($_ENV['MAILER_DSN'] ?? getenv('MAILER_DSN') ?: ''));
-        if ($mailerDsn === '' || !str_contains($mailerDsn, '://')) {
-            return;
-        }
-
-        try {
-            $transport = Transport::fromDsn($mailerDsn);
-            $mailer = new Mailer($transport);
-            $mailer->send($email);
-        } catch (\Throwable) {
-            return;
-        }
+        $this->mailer->send($email);
     }
 
     public function handleEmailConfirmation(Request $request, LogInUsers $user): void

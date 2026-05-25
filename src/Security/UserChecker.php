@@ -17,7 +17,7 @@ class UserChecker implements UserCheckerInterface
 
         if (!$user->isVerified()) {
             // This exception message is shown to the user on the login page
-            throw new CustomUserMessageAccountStatusException('Your account is not verified. Please check your email inbox.');
+            throw new CustomUserMessageAccountStatusException('Your account is not verified yet. Please check the verification email from StayGrid/Brevo and confirm your email before logging in.');
         }
     }
 
