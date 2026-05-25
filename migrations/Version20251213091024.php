@@ -25,12 +25,22 @@ final class Version20251213091024 extends AbstractMigration
         }
 
         if ($this->connection->fetchOne("SHOW TABLES LIKE 'transaction'")) {
-            $this->addSql('ALTER TABLE transaction ADD CONSTRAINT IF NOT EXISTS FK_723705D154177093 FOREIGN KEY (room_id) REFERENCES roomlisting (id)');
-            $this->addSql('ALTER TABLE transaction ADD CONSTRAINT IF NOT EXISTS FK_723705D1A76ED395 FOREIGN KEY (user_id) REFERENCES `user` (id)');
+            $exists = (bool) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'transaction' AND CONSTRAINT_NAME = 'FK_723705D154177093' AND CONSTRAINT_TYPE = 'FOREIGN KEY'");
+            if (! $exists) {
+                $this->addSql('ALTER TABLE transaction ADD CONSTRAINT FK_723705D154177093 FOREIGN KEY (room_id) REFERENCES roomlisting (id)');
+            }
+
+            $exists = (bool) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'transaction' AND CONSTRAINT_NAME = 'FK_723705D1A76ED395' AND CONSTRAINT_TYPE = 'FOREIGN KEY'");
+            if (! $exists) {
+                $this->addSql('ALTER TABLE transaction ADD CONSTRAINT FK_723705D1A76ED395 FOREIGN KEY (user_id) REFERENCES `user` (id)');
+            }
         }
 
         if ($this->connection->fetchOne("SHOW TABLES LIKE 'booking'")) {
-            $this->addSql('ALTER TABLE booking ADD CONSTRAINT IF NOT EXISTS FK_E00CEDDE54177093 FOREIGN KEY (room_id) REFERENCES roomlisting (id)');
+            $exists = (bool) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'booking' AND CONSTRAINT_NAME = 'FK_E00CEDDE54177093' AND CONSTRAINT_TYPE = 'FOREIGN KEY'");
+            if (! $exists) {
+                $this->addSql('ALTER TABLE booking ADD CONSTRAINT FK_E00CEDDE54177093 FOREIGN KEY (room_id) REFERENCES roomlisting (id)');
+            }
         }
     }
 
