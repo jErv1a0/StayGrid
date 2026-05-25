@@ -19,19 +19,17 @@ class UserFeedbackController extends AbstractController
         /** @var LogInUsers|null $user */
         $user = $this->getUser();
 
-        if (!$user) {
-            return $this->redirectToRoute('app_login');
-        }
-
         if ($request->isMethod('POST')) {
             $feedbackContent = trim((string) $request->request->get('feedback'));
             $rating = $request->request->get('rating');
+            $name = trim((string) $request->request->get('feedback_name'));
+            $email = trim((string) $request->request->get('feedback_email'));
 
             if ($feedbackContent !== '') {
                 $feedback = new Feedback();
                 $feedback->setContent($feedbackContent);
-                $feedback->setName((string) ($user->getFullName() ?: $user->getEmail()));
-                $feedback->setEmail((string) $user->getEmail());
+                $feedback->setName($user ? (string) ($user->getFullName() ?: $user->getEmail()) : $name);
+                $feedback->setEmail($user ? (string) $user->getEmail() : $email);
                 $feedback->setCreatedAt(new \DateTimeImmutable());
                 $feedback->setApproved(false);
 
@@ -56,7 +54,7 @@ class UserFeedbackController extends AbstractController
 
         return $this->render('user/feedback/index.html.twig', [
             'current_user' => $user,
-            'is_verified' => $user->isVerified(),
+            'is_verified' => $user ? $user->isVerified() : false,
             'page_title' => 'User Feedback',
         ]);
     }
