@@ -91,6 +91,8 @@ security:
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/admin, roles: ROLE_ADMIN }
 
+        - { path: ^/user/feedback$, roles: PUBLIC_ACCESS }
+
         - { path: ^/user, roles: [ROLE_CLIENT, ROLE_STAFF] }
         
         - { path: ^/(login|logout|about|contact)/, roles: PUBLIC_ACCESS }
