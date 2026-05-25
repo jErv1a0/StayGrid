@@ -20,7 +20,7 @@
                             </div>
                             <form method="post" action="{{ path('app_admin_feedback_approve', {'id': fb.getId()}) }}">
                                 <input type="hidden" name="_token" value="{{ csrf_token('approve-feedback-' ~ fb.getId()) }}">
-                                <button class="px-3 py-2 bg-yellow-400 font-black">Approve</button>
+                                <button class="px-3 py-2 bg-yellow-400 font-black">Post It</button>
                             </form>
                         </div>
 
