@@ -54,10 +54,27 @@
                     {% endfor %}
                 </div>
 
-                <a href="{{ path('app_login', {'redirect': 'book'}) }}"
-                   class="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-6 rounded-lg shadow-lg transition duration-200">
-                    Book Now
-                </a>
+                <div class="hidden md:flex items-center gap-3">
+                    {% if app.user %}
+                        <a href="{{ path(is_granted('ROLE_ADMIN') ? 'app_admin_home' : (is_granted('ROLE_STAFF') ? 'app_staff_dashboard' : 'app_user_dashboard')) }}"
+                           class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition duration-200">
+                            Dashboard
+                        </a>
+                        <a href="{{ path('app_logout') }}"
+                           class="border border-gray-300 hover:border-gray-400 text-gray-700 hover:text-black font-semibold py-2 px-5 rounded-lg transition duration-200">
+                            Log Out
+                        </a>
+                    {% else %}
+                        <a href="{{ path('app_login') }}"
+                           class="border border-gray-300 hover:border-gray-400 text-gray-700 hover:text-black font-semibold py-2 px-5 rounded-lg transition duration-200">
+                            Log In
+                        </a>
+                        <a href="{{ path('app_register') }}"
+                           class="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-6 rounded-lg shadow-lg transition duration-200">
+                            Sign Up
+                        </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </nav>
