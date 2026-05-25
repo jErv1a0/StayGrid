@@ -45,6 +45,10 @@ chmod -R 777 /var/www/staygrid/var || true
 chown -R www-data:www-data var || true
 chown -R www-data:www-data /var/www/staygrid/var || true
 
+run_symfony() {
+  su -s /bin/sh -c "cd /var/www/staygrid && $1" www-data
+}
+
 if [ ! -f vendor/autoload.php ]; then
   echo "vendor/autoload.php missing — running composer install..."
 
@@ -145,26 +149,35 @@ NGINX_PID=$!
 
   echo "Clearing Symfony cache..."
 
-  php bin/console cache:clear \
-    --env=$APP_ENV \
-    --no-debug || true
+  run_symfony "php bin/console cache:clear --env=$APP_ENV --no-debug" || true
 
   echo "Warming Symfony cache..."
 
-  php bin/console cache:warmup \
-    --env=$APP_ENV \
-    --no-debug || true
+  run_symfony "php bin/console cache:warmup --env=$APP_ENV --no-debug" || true
 
   echo "Syncing Doctrine migration metadata..."
 
-  php bin/console doctrine:migrations:sync-metadata-storage \
-    --no-interaction || true
+  COUNT=0
+  MIGRATED=0
+  while [ "$COUNT" -lt "$MAX_RETRIES" ]; do
+    if run_symfony "php bin/console doctrine:migrations:sync-metadata-storage --no-interaction" >/dev/null 2>&1; then
+      :
+    fi
 
-  echo "Running Doctrine migrations..."
+    if run_symfony "php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration"; then
+      MIGRATED=1
+      echo "Migrations completed."
+      break
+    fi
 
-  php bin/console doctrine:migrations:migrate \
-    --no-interaction \
-    --allow-no-migration || true
+    COUNT=$((COUNT+1))
+    echo "Migration attempt failed ($COUNT/$MAX_RETRIES), retrying..."
+    sleep 2
+  done
+
+  if [ "$MIGRATED" -ne 1 ]; then
+    echo "ERROR: Could not apply migrations after $MAX_RETRIES retries. The web server stays up, but the app may not be fully functional."
+  fi
 
   echo "Symfony boot completed."
 
