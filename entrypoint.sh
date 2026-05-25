@@ -7,6 +7,7 @@ export PORT="${PORT:-80}"
 export APP_ENV="${APP_ENV:-prod}"
 export APP_DEBUG="${APP_DEBUG:-0}"
 export DEFAULT_URI="${DEFAULT_URI:-http://localhost}"
+export RUN_MIGRATIONS_ON_BOOT="${RUN_MIGRATIONS_ON_BOOT:-0}"
 
 echo "Starting container..."
 
@@ -155,28 +156,32 @@ NGINX_PID=$!
 
   run_symfony "php bin/console cache:warmup --env=$APP_ENV --no-debug" || true
 
-  echo "Syncing Doctrine migration metadata..."
+  if [ "$RUN_MIGRATIONS_ON_BOOT" = "1" ]; then
+    echo "Syncing Doctrine migration metadata..."
 
-  COUNT=0
-  MIGRATED=0
-  while [ "$COUNT" -lt "$MAX_RETRIES" ]; do
-    if run_symfony "php bin/console doctrine:migrations:sync-metadata-storage --no-interaction" >/dev/null 2>&1; then
-      :
+    COUNT=0
+    MIGRATED=0
+    while [ "$COUNT" -lt "$MAX_RETRIES" ]; do
+      if run_symfony "php bin/console doctrine:migrations:sync-metadata-storage --no-interaction" >/dev/null 2>&1; then
+        :
+      fi
+
+      if run_symfony "php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration"; then
+        MIGRATED=1
+        echo "Migrations completed."
+        break
+      fi
+
+      COUNT=$((COUNT+1))
+      echo "Migration attempt failed ($COUNT/$MAX_RETRIES), retrying..."
+      sleep 2
+    done
+
+    if [ "$MIGRATED" -ne 1 ]; then
+      echo "ERROR: Could not apply migrations after $MAX_RETRIES retries. The web server stays up, but the app may not be fully functional."
     fi
-
-    if run_symfony "php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration"; then
-      MIGRATED=1
-      echo "Migrations completed."
-      break
-    fi
-
-    COUNT=$((COUNT+1))
-    echo "Migration attempt failed ($COUNT/$MAX_RETRIES), retrying..."
-    sleep 2
-  done
-
-  if [ "$MIGRATED" -ne 1 ]; then
-    echo "ERROR: Could not apply migrations after $MAX_RETRIES retries. The web server stays up, but the app may not be fully functional."
+  else
+    echo "Skipping Doctrine migrations on boot. Set RUN_MIGRATIONS_ON_BOOT=1 to enable them."
   fi
 
   echo "Symfony boot completed."
