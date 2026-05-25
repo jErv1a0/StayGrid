@@ -1,0 +1,28 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}View Feedback{% endblock %}
+
+{% block body %}
+<div class="p-6 bg-white border">
+    <h1 class="text-2xl font-black mb-4">Feedback from {{ feedback.getName() }} <span class="text-xs text-gray-400">({{ feedback.getEmail() }})</span></h1>
+    <div class="text-sm text-gray-600 mb-4">Submitted: {{ feedback.getCreatedAt() ? feedback.getCreatedAt().format('Y-m-d H:i') : 'N/A' }}</div>
+
+    {% if feedback.getRating() %}
+        <div class="mb-4">Rating: {{ feedback.getRating() }} / 5</div>
+    {% endif %}
+
+    <div class="font-mono text-gray-800 whitespace-pre-wrap">{{ feedback.getContent() }}</div>
+
+    <div class="mt-6 flex gap-3">
+        <a href="{{ path('app_admin_feedback_index') }}" class="px-3 py-2 bg-gray-200">Back</a>
+        <form method="post" action="{{ path('app_admin_feedback_approve', {'id': feedback.getId()}) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('approve-feedback-' ~ feedback.getId()) }}">
+            <button class="px-3 py-2 bg-yellow-400 font-black">Post It</button>
+        </form>
+        <form method="post" action="{{ path('app_admin_feedback_delete', {'id': feedback.getId()}) }}" onsubmit="return confirm('Delete this feedback?');">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete-feedback-' ~ feedback.getId()) }}">
+            <button class="px-3 py-2 bg-red-500 text-white">Delete</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

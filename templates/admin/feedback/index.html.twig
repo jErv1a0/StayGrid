@@ -11,20 +11,33 @@
             <div class="text-gray-500">No feedback awaiting approval.</div>
         {% else %}
             <div class="space-y-4">
-                {% for fb in pending %}
+                {% for row in pending %}
+                    {% set fb = row.feedback %}
+                    {% set user = row.user %}
                     <div class="border p-4 bg-gray-50">
                         <div class="flex justify-between items-start">
                             <div>
-                                <div class="font-bold">{{ fb.getName() }} <span class="text-xs text-gray-400">({{ fb.getEmail() }})</span></div>
+                                <div class="font-bold">{{ fb.getName() }} <span class="text-xs text-gray-400">({{ fb.getEmail() }})</span>
+                                  {% if not user %}
+                                    <span class="ml-2 inline-block text-xs bg-red-100 text-red-700 px-2 py-1 rounded">Unverified</span>
+                                  {% endif %}
+                                </div>
                                 <div class="text-xs text-gray-500 mt-1">Submitted: {{ fb.getCreatedAt() ? fb.getCreatedAt().format('Y-m-d H:i') : 'N/A' }}</div>
                             </div>
-                            <form method="post" action="{{ path('app_admin_feedback_approve', {'id': fb.getId()}) }}">
-                                <input type="hidden" name="_token" value="{{ csrf_token('approve-feedback-' ~ fb.getId()) }}">
-                                <button class="px-3 py-2 bg-yellow-400 font-black">Post It</button>
-                            </form>
+                            <div class="flex items-center gap-2">
+                                <a href="{{ path('app_admin_feedback_view', {'id': fb.getId()}) }}" class="px-3 py-2 bg-gray-200">View</a>
+                                <form method="post" action="{{ path('app_admin_feedback_delete', {'id': fb.getId()}) }}" onsubmit="return confirm('Delete this feedback?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete-feedback-' ~ fb.getId()) }}">
+                                    <button class="px-3 py-2 bg-red-500 text-white">Delete</button>
+                                </form>
+                                <form method="post" action="{{ path('app_admin_feedback_approve', {'id': fb.getId()}) }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('approve-feedback-' ~ fb.getId()) }}">
+                                    <button class="px-3 py-2 bg-yellow-400 font-black">Post It</button>
+                                </form>
+                            </div>
                         </div>
 
-                        <div class="mt-4 font-mono text-sm text-gray-700">{{ fb.getContent() }}</div>
+                        <div class="mt-4 font-mono text-sm text-gray-700">{{ fb.getContent()|raw }}</div>
                     </div>
                 {% endfor %}
             </div>
