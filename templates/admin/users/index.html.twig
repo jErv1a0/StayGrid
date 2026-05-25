@@ -21,7 +21,7 @@
                         <i data-feather="activity" class="w-4 h-4"></i>
                         Activity Logs
                     </a>
-                    <a href="{{ path('app_register') }}" class="inline-flex items-center gap-2 bg-yellow-400 text-black border border-yellow-400 px-5 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:bg-white hover:border-white transition-colors">
+                    <a href="{{ path('app_admin_users_new') }}" class="inline-flex items-center gap-2 bg-yellow-400 text-black border border-yellow-400 px-5 py-3 text-[10px] font-black uppercase tracking-[0.22em] hover:bg-white hover:border-white transition-colors">
                         <i data-feather="user-plus" class="w-4 h-4"></i>
                         New Identity
                     </a>
@@ -83,7 +83,10 @@
                                     {% endif %}
                                 </td>
                                 <td class="px-6 py-5 whitespace-nowrap text-right">
-                                    <div class="flex justify-end gap-2">
+                                    <div class="flex justify-end gap-2 flex-wrap">
+                                        <a href="{{ path('app_admin_users_edit', {'id': user.id}) }}" class="px-3 py-1.5 bg-yellow-50 border border-yellow-500 text-yellow-700 text-[10px] font-black uppercase tracking-wide hover:bg-yellow-500 hover:text-white transition-colors">
+                                            Edit
+                                        </a>
                                         {% if user.isVerified is defined and user.isVerified %}
                                             <form method="post" action="{{ path('app_admin_users_unverify', {'id': user.id}) }}">
                                                 <input type="hidden" name="_token" value="{{ csrf_token('unverify_user_' ~ user.id) }}">
@@ -99,6 +102,12 @@
                                                 </button>
                                             </form>
                                         {% endif %}
+                                        <form method="post" action="{{ path('app_admin_users_delete', {'id': user.id}) }}" onsubmit="return confirm('Delete this user account?');">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete_user_' ~ user.id) }}">
+                                            <button type="submit" class="px-3 py-1.5 bg-red-50 border border-red-500 text-red-700 text-[10px] font-black uppercase tracking-wide hover:bg-red-500 hover:text-white transition-colors">
+                                                Delete
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
