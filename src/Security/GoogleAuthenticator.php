@@ -25,7 +25,8 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
         private readonly ClientRegistry $clientRegistry,
         private readonly EntityManagerInterface $entityManager,
         private readonly RouterInterface $router,
-        private readonly UserPasswordHasherInterface $passwordHasher
+        private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly string $profilePictureDirectory
     ) {
     }
 
@@ -63,6 +64,24 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
 
                 $randomPassword = bin2hex(random_bytes(16));
                 $newUser->setPassword($this->passwordHasher->hashPassword($newUser, $randomPassword));
+
+                // If Google provided an avatar URL, try to download and save it
+                $avatarUrl = $googleUser->getAvatar();
+                if ($avatarUrl) {
+                    try {
+                        $imageContents = @file_get_contents($avatarUrl);
+                        if ($imageContents !== false) {
+                            $path = parse_url($avatarUrl, PHP_URL_PATH);
+                            $ext = pathinfo($path, PATHINFO_EXTENSION) ?: 'jpg';
+                            $safeFilename = uniqid('google_', true) . '.' . $ext;
+                            $target = rtrim($this->profilePictureDirectory, "\\/") . DIRECTORY_SEPARATOR . $safeFilename;
+                            @file_put_contents($target, $imageContents);
+                            $newUser->setProfilePicture($safeFilename);
+                        }
+                    } catch (\Throwable $e) {
+                        // Don't break authentication if avatar download fails; continue silently
+                    }
+                }
 
                 $this->entityManager->persist($newUser);
                 $this->entityManager->flush();
