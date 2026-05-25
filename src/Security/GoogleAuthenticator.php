@@ -68,6 +68,7 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
                 // If Google provided an avatar URL, try to download and save it
                 $avatarUrl = $googleUser->getAvatar();
                 if ($avatarUrl) {
+                    $downloaded = false;
                     try {
                         $imageContents = @file_get_contents($avatarUrl);
                         if ($imageContents !== false) {
@@ -75,11 +76,18 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
                             $ext = pathinfo($path, PATHINFO_EXTENSION) ?: 'jpg';
                             $safeFilename = uniqid('google_', true) . '.' . $ext;
                             $target = rtrim($this->profilePictureDirectory, "\\/") . DIRECTORY_SEPARATOR . $safeFilename;
-                            @file_put_contents($target, $imageContents);
-                            $newUser->setProfilePicture($safeFilename);
+                            if (@file_put_contents($target, $imageContents) !== false) {
+                                $newUser->setProfilePicture($safeFilename);
+                                $downloaded = true;
+                            }
                         }
                     } catch (\Throwable $e) {
-                        // Don't break authentication if avatar download fails; continue silently
+                        // ignore
+                    }
+
+                    // If we couldn't download/save the avatar (common on ephemeral hosts), store the remote URL so the template can display it directly.
+                    if (!$downloaded) {
+                        $newUser->setProfilePicture($avatarUrl);
                     }
                 }
 
