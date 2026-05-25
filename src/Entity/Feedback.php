@@ -36,6 +36,9 @@ class Feedback
     #[ORM\JoinColumn(name: 'approved_by', referencedColumnName: 'id', nullable: true)]
     private ?LogInUsers $approvedBy = null;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $rating = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -119,6 +122,17 @@ class Feedback
     public function setApprovedBy(?LogInUsers $user): static
     {
         $this->approvedBy = $user;
+        return $this;
+    }
+
+    public function getRating(): ?int
+    {
+        return $this->rating;
+    }
+
+    public function setRating(?int $rating): static
+    {
+        $this->rating = $rating;
         return $this;
     }
 }

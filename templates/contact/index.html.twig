@@ -135,7 +135,26 @@
               class="w-full bg-transparent border border-gray-300 focus:border-gray-900 focus:outline-none text-base md:text-xl font-extrabold tracking-tight placeholder:text-gray-300 transition-all px-4 py-4 resize-none leading-snug"></textarea>
       </div>
 
+      <div class="group relative">
+        <label class="block text-[10px] font-black uppercase tracking-widest text-yellow-600 mb-3">04 // Rating</label>
+        <div id="star-rating" class="flex items-center gap-2 mb-3">
+          <button type="button" data-value="1" class="star text-2xl text-gray-300">★</button>
+          <button type="button" data-value="2" class="star text-2xl text-gray-300">★</button>
+          <button type="button" data-value="3" class="star text-2xl text-gray-300">★</button>
+          <button type="button" data-value="4" class="star text-2xl text-gray-300">★</button>
+          <button type="button" data-value="5" class="star text-2xl text-gray-300">★</button>
+        </div>
+        <input type="hidden" id="rating" name="rating" value="">
+      </div>
+
       <div class="flex flex-col xl:flex-row xl:items-center gap-5 pt-2">
+        <div class="mb-3">
+          {% if recaptcha_site_key %}
+            <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+            <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+          {% endif %}
+        </div>
+
         <button type="submit"
             class="group relative inline-flex items-center justify-center gap-5 bg-gray-900 text-white px-10 py-5 overflow-hidden transition-all hover:bg-yellow-400 hover:text-gray-900">
           <span class="relative z-10 font-black uppercase tracking-[0.28em] text-xs">Submit</span>
@@ -235,3 +254,19 @@
 
 </body>
 </html>
+<script>
+  (function(){
+    const stars = document.querySelectorAll('#star-rating .star');
+    const ratingInput = document.getElementById('rating');
+    if(!stars || !ratingInput) return;
+    stars.forEach(s => s.addEventListener('click', function(){
+      const v = parseInt(this.getAttribute('data-value'),10);
+      ratingInput.value = v;
+      stars.forEach(ss => {
+        const val = parseInt(ss.getAttribute('data-value'),10);
+        ss.classList.toggle('text-yellow-400', val <= v);
+        ss.classList.toggle('text-gray-300', val > v);
+      });
+    }));
+  })();
+</script>
