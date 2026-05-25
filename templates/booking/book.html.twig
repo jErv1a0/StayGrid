@@ -53,7 +53,7 @@ NAVIGATION BAR (Included directly in the base layout)
         {% if app.user %}
             <a href="{{ path('app_booking') }}" class="inline-flex items-center px-5 py-2.5 bg-black text-white text-xs font-bold tracking-[0.2em] uppercase hover:bg-yellow-400 hover:text-black transition-colors">Book Now</a>
         {% else %}
-            <a href="{{ path('app_login', {'redirect': 'book'}) }}" class="inline-flex items-center px-5 py-2.5 bg-black text-white text-xs font-bold tracking-[0.2em] uppercase hover:bg-yellow-400 hover:text-black transition-colors">Book Now</a>
+            <a href="{{ path('app_login') }}" class="inline-flex items-center px-5 py-2.5 bg-black text-white text-xs font-bold tracking-[0.2em] uppercase hover:bg-yellow-400 hover:text-black transition-colors">Book Now</a>
         {% endif %}
     </div>
 </header>

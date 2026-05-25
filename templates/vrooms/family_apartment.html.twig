@@ -43,7 +43,7 @@
         {% if app.user %}
             <a href="{{ path('app_booking') }}" class="inline-flex items-center px-5 py-2.5 bg-black text-white text-xs font-bold tracking-[0.2em] uppercase hover:bg-yellow-400 hover:text-black transition-colors">Book Now</a>
         {% else %}
-            <a href="{{ path('app_login', {'redirect': 'book'}) }}" class="inline-flex items-center px-5 py-2.5 bg-black text-white text-xs font-bold tracking-[0.2em] uppercase hover:bg-yellow-400 hover:text-black transition-colors">Book Now</a>
+            <a href="{{ path('app_login') }}" class="inline-flex items-center px-5 py-2.5 bg-black text-white text-xs font-bold tracking-[0.2em] uppercase hover:bg-yellow-400 hover:text-black transition-colors">Book Now</a>
         {% endif %}
     </div>
 </header>
@@ -93,7 +93,7 @@
                     {% endfor %}
                 </div>
 
-                <a href="{{ path('app_login', {'redirect': 'book'}) }}" class="inline-flex items-center justify-between w-full px-8 py-6 bg-gray-900 text-yellow-400 hover:bg-yellow-400 hover:text-gray-900 transition-all duration-500 group shadow-[10px_10px_0px_0px_#facc15] hover:shadow-none">
+                <a href="{{ path('app_login') }}" class="inline-flex items-center justify-between w-full px-8 py-6 bg-gray-900 text-yellow-400 hover:bg-yellow-400 hover:text-gray-900 transition-all duration-500 group shadow-[10px_10px_0px_0px_#facc15] hover:shadow-none">
                     <span class="font-black uppercase tracking-[0.3em] text-sm">Book this Stay</span>
                     <i data-feather="arrow-right" class="group-hover:translate-x-2 transition-transform"></i>
                 </a>
@@ -166,7 +166,7 @@
                             <span class="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1">Per Night</span>
                             <p class="text-2xl font-black text-gray-900 group-hover:text-yellow-600 transition-colors">₱{{ variant.price }}</p>
                         </div>
-                        <a href="{{ path('app_login', {'redirect': 'book'}) }}" class="w-14 h-14 border border-gray-900 flex items-center justify-center group-hover:bg-yellow-400 group-hover:border-yellow-400 transition-all">
+                        <a href="{{ path('app_login') }}" class="w-14 h-14 border border-gray-900 flex items-center justify-center group-hover:bg-yellow-400 group-hover:border-yellow-400 transition-all">
                             <i data-feather="plus" class="w-5 h-5"></i>
                         </a>
                     </div>
