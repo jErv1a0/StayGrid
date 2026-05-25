@@ -64,6 +64,12 @@ class AppFixtures extends Fixture
         ];
 
         foreach ($rooms as $roomData) {
+            $existing = $manager->getRepository(RoomListing::class)->findOneBy(['number' => $roomData['number']]);
+
+            if ($existing) {
+                continue;
+            }
+
             $room = new RoomListing();
             $room->setNumber($roomData['number']);
             $room->setCategory($roomData['category']);

@@ -16,6 +16,8 @@ security:
     password_hashers:
         App\Entity\LogInUsers:
             algorithm: auto
+        App\Entity\User:
+            algorithm: auto
 
     firewalls:
 

@@ -64,7 +64,7 @@
             <div class="relative h-[290px] md:h-[440px] bg-black" id="room-gallery-slideshow">
                 <div class="h-full w-full overflow-hidden" id="room-gallery-track">
                     {% for room in all_rooms %}
-                        {% set imagePath = room.image ? (room.image matches '/^uploads\\//' ? room.image : 'uploads/rooms/' ~ room.image) : 'images/default_room.png' %}
+                        {% set imagePath = room.image ? (room.image matches '/^uploads\\//' ? room.image : 'images/' ~ room.image) : 'images/default_room.png' %}
                         <article class="room-slide absolute inset-0 opacity-0 transition-opacity duration-700" data-slide-index="{{ loop.index0 }}">
                             <img src="{{ asset(imagePath) }}" alt="{{ room.title|default('Room') }}" class="w-full h-full object-cover">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>

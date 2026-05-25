@@ -53,12 +53,16 @@ when@dev:
         App\DataFixtures\:
             resource: '../src/DataFixtures/'
             tags: ['doctrine.fixture.orm']
+            autowire: true
+            autoconfigure: true
 
 when@test:
     services:
         App\DataFixtures\:
             resource: '../src/DataFixtures/'
             tags: ['doctrine.fixture.orm']
+            autowire: true
+            autoconfigure: true
 
 when@prod:
     services:

@@ -22,7 +22,7 @@
         {# --- LEFT: VISUAL ASSET --- #}
         <div class="lg:col-span-7 space-y-8">
             <div class="aspect-[16/10] bg-gray-100 overflow-hidden relative group border border-black/10">
-                {% set roomImagePath = room.image ? (room.image matches '/^uploads\\//' ? room.image : 'uploads/rooms/' ~ room.image) : null %}
+                {% set roomImagePath = room.image ? (room.image matches '/^uploads\\//' ? room.image : 'images/' ~ room.image) : null %}
                 {% set roomCategoryKey = room.category|default('')|lower %}
                 {% set roomImageFallback = 'images/default_room.png' %}
                 {% if 'family' in roomCategoryKey %}
@@ -32,11 +32,11 @@
                 {% elseif 'studio' in roomCategoryKey %}
                     {% set roomImageFallback = 'images/studiodeluxefh.png' %}
                 {% endif %}
-                {% set room_img = roomImagePath ? asset(roomImagePath) : asset(roomImageFallback) %}
-                <img src="{{ room_img }}" 
+                 {% set room_img = roomImagePath ? asset(roomImagePath) : asset(roomImageFallback) %}
+                 <img src="{{ room_img }}" 
                      class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" 
                      alt="{{ room.title }}"
-                     onerror="this.onerror=null;this.src='{{ asset(roomImageFallback) }}'">
+                     onerror="this.onerror=null;this.src='{{ room.image ? asset('images/' ~ room.image) : asset(roomImageFallback) }}'">
                 
                 <div class="absolute bottom-6 left-6 bg-black text-white px-4 py-2 text-[9px] font-black uppercase tracking-[0.4em]">
                     Photo

@@ -32,7 +32,7 @@ final class Version20251213091024 extends AbstractMigration
 
             $exists = (bool) $this->connection->fetchOne("SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'transaction' AND CONSTRAINT_NAME = 'FK_723705D1A76ED395' AND CONSTRAINT_TYPE = 'FOREIGN KEY'");
             if (! $exists) {
-                $this->addSql('ALTER TABLE transaction ADD CONSTRAINT FK_723705D1A76ED395 FOREIGN KEY (user_id) REFERENCES `user` (id)');
+                $this->addSql('ALTER TABLE transaction ADD CONSTRAINT FK_723705D1A76ED395 FOREIGN KEY (user_id) REFERENCES log_in_users (id)');
             }
         }
 

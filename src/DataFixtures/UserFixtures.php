@@ -15,6 +15,10 @@ class UserFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
+        if ($manager->getRepository(User::class)->findOneBy(['email' => 'SuperUser@Staygird'])) {
+            return;
+        }
+
         echo "[UserFixtures] running\n";
 
         $user = new User();
