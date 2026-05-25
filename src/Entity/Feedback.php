@@ -33,7 +33,7 @@ class Feedback
     private ?\DateTimeImmutable $approvedAt = null;
 
     #[ORM\ManyToOne(targetEntity: LogInUsers::class)]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\JoinColumn(name: 'approved_by', referencedColumnName: 'id', nullable: true)]
     private ?LogInUsers $approvedBy = null;
 
     public function getId(): ?int
