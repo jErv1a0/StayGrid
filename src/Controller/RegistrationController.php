@@ -91,7 +91,8 @@ class RegistrationController extends AbstractController
         $client = $clientRegistry->getClient('google');
         $client->setAsStateless();
 
-        return $client->redirect(['email', 'profile']);
+        // Force account chooser so users can pick a Google account
+        return $client->redirect(['email', 'profile'], ['prompt' => 'select_account']);
     }
 
     #[Route('/connect/google/check', name: 'connect_google_check')]
