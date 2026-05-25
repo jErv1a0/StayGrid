@@ -7,13 +7,11 @@ use App\Form\RegistrationFormType;
 use App\Security\EmailVerifier;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -21,10 +19,6 @@ use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
 class RegistrationController extends AbstractController
 {
-    public function __construct(private EmailVerifier $emailVerifier)
-    {
-    }
-
     #[Route('/register', name: 'app_register')]
     public function register(
         Request $request, 
@@ -53,17 +47,6 @@ class RegistrationController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
-            // Send verification email
-            $this->emailVerifier->sendEmailConfirmation(
-                'app_verify_email', 
-                $user,
-                (new TemplatedEmail())
-                    ->from(new Address('no-reply@staygrid.com', 'StayGrid Notifications'))
-                    ->to($user->getEmail())
-                    ->subject('Please Confirm Your Email')
-                    ->htmlTemplate('registration/confirmation_email.html.twig')
-            );
-
             // Auto-login user after registration
             return $security->login($user, 'form_login', 'main');
         }
@@ -76,6 +59,7 @@ class RegistrationController extends AbstractController
     #[Route('/verify/email', name: 'app_verify_email')]
     public function verifyUserEmail(
         Request $request, 
+        EmailVerifier $emailVerifier,
         TranslatorInterface $translator
     ): Response 
     {
@@ -84,7 +68,7 @@ class RegistrationController extends AbstractController
         try {
             /** @var LogInUsers $user */
             $user = $this->getUser();
-            $this->emailVerifier->handleEmailConfirmation($request, $user);
+            $emailVerifier->handleEmailConfirmation($request, $user);
 
         } catch (VerifyEmailExceptionInterface $exception) {
 
