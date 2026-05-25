@@ -1,0 +1,134 @@
+{% extends 'user/base.html.twig' %}
+
+{% block title %}User Feedback{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-[#f7f4ed] pb-24">
+    <section class="relative overflow-hidden border-b border-black/10">
+        <div class="absolute inset-0 pointer-events-none" style="background:
+            radial-gradient(circle at 16% 18%, rgba(251, 191, 36, 0.24), transparent 34%),
+            radial-gradient(circle at 82% 72%, rgba(15, 23, 42, 0.08), transparent 36%),
+            linear-gradient(180deg, rgba(255,255,255,0.78) 0%, rgba(247,244,237,0.95) 100%);"></div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-8 pt-16 pb-10">
+            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="w-12 h-px bg-black"></span>
+                        <span class="text-[10px] font-black uppercase tracking-[0.38em] text-gray-500">Account Feedback</span>
+                    </div>
+                    <h1 class="text-5xl md:text-7xl font-black uppercase tracking-[-0.04em] leading-[0.86]">
+                        Send <span class="block text-transparent" style="-webkit-text-stroke: 1.1px #111827;">Your Feedback</span>
+                    </h1>
+                    <p class="mt-4 text-sm font-mono uppercase tracking-[0.2em] text-gray-500">
+                        {% if current_user %}
+                            {{ current_user.getFullName() ?: current_user.getEmail() }}
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div class="flex flex-wrap gap-3 items-center">
+                    {% if is_verified %}
+                        <span class="px-4 py-3 bg-green-100 text-green-700 border border-green-500 text-[10px] font-black uppercase tracking-[0.24em]">Verified Account</span>
+                    {% else %}
+                        <span class="px-4 py-3 bg-red-100 text-red-700 border border-red-500 text-[10px] font-black uppercase tracking-[0.24em]">Unverified Account</span>
+                    {% endif %}
+                    <a href="{{ path('app_user_dashboard') }}" class="px-6 py-3 bg-black text-white text-[10px] font-black uppercase tracking-[0.24em] hover:bg-yellow-400 hover:text-black transition-colors">
+                        Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="max-w-7xl mx-auto px-8 pt-10">
+        {% for message in app.flashes('success') %}
+            <div class="mb-6 border border-green-500 bg-green-50 text-green-700 px-4 py-3 font-bold">
+                {{ message }}
+            </div>
+        {% endfor %}
+        {% for message in app.flashes('error') %}
+            <div class="mb-6 border border-red-500 bg-red-50 text-red-700 px-4 py-3 font-bold">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        <section class="border border-black/10 bg-white overflow-hidden">
+            <div class="px-6 py-4 border-b border-black/10 flex items-center justify-between">
+                <h2 class="text-[11px] font-black uppercase tracking-[0.35em]">Feedback Form</h2>
+                <span class="text-[9px] uppercase tracking-[0.2em] text-gray-400">Submitted to admin moderation</span>
+            </div>
+
+            <form method="post" action="{{ path('app_user_feedback') }}" class="p-6 md:p-8 space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 mb-3">Name</label>
+                        <div class="w-full border border-black/10 bg-[#fcfbf8] px-4 py-4 text-sm font-bold uppercase tracking-[0.12em] text-gray-700">
+                            {{ current_user.getFullName() ?: current_user.getEmail() }}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 mb-3">Email</label>
+                        <div class="w-full border border-black/10 bg-[#fcfbf8] px-4 py-4 text-sm font-bold tracking-[0.12em] text-gray-700">
+                            {{ current_user.getEmail() }}
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 mb-3">Rating</label>
+                    <div id="star-rating" class="flex items-center gap-2">
+                        {% for value in 1..5 %}
+                            <button type="button" data-value="{{ value }}" class="star text-3xl text-gray-300 hover:text-yellow-400 transition-colors">★</button>
+                        {% endfor %}
+                    </div>
+                    <input type="hidden" id="rating" name="rating" value="">
+                </div>
+
+                <div>
+                    <label for="feedback" class="block text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 mb-3">Feedback</label>
+                    <textarea id="feedback" name="feedback" rows="7" required placeholder="Tell us what worked, what failed, or what should be improved..."
+                        class="w-full border border-black/10 bg-white px-4 py-4 text-base md:text-lg font-medium tracking-tight placeholder:text-gray-300 focus:outline-none focus:border-black resize-none"></textarea>
+                </div>
+
+                <div class="flex flex-col md:flex-row md:items-center gap-4 pt-2">
+                    <button type="submit" class="inline-flex items-center justify-center gap-3 bg-black text-white px-8 py-4 uppercase font-black tracking-[0.24em] text-[10px] hover:bg-yellow-400 hover:text-black transition-colors">
+                        Submit Feedback
+                    </button>
+                    <p class="text-[10px] font-mono uppercase tracking-[0.18em] text-gray-500">
+                        Your submission will stay pending until an admin approves it.
+                    </p>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const stars = document.querySelectorAll('#star-rating .star');
+        const ratingInput = document.getElementById('rating');
+
+        if (!stars.length || !ratingInput) {
+            return;
+        }
+
+        const paintStars = (value) => {
+            stars.forEach((star) => {
+                const starValue = parseInt(star.getAttribute('data-value'), 10);
+                star.classList.toggle('text-yellow-400', starValue <= value);
+                star.classList.toggle('text-gray-300', starValue > value);
+            });
+        };
+
+        stars.forEach((star) => {
+            star.addEventListener('click', () => {
+                const value = parseInt(star.getAttribute('data-value'), 10);
+                ratingInput.value = String(value);
+                paintStars(value);
+            });
+        });
+    });
+</script>
+{% endblock %}

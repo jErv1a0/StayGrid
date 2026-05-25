@@ -86,6 +86,16 @@
                 </svg>
                 Your Profile
             </a>
+
+            {# Feedback #}
+            <a href="{{ path('app_user_feedback') }}"
+               class="flex items-center gap-4 px-4 py-4 rounded-none text-[10px] font-black uppercase tracking-[0.3em] transition-all group
+               {{ 'feedback' in current_route ? 'bg-yellow-400 text-black' : 'text-white/50 hover:bg-white/10 hover:text-white' }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path d="M7 8h10M7 12h6m-6 4h4M21 12c0 4.97-4.03 9-9 9a8.96 8.96 0 01-4.2-1.03L3 21l1.03-4.8A8.96 8.96 0 013 12c0-4.97 4.03-9 9-9s9 4.03 9 9z" />
+                </svg>
+                Feedback
+            </a>
         </nav>
 
         {# Logout #}

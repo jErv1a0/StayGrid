@@ -17,10 +17,12 @@
                     <div class="border p-4 bg-gray-50">
                         <div class="flex justify-between items-start">
                             <div>
-                                <div class="font-bold">{{ fb.getName() }} <span class="text-xs text-gray-400">({{ fb.getEmail() }})</span>
-                                  {% if not user %}
-                                    <span class="ml-2 inline-block text-xs bg-red-100 text-red-700 px-2 py-1 rounded">Unverified</span>
-                                  {% endif %}
+                                                                <div class="font-bold">{{ fb.getName() }} <span class="text-xs text-gray-400">({{ fb.getEmail() }})</span>
+                                                                    {% if user and user.isVerified() %}
+                                                                        <span class="ml-2 inline-block text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Verified</span>
+                                                                    {% else %}
+                                                                        <span class="ml-2 inline-block text-xs bg-red-100 text-red-700 px-2 py-1 rounded">Unverified</span>
+                                                                    {% endif %}
                                 </div>
                                 <div class="text-xs text-gray-500 mt-1">Submitted: {{ fb.getCreatedAt() ? fb.getCreatedAt().format('Y-m-d H:i') : 'N/A' }}</div>
                             </div>
