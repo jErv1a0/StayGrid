@@ -46,7 +46,7 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
         $email = mb_strtolower(trim((string) $googleUser->getEmail()));
 
         return new SelfValidatingPassport(
-            new UserBadge($email, function () use ($email) {
+            new UserBadge($email, function () use ($email, $googleUser) {
                 $existingUser = $this->entityManager->getRepository(LogInUsers::class)->findOneBy(['email' => $email]);
 
                 if ($existingUser) {
