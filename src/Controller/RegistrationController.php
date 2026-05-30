@@ -86,6 +86,7 @@ class RegistrationController extends AbstractController
     }
 
     #[Route('/connect/google', name: 'connect_google_start')]
+    #[Route('/api/auth/google', name: 'api_auth_google', methods: ['GET'])]
     public function connectGoogle(ClientRegistry $clientRegistry): RedirectResponse
     {
         $client = $clientRegistry->getClient('google');

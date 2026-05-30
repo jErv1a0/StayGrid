@@ -84,9 +84,14 @@ security:
         - { path: ^/admin/login$, roles: PUBLIC_ACCESS }
         - { path: ^/staff/roomlisting/bookings, roles: PUBLIC_ACCESS }
         - { path: ^/api/login$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/auth/login$, roles: PUBLIC_ACCESS }
         - { path: ^/api/logout$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/auth/logout$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/auth/google$, roles: PUBLIC_ACCESS }
         - { path: ^/api/register$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/auth/register$, roles: PUBLIC_ACCESS }
         - { path: ^/api/verify-email$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/auth/verify-email$, roles: PUBLIC_ACCESS }
         - { path: ^/api/rooms/?$, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/admin, roles: ROLE_ADMIN }
