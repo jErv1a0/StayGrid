@@ -15,10 +15,15 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Psr\Log\LoggerInterface;
 
 class ApiAuthController extends AbstractController
 {
+    private const MOBILE_TOKEN_TTL_SECONDS = 604800;
+
     #[Route('/api/register', name: 'api_register', methods: ['POST'])]
+    #[Route('/api/auth/register', name: 'api_auth_register', methods: ['POST'])]
     public function register(
         Request $request,
         UserPasswordHasherInterface $passwordHasher,
@@ -103,6 +108,7 @@ class ApiAuthController extends AbstractController
     }
 
     #[Route('/api/verify-email', name: 'api_verify_email', methods: ['GET'])]
+    #[Route('/api/auth/verify-email', name: 'api_auth_verify_email', methods: ['GET'])]
     public function verifyEmail(
         Request $request,
         EmailVerifier $emailVerifier,
@@ -137,15 +143,17 @@ class ApiAuthController extends AbstractController
     }
 
     #[Route('/api/login', name: 'api_login_info', methods: ['GET'])]
+    #[Route('/api/auth/login', name: 'api_auth_login_info', methods: ['GET'])]
     public function loginInfo(): Response
     {
         return new JsonResponse([
             'success' => true,
-            'message' => 'Use POST /api/login with JSON body: {"email":"...","password":"..."}'
+            'message' => 'Use POST /api/auth/login with JSON body: {"email":"...","password":"..."} and send the returned access_token as Authorization: Bearer <token>'
         ]);
     }
 
     #[Route('/api/login', name: 'api_login', methods: ['POST'])]
+    #[Route('/api/auth/login', name: 'api_auth_login', methods: ['POST'])]
     public function login(
         Request $request,
         UserPasswordHasherInterface $passwordHasher,
@@ -177,8 +185,7 @@ class ApiAuthController extends AbstractController
             ], 403);
         }
 
-        // SIMPLE TOKEN (for exam/demo only)
-        $token = base64_encode($user->getId() . ':' . $user->getEmail());
+        $authToken = $this->createBearerToken($user);
 
         // Keep a session-based fallback for mobile clients that reuse cookies.
         if ($request->hasSession()) {
@@ -187,7 +194,9 @@ class ApiAuthController extends AbstractController
 
         return new JsonResponse([
             'success' => true,
-            'token' => $token,
+            'token_type' => 'Bearer',
+            'access_token' => $authToken['token'],
+            'expires_in' => $authToken['expires_in'],
             'user' => [
                 'id' => $user->getId(),
                 'email' => $user->getEmail(),
@@ -196,30 +205,153 @@ class ApiAuthController extends AbstractController
         ]);
     }
 
+    #[Route('/api/auth/google/mobile', name: 'api_auth_google_mobile_info', methods: ['GET'])]
+    public function googleMobileLoginInfo(): Response
+    {
+        return new JsonResponse([
+            'success' => true,
+            'message' => 'Use POST /api/auth/google/mobile with JSON body {"token":"<google id token>"}',
+        ]);
+    }
+
+    #[Route('/api/auth/google/mobile', name: 'api_auth_google_mobile', methods: ['POST'])]
+    public function googleMobileLogin(
+        Request $request,
+        HttpClientInterface $httpClient,
+        EntityManagerInterface $entityManager,
+        UserPasswordHasherInterface $passwordHasher,
+        LoggerInterface $logger
+    ): Response {
+        $data = json_decode($request->getContent(), true);
+        $idToken = is_array($data) ? ($data['token'] ?? null) : null;
+
+        if (!is_string($idToken) || $idToken === '') {
+            return new JsonResponse([
+                'success' => false,
+                'error' => 'Missing Google token',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        try {
+            $response = $httpClient->request('GET', 'https://oauth2.googleapis.com/tokeninfo', [
+                'query' => ['id_token' => $idToken],
+                'timeout' => 5,
+            ]);
+
+            $googleData = $response->toArray(false);
+        } catch (\Throwable $throwable) {
+            $logger->error('Google token verification failed', [
+                'error' => $throwable->getMessage(),
+            ]);
+
+            return new JsonResponse([
+                'success' => false,
+                'error' => 'Failed to verify Google token',
+            ], Response::HTTP_BAD_GATEWAY);
+        }
+
+        $googleClientId = (string) ($_ENV['GOOGLE_CLIENT_ID'] ?? $_SERVER['GOOGLE_CLIENT_ID'] ?? '');
+        if ($googleClientId === '' || ($googleData['aud'] ?? null) !== $googleClientId) {
+            return new JsonResponse([
+                'success' => false,
+                'error' => 'Token audience mismatch',
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        if (($googleData['email_verified'] ?? 'false') !== 'true') {
+            return new JsonResponse([
+                'success' => false,
+                'error' => 'Google email is not verified',
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $email = mb_strtolower(trim((string) ($googleData['email'] ?? '')));
+        if ($email === '') {
+            return new JsonResponse([
+                'success' => false,
+                'error' => 'Google token did not contain an email address',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $userRepository = $entityManager->getRepository(LogInUsers::class);
+        $user = $userRepository->findOneBy(['email' => $email]);
+
+        if (!$user) {
+            $user = new LogInUsers();
+            $user->setEmail($email);
+            $user->setRoles([LogInUsers::ROLE_CLIENT]);
+            $user->setIsVerified(true);
+
+            $displayName = trim((string) ($googleData['name'] ?? ''));
+            if ($displayName === '') {
+                $displayName = trim((string) (($googleData['given_name'] ?? '') . ' ' . ($googleData['family_name'] ?? '')));
+            }
+
+            if ($displayName !== '') {
+                $user->setFullName($displayName);
+            }
+
+            $randomPassword = bin2hex(random_bytes(16));
+            $user->setPassword($passwordHasher->hashPassword($user, $randomPassword));
+
+            $entityManager->persist($user);
+            $entityManager->flush();
+        } else {
+            $updated = false;
+
+            if (!$user->isVerified()) {
+                $user->setIsVerified(true);
+                $updated = true;
+            }
+
+            if (!$user->getFullName()) {
+                $displayName = trim((string) ($googleData['name'] ?? ''));
+                if ($displayName === '') {
+                    $displayName = trim((string) (($googleData['given_name'] ?? '') . ' ' . ($googleData['family_name'] ?? '')));
+                }
+
+                if ($displayName !== '') {
+                    $user->setFullName($displayName);
+                    $updated = true;
+                }
+            }
+
+            if ($updated) {
+                $entityManager->flush();
+            }
+        }
+
+        $authToken = $this->createBearerToken($user);
+
+        if ($request->hasSession()) {
+            $request->getSession()->set('api_user_id', $user->getId());
+        }
+
+        return new JsonResponse([
+            'success' => true,
+            'token_type' => 'Bearer',
+            'access_token' => $authToken['token'],
+            'expires_in' => $authToken['expires_in'],
+            'user' => [
+                'id' => $user->getId(),
+                'email' => $user->getEmail(),
+                'fullName' => $user->getFullName(),
+                'isVerified' => $user->isVerified(),
+            ],
+        ]);
+    }
+
     #[Route('/api/me', name: 'api_me', methods: ['GET'])]
+    #[Route('/api/auth/me', name: 'api_auth_me', methods: ['GET'])]
+    #[Route('/api/user/profile', name: 'api_user_profile', methods: ['GET'])]
     public function me(
         Request $request,
         EntityManagerInterface $entityManager
     ): Response {
-        $authHeader = $request->headers->get('Authorization');
-
-        if (!$authHeader) {
-            return new JsonResponse(['success' => false, 'error' => 'No token'], 401);
-        }
-
-        $token = str_replace('Bearer ', '', $authHeader);
-        $decoded = base64_decode($token);
-
-        if (!$decoded || !str_contains($decoded, ':')) {
-            return new JsonResponse(['success' => false, 'error' => 'Invalid token'], 401);
-        }
-
-        [$userId, $email] = explode(':', $decoded);
-
-        $user = $entityManager->getRepository(LogInUsers::class)->find($userId);
+        $user = $this->resolveAuthenticatedUser($request, $entityManager);
 
         if (!$user) {
-            return new JsonResponse(['success' => false, 'error' => 'User not found'], 404);
+            return new JsonResponse(['success' => false, 'error' => 'Unauthorized'], 401);
         }
 
         return new JsonResponse([
@@ -238,11 +370,12 @@ class ApiAuthController extends AbstractController
     }
 
     #[Route('/api/logout', name: 'api_logout', methods: ['POST'])]
+    #[Route('/api/auth/logout', name: 'api_auth_logout', methods: ['POST'])]
     public function logout(): Response
     {
         return new JsonResponse([
             'success' => true,
-            'message' => 'Logged out'
+            'message' => 'Logged out. Discard the bearer token on the client.'
         ]);
     }
 
@@ -392,17 +525,12 @@ class ApiAuthController extends AbstractController
 
     private function resolveAuthenticatedUser(Request $request, EntityManagerInterface $entityManager): ?LogInUsers
     {
-        $authHeader = $request->headers->get('Authorization');
-        if ($authHeader && str_starts_with($authHeader, 'Bearer ')) {
-            $token = str_replace('Bearer ', '', $authHeader);
-            $decoded = base64_decode($token, true);
+        $payload = $this->decodeBearerToken($request);
 
-            if ($decoded && str_contains($decoded, ':')) {
-                [$userId] = explode(':', $decoded, 2);
-                $user = $entityManager->getRepository(LogInUsers::class)->find((int) $userId);
-                if ($user) {
-                    return $user;
-                }
+        if ($payload && isset($payload['sub'])) {
+            $user = $entityManager->getRepository(LogInUsers::class)->find((int) $payload['sub']);
+            if ($user) {
+                return $user;
             }
         }
 
@@ -417,5 +545,108 @@ class ApiAuthController extends AbstractController
         }
 
         return null;
+    }
+
+    private function createBearerToken(LogInUsers $user): array
+    {
+        $issuedAt = time();
+        $expiresAt = $issuedAt + self::MOBILE_TOKEN_TTL_SECONDS;
+
+        $header = [
+            'alg' => 'HS256',
+            'typ' => 'JWT',
+        ];
+
+        $payload = [
+            'iss' => 'staygrid-api',
+            'sub' => $user->getId(),
+            'email' => $user->getEmail(),
+            'iat' => $issuedAt,
+            'exp' => $expiresAt,
+            'jti' => bin2hex(random_bytes(16)),
+        ];
+
+        $encodedHeader = $this->base64UrlEncode(json_encode($header, JSON_UNESCAPED_SLASHES));
+        $encodedPayload = $this->base64UrlEncode(json_encode($payload, JSON_UNESCAPED_SLASHES));
+        $signature = $this->base64UrlEncode(hash_hmac('sha256', $encodedHeader . '.' . $encodedPayload, (string) $this->getParameter('kernel.secret'), true));
+
+        return [
+            'token' => $encodedHeader . '.' . $encodedPayload . '.' . $signature,
+            'expires_in' => self::MOBILE_TOKEN_TTL_SECONDS,
+        ];
+    }
+
+    private function decodeBearerToken(Request $request): ?array
+    {
+        $authHeader = $request->headers->get('Authorization', '');
+
+        if (!preg_match('/^Bearer\s+(.+)$/i', $authHeader, $matches)) {
+            return null;
+        }
+
+        return $this->validateToken((string) $matches[1]);
+    }
+
+    private function validateToken(string $token): ?array
+    {
+        $parts = explode('.', $token);
+
+        if (count($parts) !== 3) {
+            return null;
+        }
+
+        [$encodedHeader, $encodedPayload, $signature] = $parts;
+
+        $headerJson = $this->base64UrlDecode($encodedHeader);
+        $payloadJson = $this->base64UrlDecode($encodedPayload);
+
+        if ($headerJson === null || $payloadJson === null) {
+            return null;
+        }
+
+        $header = json_decode($headerJson, true);
+        $payload = json_decode($payloadJson, true);
+
+        if (!is_array($header) || !is_array($payload)) {
+            return null;
+        }
+
+        if (($header['alg'] ?? null) !== 'HS256' || ($header['typ'] ?? null) !== 'JWT') {
+            return null;
+        }
+
+        if (($payload['iss'] ?? null) !== 'staygrid-api') {
+            return null;
+        }
+
+        if (!isset($payload['exp']) || !is_int($payload['exp']) || $payload['exp'] < time()) {
+            return null;
+        }
+
+        $expectedSignature = $this->base64UrlEncode(hash_hmac('sha256', $encodedHeader . '.' . $encodedPayload, (string) $this->getParameter('kernel.secret'), true));
+
+        if (!hash_equals($expectedSignature, $signature)) {
+            return null;
+        }
+
+        return $payload;
+    }
+
+    private function base64UrlEncode(string $value): string
+    {
+        return rtrim(strtr(base64_encode($value), '+/', '-_'), '=');
+    }
+
+    private function base64UrlDecode(string $value): ?string
+    {
+        $remainder = strlen($value) % 4;
+
+        if ($remainder > 0) {
+            $value .= str_repeat('=', 4 - $remainder);
+        }
+
+        $decoded = base64_decode(strtr($value, '-_', '+/'), true);
+
+        return $decoded === false ? null : $decoded;
     }
 }

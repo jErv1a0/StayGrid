@@ -85,6 +85,7 @@ security:
         - { path: ^/staff/roomlisting/bookings, roles: PUBLIC_ACCESS }
         - { path: ^/api/login$, roles: PUBLIC_ACCESS }
         - { path: ^/api/auth/login$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/auth/google/mobile$, roles: PUBLIC_ACCESS }
         - { path: ^/api/logout$, roles: PUBLIC_ACCESS }
         - { path: ^/api/auth/logout$, roles: PUBLIC_ACCESS }
         - { path: ^/api/auth/google$, roles: PUBLIC_ACCESS }
