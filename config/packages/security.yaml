@@ -30,7 +30,7 @@ security:
             pattern: ^/api
             lazy: true
             provider: app_user_provider
-            stateless: false
+            stateless: true
             user_checker: App\Security\UserChecker
 
         # ---------- ADMIN FIREWALL ----------
@@ -93,7 +93,7 @@ security:
         - { path: ^/api/auth/register$, roles: PUBLIC_ACCESS }
         - { path: ^/api/verify-email$, roles: PUBLIC_ACCESS }
         - { path: ^/api/auth/verify-email$, roles: PUBLIC_ACCESS }
-        - { path: ^/api/rooms/?$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/rooms, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/admin, roles: ROLE_ADMIN }
 
