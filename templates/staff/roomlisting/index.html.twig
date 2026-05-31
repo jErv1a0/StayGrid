@@ -25,10 +25,10 @@
     {% if rooms is not empty %}
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {% for room in rooms %}
-                {% set imgPath = room.image ? (room.image matches '/^uploads\\//' ? room.image : 'uploads/rooms/' ~ room.image) : 'images/default_room.png' %}
+                {% set imgPath = room.image ? (room.image matches '/^(uploads\\/|uploads\\/rooms\\/)/' ? room.image : 'uploads/rooms/' ~ room.image) : 'images/default_room.png' %}
                 <article class="group border border-black/10 bg-white overflow-hidden hover:-translate-y-1 transition-transform">
                     <div class="relative aspect-[16/10] overflow-hidden">
-                        <img src="{{ asset(imgPath) }}" alt="{{ room.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onerror="this.onerror=null;this.src='{{ room.image ? asset('images/' ~ room.image) : asset('images/default_room.png') }}';">
+                        <img src="{{ asset(imgPath) }}" alt="{{ room.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onerror="this.onerror=null;this.src='{{ room.image ? asset(room.image matches '/^(uploads\\/|uploads\\/rooms\\/)/' ? room.image : 'uploads/rooms/' ~ room.image) : asset('images/default_room.png') }}';">
                         <div class="absolute top-4 right-4">
                             <span class="px-3 py-1 text-[8px] font-black uppercase tracking-widest border border-white text-white backdrop-blur-md {% if room.getStatus() == 'Available' %}bg-green-500/80{% elseif room.getStatus() == 'Occupied' %}bg-yellow-500/80{% else %}bg-red-500/80{% endif %}">{{ room.getStatus() }}</span>
                         </div>

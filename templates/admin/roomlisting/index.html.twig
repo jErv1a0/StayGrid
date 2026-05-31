@@ -45,7 +45,7 @@
 
     <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         {% for data in roomData %}
-                    {% set roomImagePath = data.room.image ? (data.room.image matches '/^uploads\\//' ? data.room.image : 'images/' ~ data.room.image) : null %}
+                    {% set roomImagePath = data.room.image ? (data.room.image matches '/^(uploads\\/|uploads\\/rooms\\/)/' ? data.room.image : 'uploads/rooms/' ~ data.room.image) : null %}
                     {% set roomCategoryKey = data.room.category|default('')|lower %}
                     {% set roomImageFallback = 'images/default_room.png' %}
                     {% if 'family' in roomCategoryKey %}
@@ -59,7 +59,7 @@
             <article class="group border border-black/10 bg-white overflow-hidden hover:border-black transition-colors">
                 <div class="relative aspect-[16/10] bg-gray-100 overflow-hidden">
                     {% if data.room.image %}
-                                <img class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" src="{{ roomImageSrc }}" alt="Room {{ data.room.number }}" onerror="this.onerror=null;this.src='{{ data.room.image matches '/^uploads\\//' ? asset(data.room.image) : asset('uploads/rooms/' ~ data.room.image) }}';">
+                                <img class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" src="{{ roomImageSrc }}" alt="Room {{ data.room.number }}" onerror="this.onerror=null;this.src='{{ data.room.image matches '/^(uploads\\/|uploads\\/rooms\\/)/' ? asset(data.room.image) : asset('uploads/rooms/' ~ data.room.image) }}';">
                     {% else %}
                         <div class="h-full w-full flex items-center justify-center text-gray-300">
                             <i data-feather="image" class="w-8 h-8"></i>

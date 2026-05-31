@@ -73,7 +73,7 @@
 
                 {% if form.vars.value.image %}
                     <div class="mt-4 border border-black/10 bg-white p-2 inline-block">
-                        <img src="{{ asset(form.vars.value.image matches '/^uploads\\//' ? form.vars.value.image : ('images/' ~ form.vars.value.image)) }}" alt="Current room image" class="h-28 w-44 object-cover" onerror="this.onerror=null;this.src='{{ asset(form.vars.value.image matches '/^uploads\\//' ? form.vars.value.image : ('uploads/rooms/' ~ form.vars.value.image)) }}';">
+                        <img src="{{ asset(form.vars.value.image matches '/^(uploads\\/|uploads\\/rooms\\/)/' ? form.vars.value.image : ('uploads/rooms/' ~ form.vars.value.image)) }}" alt="Current room image" class="h-28 w-44 object-cover" onerror="this.onerror=null;this.src='{{ asset(form.vars.value.image matches '/^(uploads\\/|uploads\\/rooms\\/)/' ? form.vars.value.image : ('uploads/rooms/' ~ form.vars.value.image)) }}';">
                     </div>
                 {% endif %}
             </div>

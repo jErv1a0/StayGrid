@@ -50,7 +50,7 @@
                 </div>
                 <div class="relative">
                     <div class="aspect-[4/3] overflow-hidden bg-gray-100">
-                        {% set imgPath = room.image ? (room.image matches '/^uploads\\//' ? room.image : 'uploads/rooms/' ~ room.image) : 'images/default_room.png' %}
+                        {% set imgPath = room.image ? (room.image matches '/^(uploads\\/|uploads\\/rooms\\/)/' ? room.image : 'uploads/rooms/' ~ room.image) : 'images/default_room.png' %}
                         <img src="{{ asset(imgPath) }}" class="w-full h-full object-cover" alt="Room preview image">
                     </div>
                     <div class="absolute top-4 right-4 bg-black/80 text-white px-3 py-1 text-[9px] font-black uppercase tracking-widest border border-white/20">

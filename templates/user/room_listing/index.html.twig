@@ -38,7 +38,7 @@
                 {% for room in rooms %}
                     <article class="group relative border border-black/10 bg-white overflow-hidden">
                         <div class="aspect-[4/5] overflow-hidden bg-gray-100 relative">
-                            {% set room_img = room.image ? (room.image matches '/^uploads\\//' ? asset(room.image) : asset('images/' ~ room.image)) : asset('images/default_room.png') %}
+                            {% set room_img = room.image ? asset(room.image matches '/^(uploads\\/|uploads\\/rooms\\/)/' ? room.image : 'uploads/rooms/' ~ room.image) : asset('images/default_room.png') %}
                             <img src="{{ room_img }}"
                                  class="w-full h-full object-cover transition-transform duration-700 scale-105 group-hover:scale-110"
                                  alt="Room {{ room.number }}">
