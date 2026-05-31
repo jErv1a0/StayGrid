@@ -30,7 +30,7 @@ security:
             pattern: ^/api
             lazy: true
             provider: app_user_provider
-            stateless: true
+            context: app_shared_session
             user_checker: App\Security\UserChecker
             custom_authenticators:
                 - App\Security\ApiTokenAuthenticator
@@ -62,6 +62,7 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+            context: app_shared_session
             user_checker: App\Security\UserChecker
             entry_point: form_login
             custom_authenticators:
