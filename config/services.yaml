@@ -15,6 +15,7 @@ services:
         # CRITICAL FIX: Use bind to map the parameter name to the controller argument
         bind:
             $profilePictureDirectory: '%profile_pictures_directory%'
+            $kernelSecret: '%kernel.secret%'
 
     App\:
         resource: '../src/'

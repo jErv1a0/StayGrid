@@ -25,13 +25,15 @@ security:
             pattern: ^/(_(profiler|wdt))
             security: false
 
-        # API firewall - uses session-based authentication (works cross-device)
+        # API firewall - token-based stateless authentication for API clients
         api:
             pattern: ^/api
             lazy: true
             provider: app_user_provider
-            stateless: false
+            stateless: true
             user_checker: App\Security\UserChecker
+            custom_authenticators:
+                - App\Security\ApiTokenAuthenticator
 
         # ---------- ADMIN FIREWALL ----------
         admin:
