@@ -65,9 +65,9 @@
                                     <span class="text-2xl font-black">₱{{ room.pricePerNight|default(0)|number_format(0) }}</span>
                                     <span class="text-[9px] font-black uppercase tracking-widest text-gray-400">/ Cycle</span>
                                 </div>
-                                <a href="{{ path('app_login') }}"
+                                <a href="{{ path('app_roomlisting_show', { id: room.id }) }}"
                                    class="text-[10px] font-black uppercase tracking-[0.24em] border-b-2 border-black pb-1 group-hover:text-yellow-600 group-hover:border-yellow-600 transition-all">
-                                    Initialize Stay
+                                    View Room
                                 </a>
                             </div>
                         </div>
