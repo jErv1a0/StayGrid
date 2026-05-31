@@ -16,7 +16,12 @@ export default function BookingScreen({ tunnelHost, authToken }) {
           'Accept': 'application/json',
           'Authorization': `Bearer ${authToken}`,
         },
-        body: JSON.stringify({ roomId: parseInt(roomId, 10), startDate, endDate, guests: parseInt(guests, 10) })
+        body: JSON.stringify({
+          room_id: parseInt(roomId, 10),
+          check_in: startDate,
+          check_out: endDate,
+          guests: parseInt(guests, 10),
+        })
       });
       if (resp.status === 201 || resp.ok) {
         const data = await resp.json();

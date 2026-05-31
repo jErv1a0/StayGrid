@@ -27,6 +27,7 @@ What it does
 ------------
 - `apiClient.js` centralizes the API base URL and attaches `Authorization: Bearer <token>` automatically.
 - `ProfileScreen` calls `GET /api/user/profile` with the bearer token.
+- `ProfileScreen` also calls `GET /api/bookings/my` so the signed-in user can see their own bookings.
 - `BookingScreen` posts to `POST /api/bookings` with the same bearer token.
 - The backend login endpoint returns `access_token`, `token_type`, and `expires_in` for mobile storage.
 

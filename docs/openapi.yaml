@@ -83,7 +83,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RoomsResponse'
-  /api/bookings:
+  /api/bookings/my:
     get:
       summary: List the current user's bookings
       security:
@@ -97,6 +97,7 @@ paths:
                 $ref: '#/components/schemas/BookingsResponse'
         '401':
           description: Unauthorized
+  /api/bookings:
     post:
       summary: Create a booking
       security:

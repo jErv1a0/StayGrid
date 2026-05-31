@@ -64,7 +64,7 @@ Endpoints
 - `GET /api/user/profile`
 - `POST /api/auth/logout`
 - `GET /api/rooms`
-- `GET /api/bookings`
+- `GET /api/bookings/my`
 - `POST /api/bookings`
 
 Fetch example
@@ -109,6 +109,24 @@ export async function fetchProfile(accessToken) {
 
   return payload.user;
 }
+
+export async function fetchMyBookings(accessToken) {
+  const response = await fetch(`${API_BASE_URL}/api/bookings/my`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  const payload = await response.json();
+
+  if (!response.ok) {
+    throw new Error(payload.error || 'Bookings request failed');
+  }
+
+  return payload;
+}
 ```
 
 Axios example
@@ -141,9 +159,9 @@ export async function getRooms() {
 
 export async function createBooking(roomId, startDate, endDate, guests) {
   const { data } = await api.post('/api/bookings', {
-    roomId,
-    startDate,
-    endDate,
+    room_id: roomId,
+    check_in: startDate,
+    check_out: endDate,
     guests,
   });
 

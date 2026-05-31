@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { SafeAreaView, View, Text, Button, StyleSheet, TextInput, Alert, ActivityIndicator } from 'react-native';
 import ProfileScreen from './screens/ProfileScreen';
 import BookingScreen from './screens/BookingScreen';
+import { setAccessToken } from './apiClient';
 
 // Replace with your tunnel host (ngrok/localtunnel)
 const TUNNEL_HOST = 'https://abcd1234.ngrok.io';
@@ -35,6 +36,7 @@ export default function App() {
       }
 
       setAuthToken(data.access_token);
+      setAccessToken(data.access_token);
       setLoggedIn(true);
       setRoute('profile');
     } catch (error) {
@@ -61,7 +63,7 @@ export default function App() {
           <View style={styles.nav}>
             <Button title="Profile" onPress={() => setRoute('profile')} />
             <Button title="Booking" onPress={() => setRoute('booking')} />
-            <Button title="Logout" onPress={() => { setLoggedIn(false); setRoute('home'); setAuthToken(''); }} />
+            <Button title="Logout" onPress={() => { setLoggedIn(false); setRoute('home'); setAuthToken(''); setAccessToken(''); }} />
           </View>
 
           {route === 'profile' && <ProfileScreen tunnelHost={TUNNEL_HOST} authToken={authToken} />}

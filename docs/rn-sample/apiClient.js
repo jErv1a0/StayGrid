@@ -56,7 +56,7 @@ export function getRooms() {
 }
 
 export function getBookings() {
-  return request('/api/bookings');
+  return request('/api/bookings/my');
 }
 
 export function createBooking(roomId, startDate, endDate, guests) {
@@ -65,7 +65,12 @@ export function createBooking(roomId, startDate, endDate, guests) {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ roomId, startDate, endDate, guests }),
+    body: JSON.stringify({
+      room_id: roomId,
+      check_in: startDate,
+      check_out: endDate,
+      guests,
+    }),
   });
 }
 
