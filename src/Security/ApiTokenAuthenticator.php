@@ -10,11 +10,12 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
+use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 
-class ApiTokenAuthenticator extends AbstractAuthenticator
+class ApiTokenAuthenticator extends AbstractAuthenticator implements AuthenticationEntryPointInterface
 {
     public function __construct(private LogInUsersRepository $userRepository, private string $kernelSecret)
     {
@@ -67,6 +68,15 @@ class ApiTokenAuthenticator extends AbstractAuthenticator
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         return new JsonResponse(['error' => $exception->getMessageKey()], Response::HTTP_UNAUTHORIZED);
+    }
+
+    /**
+     * Called when authentication is required, e.g. entry_point for API firewall.
+     */
+    public function start(Request $request, AuthenticationException $authException = null): Response
+    {
+        $message = $authException ? $authException->getMessage() : 'Authentication Required';
+        return new JsonResponse(['error' => $message], Response::HTTP_UNAUTHORIZED);
     }
 
     private function validateToken(string $token): ?array
