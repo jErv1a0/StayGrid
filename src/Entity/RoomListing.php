@@ -6,9 +6,6 @@ use App\Repository\RoomListingRepository;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
-use ApiPlatform\Metadata\Delete;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -18,11 +15,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     operations: [
-        new Get(),
-        new GetCollection(),
-        new Post(),
-        new Put(),
-        new Delete(),
+        new GetCollection(uriTemplate: '/rooms', security: "is_granted('PUBLIC_ACCESS')"),
+        new Get(uriTemplate: '/rooms/{id}', security: "is_granted('PUBLIC_ACCESS')"),
     ]
 )]
 #[ORM\Table(name: 'roomlisting')]

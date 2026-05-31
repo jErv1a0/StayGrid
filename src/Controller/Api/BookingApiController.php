@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\Booking;
+use App\Entity\LogInUsers;
 use App\Repository\BookingRepository;
 use App\Repository\RoomListingRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -30,10 +31,10 @@ class BookingApiController extends AbstractController
         $this->activityLogger = $activityLogger;
     }
 
-    #[Route('/my', name: 'api_bookings_my', methods: ['GET'])]
+    #[Route('/my', name: 'api_bookings_my', methods: ['GET'], priority: 100)]
     public function myBookings(): JsonResponse
     {
-        $user = $this->getUser();
+        $user = $this->resolveAuthenticatedUser();
         if (!$user) {
             return new JsonResponse(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
         }
@@ -60,7 +61,7 @@ class BookingApiController extends AbstractController
     #[Route('', name: 'api_bookings_create', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
-        $user = $this->getUser();
+        $user = $this->resolveAuthenticatedUser();
         if (!$user) {
             return new JsonResponse(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
         }
@@ -138,7 +139,7 @@ class BookingApiController extends AbstractController
     #[Route('/{id}', name: 'api_bookings_cancel', methods: ['DELETE'])]
     public function cancel(int $id): JsonResponse
     {
-        $user = $this->getUser();
+        $user = $this->resolveAuthenticatedUser();
         if (!$user) {
             return new JsonResponse(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
         }
@@ -160,5 +161,29 @@ class BookingApiController extends AbstractController
         $this->activityLogger->log('booking.cancelled', $user, $booking, ['id' => $booking->getId()]);
 
         return new JsonResponse(['message' => 'Booking cancelled'], Response::HTTP_OK);
+    }
+
+    private function resolveAuthenticatedUser(): ?LogInUsers
+    {
+        $tokenUser = $this->getUser();
+        if ($tokenUser instanceof LogInUsers) {
+            return $tokenUser;
+        }
+
+        if (method_exists($this, 'getRequestStack')) {
+            $request = $this->container->get('request_stack')->getCurrentRequest();
+            if ($request && $request->hasSession()) {
+                $sessionUserId = $request->getSession()->get('api_user_id');
+                if ($sessionUserId) {
+                    $entityManager = $this->container->get('doctrine')->getManager();
+                    $user = $entityManager->getRepository(LogInUsers::class)->find((int) $sessionUserId);
+                    if ($user instanceof LogInUsers) {
+                        return $user;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }

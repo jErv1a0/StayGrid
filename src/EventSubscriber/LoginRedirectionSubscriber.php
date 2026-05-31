@@ -24,6 +24,11 @@ class LoginRedirectionSubscriber implements EventSubscriberInterface
 
     public function onLoginSuccess(LoginSuccessEvent $event): void
     {
+        $request = $event->getRequest();
+        if (str_starts_with($request->getPathInfo(), '/api/')) {
+            return;
+        }
+
         $user = $event->getPassport()->getUser();
 
         // Ensure we are dealing with a UserInterface entity

@@ -4,10 +4,7 @@ namespace App\Entity;
 
 use App\Repository\BookingRepository;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\RoomListing;
@@ -21,11 +18,11 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     operations: [
-        new Get(),
-        new GetCollection(),
-        new Post(),
-        new Put(),
-        new Delete(),
+        new GetCollection(
+            uriTemplate: '/bookings/my',
+            security: "is_granted('ROLE_USER')"
+        ),
+        new Delete(security: "is_granted('ROLE_USER')"),
     ]
 )]
 #[ORM\Entity(repositoryClass: BookingRepository::class)]
