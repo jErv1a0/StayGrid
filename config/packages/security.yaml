@@ -30,7 +30,7 @@ security:
             pattern: ^/api
             lazy: true
             provider: app_user_provider
-            stateless: true
+            stateless: false
             user_checker: App\Security\UserChecker
 
         # ---------- ADMIN FIREWALL ----------
