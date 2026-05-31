@@ -71,6 +71,10 @@ class Booking
     #[Groups(['booking:read', 'booking:write'])]
     private ?int $numberOfHours = null;
 
+    #[ORM\Column(type: 'smallint', nullable: true)]
+    #[Groups(['booking:read', 'booking:write'])]
+    private ?int $guests = null;
+
     public function __construct()
     {
         $this->transactions = new ArrayCollection();
@@ -208,6 +212,17 @@ class Booking
     public function setNumberOfHours(?int $numberOfHours): self
     {
         $this->numberOfHours = $numberOfHours;
+        return $this;
+    }
+
+    public function getGuests(): ?int
+    {
+        return $this->guests;
+    }
+
+    public function setGuests(?int $guests): self
+    {
+        $this->guests = $guests;
         return $this;
     }
 
