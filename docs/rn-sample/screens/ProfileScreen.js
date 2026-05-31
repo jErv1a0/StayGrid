@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet, ActivityIndicator } from 'react-native';
 
-export default function ProfileScreen({ tunnelHost }) {
+export default function ProfileScreen({ tunnelHost, authToken }) {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -10,15 +10,17 @@ export default function ProfileScreen({ tunnelHost }) {
     try {
       const resp = await fetch(`${tunnelHost}/api/user/profile`, {
         method: 'GET',
-        credentials: 'include',
-        headers: { 'Accept': 'application/json' }
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+        }
       });
+      const data = await resp.json();
+
       if (resp.ok) {
-        const data = await resp.json();
-        setProfile(data);
+        setProfile(data.user);
       } else {
-        const text = await resp.text();
-        setProfile({ error: resp.status, body: text });
+        setProfile({ error: resp.status, body: data.error || JSON.stringify(data) });
       }
     } catch (e) {
       setProfile({ error: 'network', message: e.message });
@@ -37,7 +39,7 @@ export default function ProfileScreen({ tunnelHost }) {
         <View>
           <Text>ID: {profile.id}</Text>
           <Text>Email: {profile.email}</Text>
-          <Text>Name: {profile.name}</Text>
+          <Text>Name: {profile.fullName}</Text>
           <Text>Verified: {String(profile.isVerified)}</Text>
         </View>
       ) : (

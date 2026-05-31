@@ -1,117 +1,172 @@
 openapi: 3.0.3
 info:
-  title: StayGrid Customer API
+  title: StayGrid Mobile API
   version: 1.0.0
-  description: Minimal OpenAPI skeleton for core customer endpoints (for project documentation).
+  description: Mobile-ready JSON API for the StayGrid backend using bearer tokens.
 servers:
+  - url: http://localhost:8000
   - url: https://{host}
     variables:
       host:
-        default: localhost:8000
+        default: YOUR_HOST
 paths:
-  /api/rooms:
-    get:
-      summary: List rooms
-      responses:
-        '200':
-          description: A list of rooms
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Room'
-      tags: [Rooms]
-  /api/rooms/{id}:
-    get:
-      summary: Get a single room
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Room object
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Room'
-        '404':
-          description: Not Found
-      tags: [Rooms]
-  /api/bookings:
-    post:
-      summary: Create a booking
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NewBooking'
-      responses:
-        '201':
-          description: Booking created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Booking'
-      security:
-        - cookieAuth: []
-      tags: [Bookings]
-  /api/user/profile:
-    get:
-      summary: Get authenticated user profile
-      security:
-        - cookieAuth: []
-      responses:
-        '200':
-          description: User profile
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
   /api/auth/login:
     post:
-      summary: Login (session)
+      summary: Login and receive a bearer token
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required: [email, password]
               properties:
                 email:
                   type: string
+                  format: email
                 password:
                   type: string
       responses:
         '200':
-          description: Authenticated (sets session cookie)
+          description: Login success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthLoginResponse'
+        '401':
+          description: Invalid credentials
+        '403':
+          description: Email not verified
+  /api/auth/me:
+    get:
+      summary: Get the current authenticated user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Authenticated user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthMeResponse'
+        '401':
+          description: Unauthorized
+  /api/user/profile:
+    get:
+      summary: Alias for current authenticated user profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Authenticated user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthMeResponse'
+        '401':
+          description: Unauthorized
+  /api/auth/logout:
+    post:
+      summary: Logout client-side by discarding the token
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Logged out
+  /api/rooms:
+    get:
+      summary: List rooms
+      responses:
+        '200':
+          description: Rooms collection
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomsResponse'
+  /api/bookings:
+    get:
+      summary: List the current user's bookings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Bookings collection
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingsResponse'
+        '401':
+          description: Unauthorized
+    post:
+      summary: Create a booking
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewBookingRequest'
+      responses:
+        '201':
+          description: Booking created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingCreateResponse'
+        '400':
+          description: Invalid booking payload
+        '401':
+          description: Unauthorized
+        '409':
+          description: Booking conflict
 components:
   securitySchemes:
-    cookieAuth:
-      type: apiKey
-      in: cookie
-      name: PHPSESSID
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
-    Room:
+    AuthLoginResponse:
       type: object
       properties:
-        id:
+        success:
+          type: boolean
+        token_type:
+          type: string
+          example: Bearer
+        access_token:
+          type: string
+        expires_in:
           type: integer
-        title:
-          type: string
-        number:
-          type: string
-        category:
-          type: string
-        pricePerNight:
-          type: number
-        image:
-          type: string
-    NewBooking:
+        user:
+          $ref: '#/components/schemas/UserSummary'
+    AuthMeResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        user:
+          $ref: '#/components/schemas/UserProfile'
+    RoomsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Room'
+    BookingsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Booking'
+    NewBookingRequest:
       type: object
       required: [roomId, startDate, endDate]
       properties:
@@ -125,6 +180,34 @@ components:
           format: date
         guests:
           type: integer
+    BookingCreateResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Booking'
+    Room:
+      type: object
+      properties:
+        id:
+          type: integer
+        number:
+          type: string
+        category:
+          type: string
+        description:
+          type: string
+        capacity:
+          type: integer
+        pricePerNight:
+          type: number
+        isAvailable:
+          type: boolean
+        location:
+          type: string
+        isBlocked:
+          type: boolean
     Booking:
       type: object
       properties:
@@ -140,25 +223,34 @@ components:
         endDate:
           type: string
           format: date
-    User:
+        status:
+          type: string
+        bookingType:
+          type: string
+    UserSummary:
       type: object
       properties:
         id:
           type: integer
         email:
           type: string
-        name:
+        fullName:
           type: string
-        isVerified:
-          type: boolean
-
-# Example request snippets
-x-samples:
-  listRooms:
-    summary: curl list rooms
-    request: |
-      curl -X GET "http://localhost:8000/api/rooms" -H "Accept: application/json"
-  createBooking:
-    summary: curl create booking
-    request: |
-      curl -X POST "http://localhost:8000/api/bookings" -H "Content-Type: application/json" -d '{"roomId":1,"startDate":"2026-06-01","endDate":"2026-06-05","guests":2}' -c cookiejar.txt
+    UserProfile:
+      allOf:
+        - $ref: '#/components/schemas/UserSummary'
+        - type: object
+          properties:
+            phoneNumber:
+              type: string
+            address:
+              type: string
+            birthday:
+              type: string
+              format: date
+            roles:
+              type: array
+              items:
+                type: string
+            isVerified:
+              type: boolean

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 
-export default function BookingScreen({ tunnelHost }) {
+export default function BookingScreen({ tunnelHost, authToken }) {
   const [roomId, setRoomId] = useState('101');
   const [startDate, setStartDate] = useState('2026-06-01');
   const [endDate, setEndDate] = useState('2026-06-05');
@@ -11,8 +11,11 @@ export default function BookingScreen({ tunnelHost }) {
     try {
       const resp = await fetch(`${tunnelHost}/api/bookings`, {
         method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+        },
         body: JSON.stringify({ roomId: parseInt(roomId, 10), startDate, endDate, guests: parseInt(guests, 10) })
       });
       if (resp.status === 201 || resp.ok) {

@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    {% include 'partials/_global_radius.html.twig' %}
     <meta charset="UTF-8">
     <title>StayGrid Create Account</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,7 +37,20 @@
 <body>
 <div class="min-h-screen bg-[radial-gradient(circle_at_10%_15%,rgba(250,204,21,0.24),transparent_32%),radial-gradient(circle_at_90%_85%,rgba(17,17,17,0.12),transparent_34%),linear-gradient(145deg,#f8f6f2_0%,#f0ece5_45%,#f6f4ef_100%)]">
 
-    {% include 'partials/_public_nav.html.twig' %}
+    <header class="sticky top-0 z-20 backdrop-blur border-b border-black/10 bg-[#f6f4ef]/85">
+        <div class="max-w-7xl mx-auto px-5 md:px-8 h-16 flex items-center justify-between">
+            <a href="{{ path('app_home') }}" class="display-font text-xl font-bold tracking-tight">StayGrid</a>
+
+            <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-black/70">
+                <a href="{{ path('app_home') }}" class="hover:text-black transition-colors">Home</a>
+                <a href="{{ path('app_rooms') }}" class="hover:text-black transition-colors">Rooms</a>
+                <a href="{{ path('app_about') }}" class="hover:text-black transition-colors">About</a>
+                <a href="{{ path('app_contact') }}" class="hover:text-black transition-colors">Contact</a>
+            </nav>
+
+            <a href="{{ path('app_login', {'redirect': 'book'}) }}" class="inline-flex items-center px-5 py-2.5 bg-black text-white text-xs font-bold tracking-[0.2em] uppercase hover:bg-yellow-400 hover:text-black transition-colors">Book Now</a>
+        </div>
+    </header>
 
     <main class="max-w-7xl mx-auto px-5 md:px-8 py-8 md:py-14">
         <section class="grid lg:grid-cols-[1.05fr_0.95fr] gap-6 lg:gap-8 min-h-[calc(100vh-9rem)]">

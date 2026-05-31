@@ -1,19 +1,18 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-    {% include 'partials/_global_radius.html.twig' %}
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>{% block title %}{{ page_title|default("StayGrid") }}{% endblock %}</title>
+    <title>{% block title %}{{ page_title|default("StayGrid") }}{% endblock %}</title>
     <link rel="icon" type="image/png" href="{{ asset('icons/staygrid16x16.png') }}"/>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="//unpkg.com/alpinejs" defer></script>
 
     <style>
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Manrope', sans-serif;
             background-color: #f7f9fc;
         }
         .nav-link { color: #4b5563; }
@@ -21,72 +20,32 @@
         .btn-primary { background-color: #FFD700; border-color: #FFD700; }
         .btn-primary:hover { background-color: #e6c200; }
         .feature-icon-bg { background-color: #FFF4B0; color: #FFD700; }
-        
-        /* Button radius controlled by included partial: templates/partials/_global_radius.html.twig */
-
-    {% block styles %}{% endblock %} 
-
-</style>
+        {% block styles %}{% endblock %}
+    </style>
 
 </head>
 <body>
+    <header class="sticky top-0 z-20 backdrop-blur border-b border-black/10 bg-[#f6f4ef]/85">
+        <div class="max-w-7xl mx-auto px-5 md:px-8 h-16 flex items-center justify-between">
+            <a href="{{ path('app_home') }}" class="text-xl font-bold tracking-tight text-black">StayGrid</a>
 
-    </div>
+            <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-black/70">
+                <a href="{{ path('app_home') }}" class="hover:text-black transition-colors">Home</a>
+                <a href="{{ path('app_rooms') }}" class="hover:text-black transition-colors">Rooms</a>
+                <a href="{{ path('app_about') }}" class="hover:text-black transition-colors">About</a>
+                <a href="{{ path('app_contact') }}" class="hover:text-black transition-colors">Contact</a>
+            </nav>
 
-    <nav class="bg-white shadow-sm sticky top-0 z-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <a href="/" class="flex items-center space-x-2 text-xl font-bold text-gray-800">
-                    StayGrid
-                </a>
-
-                <div class="hidden md:flex space-x-6 items-center">
-                    {% set nav_items = [
-                        { name: 'Home', url: '/' },
-                        { name: 'Rooms', url: '/rooms' },
-                        { name: 'About', url: '/about' },
-                        { name: 'Contact', url: '/contact' }
-                    ] %}
-                    {% for item in nav_items %}
-                        <a href="{{ item.url }}" class="nav-link text-sm font-medium flex items-center">
-                            {{ item.name }}
-                        </a>
-                    {% endfor %}
-                </div>
-
-                <div class="hidden md:flex items-center gap-3">
-                    {% if app.user %}
-                        <a href="{{ path(is_granted('ROLE_ADMIN') ? 'app_admin_home' : (is_granted('ROLE_STAFF') ? 'app_staff_dashboard' : 'app_user_dashboard')) }}"
-                           class="bg-black hover:bg-gray-800 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition duration-200">
-                            Dashboard
-                        </a>
-                        <a href="{{ path('app_logout') }}"
-                           class="border border-gray-300 hover:border-gray-400 text-gray-700 hover:text-black font-semibold py-2 px-5 rounded-lg transition duration-200">
-                            Log Out
-                        </a>
-                    {% else %}
-                        <a href="{{ path('app_login') }}"
-                           class="border border-gray-300 hover:border-gray-400 text-gray-700 hover:text-black font-semibold py-2 px-5 rounded-lg transition duration-200">
-                            Log In
-                        </a>
-                        <a href="{{ path('app_register') }}"
-                           class="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-6 rounded-lg shadow-lg transition duration-200">
-                            Sign Up
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
+            <a href="{{ path('app_login', {'redirect': 'book'}) }}" class="inline-flex items-center px-5 py-2.5 bg-black text-white text-xs font-bold tracking-[0.2em] uppercase hover:bg-yellow-400 hover:text-black transition-colors">Book Now</a>
         </div>
-    </nav>
+    </header>
 
-      <main>
-          {# 🛑 CRITICAL FIX: The missing content block was preventing child templates from rendering their body content. #}
-          {% block content %}{# All page-specific content will be rendered here #}{% endblock %}
-      </main>
-      
-       <footer> 
-            {% block footer %}{# Add your footer content here #}{% endblock %}
-       </footer> 
+    <main>
+        {% block content %}{% endblock %}
+    </main>
 
-    </body>
+    <footer>
+        {% block footer %}{% endblock %}
+    </footer>
+</body>
 </html>
