@@ -6,7 +6,6 @@
 {% block body %}
 <div class="min-h-screen bg-[#f6f4ef] py-10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    {% set roomImagePath = room_listing.image ? (room_listing.image matches '/^(uploads\\/|uploads\\/rooms\\/)/' ? room_listing.image : 'uploads/rooms/' ~ room_listing.image) : null %}
     {% set roomCategoryKey = room_listing.category|default('')|lower %}
     {% set roomImageFallback = 'images/default_room.png' %}
     {% if 'family' in roomCategoryKey %}

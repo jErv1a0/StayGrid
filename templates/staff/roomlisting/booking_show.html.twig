@@ -33,7 +33,7 @@
                 </p>
                 
                 <div class="aspect-[4/5] w-full bg-gray-100 overflow-hidden grayscale border border-gray-100">
-                    {% set imgPath = booking.room.image ? (booking.room.image matches '/^(uploads\\/|uploads\\/rooms\\/)/' ? booking.room.image : 'uploads/rooms/' ~ booking.room.image) : 'images/default_room.png' %}
+                    {% set imgPath = booking.room.imagePath ?: 'images/default_room.png' %}
                     <img src="{{ asset(imgPath) }}" class="w-full h-full object-cover" alt="Unit Visual">
                 </div>
             </div>

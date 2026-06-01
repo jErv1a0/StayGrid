@@ -380,11 +380,19 @@ class ApiAuthController extends AbstractController
     }
 
     #[Route('/api/rooms', name: 'api_rooms', methods: ['GET'], priority: 100)]
-    public function rooms(EntityManagerInterface $entityManager): Response
+    public function rooms(Request $request, EntityManagerInterface $entityManager): Response
     {
         $rooms = $entityManager->getRepository(RoomListing::class)->findBy(['isBlocked' => false]);
 
-        $payload = array_map(static function (RoomListing $room): array {
+        $baseUrl = $request->getSchemeAndHttpHost();
+        $payload = array_map(static function (RoomListing $room) use ($baseUrl): array {
+            $imagePath = $room->getImagePath();
+            $imageUrl = null;
+
+            if ($imagePath) {
+                $imageUrl = rtrim($baseUrl, '/') . '/' . ltrim($imagePath, '/');
+            }
+
             return [
                 'id' => $room->getId(),
                 'number' => $room->getNumber(),
@@ -395,10 +403,12 @@ class ApiAuthController extends AbstractController
                 'isAvailable' => $room->isAvailable(),
                 'location' => $room->getLocation(),
                 'isBlocked' => $room->isBlocked(),
+                'imagePath' => $imagePath,
+                'imageUrl' => $imageUrl,
             ];
         }, $rooms);
 
-        return new JsonResponse([
+        return $this->json([
             'success' => true,
             'data' => $payload,
         ]);

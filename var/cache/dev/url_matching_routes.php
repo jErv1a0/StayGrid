@@ -26,6 +26,7 @@ return [
         '/admin/profile' => [[['_route' => 'app_admin_profile', '_controller' => 'App\\Controller\\Admin\\AdminProfileController::index'], null, ['GET' => 0], null, false, false, null]],
         '/admin/bookings' => [[['_route' => 'app_admin_bookings_index', '_controller' => 'App\\Controller\\Admin\\BookingController::index'], null, ['GET' => 0], null, true, false, null]],
         '/admin/bookings/new' => [[['_route' => 'app_admin_bookings_new', '_controller' => 'App\\Controller\\Admin\\BookingController::new'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        '/admin/feedback' => [[['_route' => 'app_admin_feedback_index', '_controller' => 'App\\Controller\\Admin\\FeedbackController::index'], null, ['GET' => 0], null, true, false, null]],
         '/admin/roomlisting' => [[['_route' => 'app_admin_roomlisting_index', '_controller' => 'App\\Controller\\Admin\\RoomListingController::index'], null, ['GET' => 0], null, true, false, null]],
         '/admin/roomlisting/new' => [[['_route' => 'app_admin_roomlisting_new', '_controller' => 'App\\Controller\\Admin\\RoomListingController::new'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
         '/admin/login' => [[['_route' => 'app_admin_login', '_controller' => 'App\\Controller\\Admin\\SecurityAdminController::login'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
@@ -33,6 +34,7 @@ return [
         '/admin/user-activity' => [[['_route' => 'app_admin_user_activity_index', '_controller' => 'App\\Controller\\Admin\\UserActivityController::index'], null, ['GET' => 0], null, true, false, null]],
         '/admin/user-activity/debug/create' => [[['_route' => 'app_admin_user_activity_debug', '_controller' => 'App\\Controller\\Admin\\UserActivityController::debugCreate'], null, ['GET' => 0], null, false, false, null]],
         '/admin/users' => [[['_route' => 'app_admin_users_index', '_controller' => 'App\\Controller\\Admin\\UserController::index'], null, null, null, true, false, null]],
+        '/admin/users/new' => [[['_route' => 'app_admin_users_new', '_controller' => 'App\\Controller\\Admin\\UserController::new'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
         '/api/register' => [[['_route' => 'api_register', '_controller' => 'App\\Controller\\ApiAuthController::register'], null, ['POST' => 0], null, false, false, null]],
         '/api/verify-email' => [[['_route' => 'api_verify_email', '_controller' => 'App\\Controller\\ApiAuthController::verifyEmail'], null, ['GET' => 0], null, false, false, null]],
         '/api/login' => [
@@ -75,6 +77,7 @@ return [
         '/staff/users' => [[['_route' => 'app_staff_users_index', '_controller' => 'App\\Controller\\Staff\\StaffUserController::index'], null, ['GET' => 0], null, true, false, null]],
         '/user/booking' => [[['_route' => 'app_client_booking_index', '_controller' => 'App\\Controller\\User\\BookingController::index'], null, ['GET' => 0], null, true, false, null]],
         '/user/rooms' => [[['_route' => 'app_user_rooms_rooms', '_controller' => 'App\\Controller\\User\\RoomsController::rooms'], null, null, null, false, false, null]],
+        '/user/feedback' => [[['_route' => 'app_user_feedback', '_controller' => 'App\\Controller\\User\\UserFeedbackController::index'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
         '/user' => [[['_route' => 'app_user_dashboard', '_controller' => 'App\\Controller\\User\\UserHomeController::dashboard'], null, null, null, false, false, null]],
         '/user/profile' => [[['_route' => 'app_user_profile', '_controller' => 'App\\Controller\\User\\UserProfileController::index'], null, ['GET' => 0], null, false, false, null]],
         '/user/profile/edit' => [[['_route' => 'app_user_profile_edit', '_controller' => 'App\\Controller\\User\\UserProfileController::edit'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
@@ -125,59 +128,66 @@ return [
                             .'|/edit(*:604)'
                             .'|(*:612)'
                         .')'
+                        .'|feedback/([^/]++)/(?'
+                            .'|approve(*:649)'
+                            .'|view(*:661)'
+                            .'|delete(*:675)'
+                        .')'
                         .'|roomlisting/([^/]++)(?'
-                            .'|(*:644)'
-                            .'|/edit(*:657)'
-                            .'|(*:665)'
+                            .'|(*:707)'
+                            .'|/edit(*:720)'
+                            .'|(*:728)'
                         .')'
                         .'|users/([^/]++)/(?'
-                            .'|verify(*:698)'
-                            .'|unverify(*:714)'
+                            .'|edit(*:759)'
+                            .'|verify(*:773)'
+                            .'|unverify(*:789)'
+                            .'|delete(*:803)'
                         .')'
                     .')'
                 .')'
                 .'|/_(?'
-                    .'|error/(\\d+)(?:\\.([^/]++))?(*:756)'
-                    .'|wdt/([^/]++)(*:776)'
+                    .'|error/(\\d+)(?:\\.([^/]++))?(*:845)'
+                    .'|wdt/([^/]++)(*:865)'
                     .'|profiler/(?'
-                        .'|font/([^/\\.]++)\\.woff2(*:818)'
+                        .'|font/([^/\\.]++)\\.woff2(*:907)'
                         .'|([^/]++)(?'
                             .'|/(?'
-                                .'|search/results(*:855)'
-                                .'|router(*:869)'
+                                .'|search/results(*:944)'
+                                .'|router(*:958)'
                                 .'|exception(?'
-                                    .'|(*:889)'
-                                    .'|\\.css(*:902)'
+                                    .'|(*:978)'
+                                    .'|\\.css(*:991)'
                                 .')'
                             .')'
-                            .'|(*:912)'
+                            .'|(*:1001)'
                         .')'
                     .')'
                 .')'
-                .'|/listings/([^/]++)(*:941)'
+                .'|/listings/([^/]++)(*:1031)'
                 .'|/staff/(?'
                     .'|bookings/(?'
                         .'|([^/]++)(?'
-                            .'|(*:982)'
-                            .'|/edit(*:995)'
+                            .'|(*:1073)'
+                            .'|/edit(*:1087)'
                         .')'
-                        .'|new(?:/([^/]++))?(*:1021)'
-                        .'|([^/]++)/delete(*:1045)'
+                        .'|new(?:/([^/]++))?(*:1114)'
+                        .'|([^/]++)/delete(*:1138)'
                     .')'
                     .'|roomlisting/(?'
                         .'|([^/]++)(?'
-                            .'|/edit(*:1086)'
-                            .'|(*:1095)'
+                            .'|/edit(*:1179)'
+                            .'|(*:1188)'
                         .')'
-                        .'|bookings(*:1113)'
+                        .'|bookings(*:1206)'
                     .')'
                 .')'
                 .'|/user/(?'
                     .'|booking/(?'
-                        .'|new/([^/]++)(*:1156)'
-                        .'|([^/]++)(*:1173)'
+                        .'|new/([^/]++)(*:1249)'
+                        .'|([^/]++)(*:1266)'
                     .')'
-                    .'|rooms/([^/]++)(*:1197)'
+                    .'|rooms/([^/]++)(*:1290)'
                 .')'
             .')/?$}sDu',
     ],
@@ -219,30 +229,35 @@ return [
             [['_route' => 'app_admin_bookings_delete', '_controller' => 'App\\Controller\\Admin\\BookingController::delete'], ['id'], ['POST' => 0], null, false, true, null],
             [['_route' => 'app_admin_bookings_show', '_controller' => 'App\\Controller\\Admin\\BookingController::show'], ['id'], ['GET' => 0], null, false, true, null],
         ],
-        644 => [[['_route' => 'app_admin_roomlisting_show', '_controller' => 'App\\Controller\\Admin\\RoomListingController::show'], ['id'], ['GET' => 0], null, false, true, null]],
-        657 => [[['_route' => 'app_admin_roomlisting_edit', '_controller' => 'App\\Controller\\Admin\\RoomListingController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        665 => [[['_route' => 'app_admin_roomlisting_delete', '_controller' => 'App\\Controller\\Admin\\RoomListingController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
-        698 => [[['_route' => 'app_admin_users_verify', '_controller' => 'App\\Controller\\Admin\\UserController::verify'], ['id'], ['POST' => 0], null, false, false, null]],
-        714 => [[['_route' => 'app_admin_users_unverify', '_controller' => 'App\\Controller\\Admin\\UserController::unverify'], ['id'], ['POST' => 0], null, false, false, null]],
-        756 => [[['_route' => '_preview_error', '_controller' => 'error_controller::preview', '_format' => 'html'], ['code', '_format'], null, null, false, true, null]],
-        776 => [[['_route' => '_wdt', '_controller' => 'web_profiler.controller.profiler::toolbarAction'], ['token'], null, null, false, true, null]],
-        818 => [[['_route' => '_profiler_font', '_controller' => 'web_profiler.controller.profiler::fontAction'], ['fontName'], null, null, false, false, null]],
-        855 => [[['_route' => '_profiler_search_results', '_controller' => 'web_profiler.controller.profiler::searchResultsAction'], ['token'], null, null, false, false, null]],
-        869 => [[['_route' => '_profiler_router', '_controller' => 'web_profiler.controller.router::panelAction'], ['token'], null, null, false, false, null]],
-        889 => [[['_route' => '_profiler_exception', '_controller' => 'web_profiler.controller.exception_panel::body'], ['token'], null, null, false, false, null]],
-        902 => [[['_route' => '_profiler_exception_css', '_controller' => 'web_profiler.controller.exception_panel::stylesheet'], ['token'], null, null, false, false, null]],
-        912 => [[['_route' => '_profiler', '_controller' => 'web_profiler.controller.profiler::panelAction'], ['token'], null, null, false, true, null]],
-        941 => [[['_route' => 'app_roomlisting_show', '_controller' => 'App\\Controller\\RoomListingController::show'], ['id'], ['GET' => 0], null, false, true, null]],
-        982 => [[['_route' => 'app_staff_booking_show', '_controller' => 'App\\Controller\\Staff\\BookingController::show'], ['id'], ['GET' => 0], null, false, true, null]],
-        995 => [[['_route' => 'app_staff_booking_edit', '_controller' => 'App\\Controller\\Staff\\BookingController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        1021 => [[['_route' => 'app_staff_booking_new', 'roomId' => null, '_controller' => 'App\\Controller\\Staff\\BookingController::new'], ['roomId'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
-        1045 => [[['_route' => 'app_staff_booking_delete', '_controller' => 'App\\Controller\\Staff\\BookingController::delete'], ['id'], ['POST' => 0], null, false, false, null]],
-        1086 => [[['_route' => 'app_staff_roomlisting_edit', '_controller' => 'App\\Controller\\Staff\\RoomListingController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        1095 => [[['_route' => 'app_staff_roomlisting_delete', '_controller' => 'App\\Controller\\Staff\\RoomListingController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
-        1113 => [[['_route' => 'app_staff_roomlisting_bookings', '_controller' => 'App\\Controller\\Staff\\RoomListingController::bookings'], [], ['GET' => 0], null, false, false, null]],
-        1156 => [[['_route' => 'app_booking_new', '_controller' => 'App\\Controller\\User\\BookingController::new'], ['roomId'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
-        1173 => [[['_route' => 'app_client_booking_show', '_controller' => 'App\\Controller\\User\\BookingController::show'], ['id'], ['GET' => 0], null, false, true, null]],
-        1197 => [
+        649 => [[['_route' => 'app_admin_feedback_approve', '_controller' => 'App\\Controller\\Admin\\FeedbackController::approve'], ['id'], ['POST' => 0], null, false, false, null]],
+        661 => [[['_route' => 'app_admin_feedback_view', '_controller' => 'App\\Controller\\Admin\\FeedbackController::view'], ['id'], ['GET' => 0], null, false, false, null]],
+        675 => [[['_route' => 'app_admin_feedback_delete', '_controller' => 'App\\Controller\\Admin\\FeedbackController::delete'], ['id'], ['POST' => 0], null, false, false, null]],
+        707 => [[['_route' => 'app_admin_roomlisting_show', '_controller' => 'App\\Controller\\Admin\\RoomListingController::show'], ['id'], ['GET' => 0], null, false, true, null]],
+        720 => [[['_route' => 'app_admin_roomlisting_edit', '_controller' => 'App\\Controller\\Admin\\RoomListingController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        728 => [[['_route' => 'app_admin_roomlisting_delete', '_controller' => 'App\\Controller\\Admin\\RoomListingController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
+        759 => [[['_route' => 'app_admin_users_edit', '_controller' => 'App\\Controller\\Admin\\UserController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        773 => [[['_route' => 'app_admin_users_verify', '_controller' => 'App\\Controller\\Admin\\UserController::verify'], ['id'], ['POST' => 0], null, false, false, null]],
+        789 => [[['_route' => 'app_admin_users_unverify', '_controller' => 'App\\Controller\\Admin\\UserController::unverify'], ['id'], ['POST' => 0], null, false, false, null]],
+        803 => [[['_route' => 'app_admin_users_delete', '_controller' => 'App\\Controller\\Admin\\UserController::delete'], ['id'], ['POST' => 0], null, false, false, null]],
+        845 => [[['_route' => '_preview_error', '_controller' => 'error_controller::preview', '_format' => 'html'], ['code', '_format'], null, null, false, true, null]],
+        865 => [[['_route' => '_wdt', '_controller' => 'web_profiler.controller.profiler::toolbarAction'], ['token'], null, null, false, true, null]],
+        907 => [[['_route' => '_profiler_font', '_controller' => 'web_profiler.controller.profiler::fontAction'], ['fontName'], null, null, false, false, null]],
+        944 => [[['_route' => '_profiler_search_results', '_controller' => 'web_profiler.controller.profiler::searchResultsAction'], ['token'], null, null, false, false, null]],
+        958 => [[['_route' => '_profiler_router', '_controller' => 'web_profiler.controller.router::panelAction'], ['token'], null, null, false, false, null]],
+        978 => [[['_route' => '_profiler_exception', '_controller' => 'web_profiler.controller.exception_panel::body'], ['token'], null, null, false, false, null]],
+        991 => [[['_route' => '_profiler_exception_css', '_controller' => 'web_profiler.controller.exception_panel::stylesheet'], ['token'], null, null, false, false, null]],
+        1001 => [[['_route' => '_profiler', '_controller' => 'web_profiler.controller.profiler::panelAction'], ['token'], null, null, false, true, null]],
+        1031 => [[['_route' => 'app_roomlisting_show', '_controller' => 'App\\Controller\\RoomListingController::show'], ['id'], ['GET' => 0], null, false, true, null]],
+        1073 => [[['_route' => 'app_staff_booking_show', '_controller' => 'App\\Controller\\Staff\\BookingController::show'], ['id'], ['GET' => 0], null, false, true, null]],
+        1087 => [[['_route' => 'app_staff_booking_edit', '_controller' => 'App\\Controller\\Staff\\BookingController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        1114 => [[['_route' => 'app_staff_booking_new', 'roomId' => null, '_controller' => 'App\\Controller\\Staff\\BookingController::new'], ['roomId'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
+        1138 => [[['_route' => 'app_staff_booking_delete', '_controller' => 'App\\Controller\\Staff\\BookingController::delete'], ['id'], ['POST' => 0], null, false, false, null]],
+        1179 => [[['_route' => 'app_staff_roomlisting_edit', '_controller' => 'App\\Controller\\Staff\\RoomListingController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        1188 => [[['_route' => 'app_staff_roomlisting_delete', '_controller' => 'App\\Controller\\Staff\\RoomListingController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
+        1206 => [[['_route' => 'app_staff_roomlisting_bookings', '_controller' => 'App\\Controller\\Staff\\RoomListingController::bookings'], [], ['GET' => 0], null, false, false, null]],
+        1249 => [[['_route' => 'app_booking_new', '_controller' => 'App\\Controller\\User\\BookingController::new'], ['roomId'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
+        1266 => [[['_route' => 'app_client_booking_show', '_controller' => 'App\\Controller\\User\\BookingController::show'], ['id'], ['GET' => 0], null, false, true, null]],
+        1290 => [
             [['_route' => 'app_user_rooms_show', '_controller' => 'App\\Controller\\User\\RoomsController::show'], ['id'], ['GET' => 0], null, false, true, null],
             [null, null, null, null, false, false, 0],
         ],

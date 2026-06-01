@@ -105,9 +105,9 @@
             {% for room in rooms %}
                 <div class="group bg-white rounded-3xl p-3 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition duration-300 border border-gray-100">
                     <div class="relative h-64 rounded-2xl overflow-hidden mb-4 bg-gray-100">
-                        {% if room.image %}
-                             {# Assuming images are stored in public/uploads/rooms or similar #}
-                            <img src="{{ asset('uploads/rooms/' ~ room.image) }}" alt="{{ room.category }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        {% set imagePath = room.imagePath ?: null %}
+                        {% if imagePath %}
+                            <img src="{{ asset(imagePath) }}" alt="{{ room.category }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                         {% else %}
                             <img src="https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=1974&auto=format&fit=crop" alt="Room Placeholder" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 grayscale opacity-80">
                         {% endif %}

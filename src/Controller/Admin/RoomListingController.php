@@ -86,7 +86,7 @@ class RoomListingController extends AbstractController
                 } catch (FileException $e) {
                     $this->addFlash('error', 'Failed to upload image.');
                 }
-                $roomListing->setImage($newFilename);
+                $roomListing->setImage('uploads/rooms/' . $newFilename);
             }
 
             $entityManager->persist($roomListing);
@@ -131,7 +131,7 @@ class RoomListingController extends AbstractController
                 } catch (FileException $e) {
                     $this->addFlash('error', 'Failed to upload image.');
                 }
-                $roomListing->setImage($newFilename);
+                $roomListing->setImage('uploads/rooms/' . $newFilename);
             }
 
             $entityManager->flush();

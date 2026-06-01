@@ -174,6 +174,28 @@ class RoomListing
     }
 
     /**
+     * Return the normalized image path for display in templates/API.
+     * If image is not set, returns null (let caller handle fallback).
+     * If image already starts with 'images/' or 'uploads/', returns as-is.
+     * Otherwise, prepends 'uploads/rooms/' to the filename.
+     */
+    #[Groups(['room:read'])]
+    public function getImagePath(): ?string
+    {
+        if (!$this->image) {
+            return null;
+        }
+
+        // If already has path prefix (images/ or uploads/), return as-is
+        if (str_starts_with($this->image, 'images/') || str_starts_with($this->image, 'uploads/')) {
+            return $this->image;
+        }
+
+        // Otherwise, default to the known uploads directory
+        return 'uploads/rooms/' . $this->image;
+    }
+
+    /**
      * Return a human-friendly title for the room.
      * Falls back to category and number when appropriate.
      */
