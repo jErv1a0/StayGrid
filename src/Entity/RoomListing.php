@@ -186,13 +186,13 @@ class RoomListing
             return null;
         }
 
-        // If already has path prefix (images/ or uploads/), return as-is
-        if (str_starts_with($this->image, 'images/') || str_starts_with($this->image, 'uploads/')) {
+        // If already a full URL (Cloudinary), return as-is
+        if (str_starts_with($this->image, 'http')) {
             return $this->image;
         }
 
-        // Otherwise, default to the known uploads directory
-        return 'uploads/rooms/' . $this->image;
+        // Otherwise, assume it's a local path
+        return $this->image;
     }
 
     /**

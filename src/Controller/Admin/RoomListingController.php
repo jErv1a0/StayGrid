@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\RoomListing;
 use App\Entity\Booking;
 use App\Form\RoomListingType;
+use App\Service\CloudinaryService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -68,7 +69,7 @@ class RoomListingController extends AbstractController
     }
 
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, CloudinaryService $cloudinary): Response
     {
         $roomListing = new RoomListing();
         $form = $this->createForm(RoomListingType::class, $roomListing);
@@ -77,16 +78,12 @@ class RoomListingController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $imageFile = $form->get('image')->getData();
             if ($imageFile) {
-                $newFilename = uniqid() . '.' . $imageFile->guessExtension();
                 try {
-                    $imageFile->move(
-                        $this->getParameter('rooms_images_directory'),
-                        $newFilename
-                    );
-                } catch (FileException $e) {
-                    $this->addFlash('error', 'Failed to upload image.');
+                    $result = $cloudinary->upload($imageFile->getPathname());
+                    $roomListing->setImage($result['url']);
+                } catch (\Exception $e) {
+                    $this->addFlash('error', 'Failed to upload image to Cloudinary.');
                 }
-                $roomListing->setImage('uploads/rooms/' . $newFilename);
             }
 
             $entityManager->persist($roomListing);
@@ -114,7 +111,7 @@ class RoomListingController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, RoomListing $roomListing, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, RoomListing $roomListing, EntityManagerInterface $entityManager, CloudinaryService $cloudinary): Response
     {
         $form = $this->createForm(RoomListingType::class, $roomListing);
         $form->handleRequest($request);
@@ -122,16 +119,12 @@ class RoomListingController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $imageFile = $form->get('image')->getData();
             if ($imageFile) {
-                $newFilename = uniqid() . '.' . $imageFile->guessExtension();
                 try {
-                    $imageFile->move(
-                        $this->getParameter('rooms_images_directory'),
-                        $newFilename
-                    );
-                } catch (FileException $e) {
-                    $this->addFlash('error', 'Failed to upload image.');
+                    $result = $cloudinary->upload($imageFile->getPathname());
+                    $roomListing->setImage($result['url']);
+                } catch (\Exception $e) {
+                    $this->addFlash('error', 'Failed to upload image to Cloudinary.');
                 }
-                $roomListing->setImage('uploads/rooms/' . $newFilename);
             }
 
             $entityManager->flush();

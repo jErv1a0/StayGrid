@@ -6,6 +6,7 @@ use App\Entity\RoomListing;
 use App\Entity\Booking;
 use App\Form\RoomListingType;
 use App\Repository\BookingRepository;
+use App\Service\CloudinaryService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,7 +37,7 @@ class RoomListingController extends AbstractController
 
     #[IsGranted('ROLE_STAFF')]
     #[Route('/new', name: 'new', methods: ['GET','POST'])]
-    public function new(Request $request, EntityManagerInterface $em): Response
+    public function new(Request $request, EntityManagerInterface $em, CloudinaryService $cloudinary): Response
     {
         $roomListing = new RoomListing();
         $form = $this->createForm(RoomListingType::class, $roomListing);
@@ -57,15 +58,9 @@ class RoomListingController extends AbstractController
             }
 
             if ($imageFile) {
-                // Save images under public/uploads/rooms and persist a standardized path
-                $newFilename = uniqid() . '.' . $imageFile->guessExtension();
                 try {
-                    $uploadsDir = $this->getParameter('kernel.project_dir') . '/public/uploads/rooms';
-                    if (!is_dir($uploadsDir)) {
-                        @mkdir($uploadsDir, 0777, true);
-                    }
-                    $imageFile->move($uploadsDir, $newFilename);
-                    $roomListing->setImage('uploads/rooms/' . $newFilename);
+                    $result = $cloudinary->upload($imageFile->getPathname());
+                    $roomListing->setImage($result['url']);
                 } catch (\Exception $e) {
                     // ignore upload errors for staff flow
                 }
@@ -90,7 +85,7 @@ class RoomListingController extends AbstractController
 
     #[IsGranted('ROLE_STAFF')]
     #[Route('/{id}/edit', name: 'edit', methods: ['GET','POST'])]
-    public function edit(Request $request, RoomListing $roomListing, EntityManagerInterface $em): Response
+    public function edit(Request $request, RoomListing $roomListing, EntityManagerInterface $em, CloudinaryService $cloudinary): Response
     {
         $form = $this->createForm(RoomListingType::class, $roomListing);
         $form->handleRequest($request);
@@ -98,14 +93,9 @@ class RoomListingController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $imageFile = $form->get('image')->getData();
             if ($imageFile) {
-                $newFilename = uniqid() . '.' . $imageFile->guessExtension();
                 try {
-                    $uploadsDir = $this->getParameter('kernel.project_dir') . '/public/uploads/rooms';
-                    if (!is_dir($uploadsDir)) {
-                        @mkdir($uploadsDir, 0777, true);
-                    }
-                    $imageFile->move($uploadsDir, $newFilename);
-                    $roomListing->setImage('uploads/rooms/' . $newFilename);
+                    $result = $cloudinary->upload($imageFile->getPathname());
+                    $roomListing->setImage($result['url']);
                 } catch (\Exception $e) {
                     // ignore
                 }

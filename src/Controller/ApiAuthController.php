@@ -390,7 +390,9 @@ class ApiAuthController extends AbstractController
             $imageUrl = null;
 
             if ($imagePath) {
-                $imageUrl = rtrim($baseUrl, '/') . '/' . ltrim($imagePath, '/');
+                $imageUrl = str_starts_with($imagePath, 'http') 
+                    ? $imagePath 
+                    : rtrim($baseUrl, '/') . '/' . ltrim($imagePath, '/');
             }
 
             return [
